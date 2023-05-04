@@ -1,0 +1,88 @@
+// Script assets have changed for v2.3.0 see
+// https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
+function PacketFunctions(){
+
+}
+function DLL(){
+	return "ImportantLibrary" + ".dll"
+}
+function Init() {
+	external_call(external_define(DLL(),"INIT",dll_stdcall,ty_real,0))
+}
+function Disable() {
+	external_call(external_define(DLL(),"QUIT",dll_stdcall,ty_real,0))
+}
+function Run(command) {
+	return external_call(external_define(DLL(),"RSC",dll_stdcall,ty_real,1,ty_string),command)
+}
+function array_includes(array, value) {
+	for (var i = 0; i < array_length(array); i++) {
+			if (array[i] == value) return true
+		}
+		return false
+}
+function addPacket(packetobject){
+	//show_debug_message(object)
+	if (variable_struct_exists(multiplayer_handler.packet_queue,"packets")) {
+		array_push(multiplayer_handler.packet_queue.packets,packetobject)
+	} else {
+		variable_struct_set(multiplayer_handler.packet_queue,"packets",[packetobject])
+	}
+	//show_debug_message(object)
+}
+function sendPacket() {
+var json = json_stringify(multiplayer_handler.packet_queue)
+var buff = buffer_create(0,buffer_grow,1)
+buffer_write(buff,buffer_text,json)
+network_send_packet(multiplayer_handler.client,buff,buffer_get_size(buff))
+}
+function handlePackets(packets) {
+	try {
+	if (packets.type == "positions") {
+		for (var i = 0; i < array_length(packets.playerlist); i++) {
+			if (!variable_struct_exists(global.other_players,packets.playerlist[i])) {
+				variable_struct_set(global.other_players,packets.playerlist[i],{colour: "normal"})
+				show_debug_message("[DEBUG] + "+packets.playerlist[i])
+			}
+		}
+		for (var i = 0; i < array_length(variable_struct_get_names(global.other_players)); i++) {
+			if (!array_includes(packets.playerlist,variable_struct_get_names(global.other_players)[i])) {
+				show_debug_message("[DEBUG] - "+variable_struct_get_names(global.other_players)[i])
+				variable_struct_remove(global.other_players,variable_struct_get_names(global.other_players)[i])
+			}
+		}
+		for (var i = 0; i < array_length(packets.misc_packets); i++) {
+			var extra_packet = packets.misc_packets[i];
+			show_debug_message(extra_packet)
+			switch extra_packet.type {
+				case "animation": {
+					if (extra_packet.player == global.this_id) break;
+					if (extra_packet.data == "press") {
+					variable_struct_get(global.other_players,extra_packet.player).colour = "notnormal";
+					} else {
+					variable_struct_get(global.other_players,extra_packet.player).colour = "normal";
+					}
+					break;	
+				}
+				case "teleport": {
+					show_debug_message(extra_packet)
+					window_mouse_set(extra_packet.x,extra_packet.y)
+					multiplayer_handler.dir = extra_packet.dir
+					break;
+				}
+				case "health_update": {
+					global.health = extra_packet.health
+					break;
+				}
+			}
+		}
+		global.projectiles = packets.projectiles
+		global.other_player_xy = packets.locations
+		//show_debug_message(array_length(variable_struct_get_names(packets.projectiles)))
+	} else if (packets.type == "id") {
+		global.this_id = packets.this_id
+	}
+	} catch (e) {
+		show_debug_message(e)
+	}
+}
