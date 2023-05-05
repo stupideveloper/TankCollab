@@ -17,7 +17,6 @@
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Objects","folderPath":"folders/Objects.yy","order":0,},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Paths","folderPath":"folders/Paths.yy","order":0,},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Rooms","folderPath":"folders/Rooms.yy","order":0,},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Notes","folderPath":"folders/Rooms/Notes.yy","order":0,},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Scripts","folderPath":"folders/Scripts.yy","order":0,},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Sequences","folderPath":"folders/Sequences.yy","order":0,},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Shaders","folderPath":"folders/Shaders.yy","order":0,},
@@ -26,9 +25,7 @@
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Tile Sets","folderPath":"folders/Tile Sets.yy","order":0,},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Timelines","folderPath":"folders/Timelines.yy","order":0,},
   ],
-  "IncludedFiles": [
-    {"resourceType":"GMIncludedFile","resourceVersion":"1.0","name":"ImportantLibrary.dll","CopyToMask":-1,"filePath":"datafiles",},
-  ],
+  "IncludedFiles": [],
   "isEcma": false,
   "MetaData": {
     "IDEVersion": "2023.1.0.58",

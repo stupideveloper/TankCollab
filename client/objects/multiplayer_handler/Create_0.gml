@@ -2,7 +2,7 @@
 // You can write your code in this editor
 // network_set_config(network_config_connect_timeout,10000)
 var gameId = "hi"
-Init()
+//Init()
 show_debug_message(parameter_string(0) + " " +
         parameter_string(1) + " " +
         parameter_string(2) + " " +
@@ -13,6 +13,9 @@ packet_queue = {
 }
 dir = 0
 spd = 90
+image_xscale = 0.1;
+image_yscale = 0.1;
+fake_direction = 0;
 global.other_player_xy = []
 global.other_players = {}
 global.projectiles = {}

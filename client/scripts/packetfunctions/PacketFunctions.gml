@@ -3,18 +3,18 @@
 function PacketFunctions(){
 
 }
-function DLL(){
-	return "ImportantLibrary" + ".dll"
-}
-function Init() {
-	external_call(external_define(DLL(),"INIT",dll_stdcall,ty_real,0))
-}
-function Disable() {
-	external_call(external_define(DLL(),"QUIT",dll_stdcall,ty_real,0))
-}
-function Run(command) {
-	return external_call(external_define(DLL(),"RSC",dll_stdcall,ty_real,1,ty_string),command)
-}
+//function DLL(){
+//	return "ImportantLibrary" + ".dll"
+//}
+//function Init() {
+//	external_call(external_define(DLL(),"INIT",dll_stdcall,ty_real,0))
+//}
+//function Disable() {
+//	external_call(external_define(DLL(),"QUIT",dll_stdcall,ty_real,0))
+//}
+//function Run(command) {
+//	return external_call(external_define(DLL(),"RSC",dll_stdcall,ty_real,1,ty_string),command)
+//}
 function array_includes(array, value) {
 	for (var i = 0; i < array_length(array); i++) {
 			if (array[i] == value) return true
@@ -53,7 +53,7 @@ function handlePackets(packets) {
 		}
 		for (var i = 0; i < array_length(packets.misc_packets); i++) {
 			var extra_packet = packets.misc_packets[i];
-			show_debug_message(extra_packet)
+			//show_debug_message(extra_packet)
 			switch extra_packet.type {
 				case "animation": {
 					if (extra_packet.player == global.this_id) break;
@@ -65,8 +65,9 @@ function handlePackets(packets) {
 					break;	
 				}
 				case "teleport": {
-					show_debug_message(extra_packet)
-					window_mouse_set(extra_packet.x,extra_packet.y)
+					//show_debug_message(extra_packet)
+					multiplayer_handler.x = extra_packet.x
+					multiplayer_handler.y = extra_packet.y
 					multiplayer_handler.dir = extra_packet.dir
 					break;
 				}
@@ -83,6 +84,6 @@ function handlePackets(packets) {
 		global.this_id = packets.this_id
 	}
 	} catch (e) {
-		show_debug_message(e)
+		//show_debug_message(e)
 	}
 }

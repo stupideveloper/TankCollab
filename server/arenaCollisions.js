@@ -10,12 +10,21 @@ const arenaGeometry = [
         angle: 0
     }
 ]
+let arenaBounds = {
+    x_min: 0,
+    y_min: 0,
+    x_max: 7680,
+    y_max: 4660
+}
 
 const checkWallCollisions = function (rect) {
     const circleOfRect = {
         radius: rect.rough_radius,
         x: rect.x,
         y: rect.y
+    }
+    if (!Collisions.point(rect.x,rect.y,arenaBounds.x_min,arenaBounds.x_max,arenaBounds.y_min,arenaBounds.y_max)) {
+        return true
     }
     let returnval = false
     arenaGeometry.forEach(function(arenaPart){

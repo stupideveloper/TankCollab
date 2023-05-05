@@ -13,12 +13,7 @@ let clients = {
 let packetListeners = {
 
 }
-let arenaBounds = {
-    x_min: 0,
-    y_min: 0,
-    x_max: 600,
-    y_max: 768
-}
+const do_lag_back = false
 setInterval(async function SERVER_GAME_TICK(){
     Object.keys(packetListeners).map(player=>{
         packetListeners[player]()
@@ -33,9 +28,6 @@ setInterval(async function SERVER_GAME_TICK(){
             projectile.y = projectile.y - (Math.cos(toRadians(dir))*vel)
             projectile.dist_left -= 1
             if (projectile.dist_left <= 0) {
-                deletables.push(id)
-            }
-            if (!Collision.point(projectile.x,projectile.y,arenaBounds.x_min,arenaBounds.x_max,arenaBounds.y_min,arenaBounds.y_max)) {
                 deletables.push(id)
             }
             if (checkWalls({
@@ -58,8 +50,8 @@ let bulletRect = {
     rough_radius: 8.1
 }
 let tankRect = {
-    w: 31,
-    h: 31,
+    w: 21,
+    h: 21,
     rough_radius: Math.sqrt(32**2+32**2)
 }
 let rooms = {
@@ -100,8 +92,8 @@ server.on('connection', function (conn)
     clientPackets[id] = []
     clientsPos[id] = {
         id: id,
-        x: 0,
-        y: 0,
+        x: 120,
+        y: 120,
         dir: 0
     }
     clients[currentRoom].forEach(client=>{
@@ -130,12 +122,13 @@ server.on('connection', function (conn)
         //console.log(clientPackets[id])
         clientPackets[id] = []
     }
-
+    var bulletPacketLimiter = false;
     conn.on('data', onConnData);
     conn.once('close', onConnClose);
     conn.on('error', onConnError);
     function onConnData(d)
     {
+        var sendBulletPack = false
         if (Buffer.from(d).toString().split(gamemakerMagic).length != 1) {
             console.log("Multiple packets detected! Dropping last sent packet!")
             clientPackets[id].push({
@@ -163,23 +156,23 @@ server.on('connection', function (conn)
                     })
                     continue;
                 }
-                // if (checkWalls({
-                //     ...tankRect,
-                //     x: packet.x,
-                //     y: packet.y,
-                //     angle: packet.dir || 0
-                // })) {
-                    // clientPackets[id].push({
-                    //     type: "teleport",
-                    //     x: clientsPos[id].x,
-                    //     y: clientsPos[id].y,
-                    //     dir: clientsPos[id].dir
-                    // })
-                // } else {
+                if (checkWalls({
+                     ...tankRect,
+                     x: packet.x,
+                     y: packet.y,
+                     angle: packet.dir || 0
+                 }) && do_lag_back) {
+                    clientPackets[id].push({
+                        type: "teleport",
+                        x: clientsPos[id].x,
+                        y: clientsPos[id].y,
+                        dir: clientsPos[id].dir
+                    })
+                } else {
                     clientsPos[id].x = packet.x
                     clientsPos[id].y = packet.y
                     clientsPos[id].dir = packet.dir || 0
-                // }
+                }
             } else if (packet.type == "keepalive") {
             } else if (packet.type == "animation") {
                 clients[currentRoom].forEach(client=>{
@@ -191,6 +184,9 @@ server.on('connection', function (conn)
                     })
                 })
             } else if (packet.type == "fire_bullet") {
+                if (bulletPacketLimiter) continue;
+                sendBulletPack = true;
+                bulletPacketLimiter = true;
                 fireBullet(clientsPos[id].x,clientsPos[id].y,clientsPos[id].dir,id)
             } else {
                 console.log(packet)
@@ -199,6 +195,7 @@ server.on('connection', function (conn)
     } catch {
         console.log("|The following json caused an error :/|\n"+Buffer.from(d).toString()+"\n||")
     }
+    bulletPacketLimiter = sendBulletPack && bulletPacketLimiter
         //conn.write(d);  
     }
     function onConnClose()

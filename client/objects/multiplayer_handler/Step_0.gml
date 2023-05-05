@@ -22,85 +22,28 @@ if (ticks_since_update % 300 == 299 ) {
 last_pack_ticks += 1
 ticks_since_update += 1
 
-if (mouse_check_button(mb_left)) {
+if (mouse_check_button_pressed(mb_left)) {
 	last_was_clicked = true
 	addPacket({
 		type: "fire_bullet",
 	})
 }
 var imageanglekey = 0b0000
-var _speed = 3
-if (keyboard_check(ord("W")) || keyboard_check(vk_up)) {
-		imageanglekey+= 0b1000;
-		sendPosPack = true
-	}
-	if (keyboard_check(ord("S")) || keyboard_check(vk_down)) {
-		imageanglekey+= 0b0100
-		sendPosPack = true
-	}
-	if (keyboard_check(ord("D")) || keyboard_check(vk_right)) {
-		imageanglekey+= 0b0010
-		sendPosPack = true
-	}
-	if (keyboard_check(ord("A")) || keyboard_check(vk_left)) {
-		imageanglekey+= 0b0001
-		sendPosPack = true
-	}
-	switch (imageanglekey) {
-		case 0b0000:
-		case 0b1111:
-		case 0b1100:
-		case 0b0011:
-		break;
-		case 0b1000:
-		case 0b1011:
-			if (place_free(x,y-_speed)) y-=_speed
-			break;
-		case 0b0100:
-		case 0b0111:
-			if (place_free(x,y+_speed)) y+=_speed
-			break;
-		case 0b0010:
-		case 0b1110:
-			if (place_free(x+_speed,y)) x+=_speed
-			break;
-		case 0b0001:
-		case 0b1101:
-			if (place_free(x-_speed,y)) x-=_speed
-			break;
-		case 0b1010:
-			if (place_free(x+_speed*(sin(0.25*pi)),y)){
-				x+=_speed*(sin(0.25*pi))
-			}
-			if (place_free(x,y-_speed*(sin(0.25*pi)))){
-				y-=_speed*(sin(0.25*pi))
-			}
-			break;
-		case 0b1001:
-			if (place_free(x-_speed*(sin(0.25*pi)),y)){
-				x-=_speed*(sin(0.25*pi))
-			}
-			if (place_free(x,y-_speed*(sin(0.25*pi)))){
-				y-=_speed*(sin(0.25*pi))
-			}
-			break;
-		case 0b0110:
-			if (place_free(x+_speed*(sin(0.25*pi)),y)){
-				x+=_speed*(sin(0.25*pi))
-			}
-			if (place_free(x,y+_speed*(sin(0.25*pi)))){
-				y+=_speed*(sin(0.25*pi))
-			}
-			break;
-		case 0b0101:
-			if (place_free(x-_speed*(sin(0.25*pi)),y)){
-				x-=_speed*(sin(0.25*pi))
-			}
-			if (place_free(x,y+_speed*(sin(0.25*pi)))){
-				y+=_speed*(sin(0.25*pi))
-			}
-			break;
-	}
+var _speed = 10
+
+if (keyboard_check(ord("W"))||keyboard_check(vk_up)) {
+	
+}
+if (keyboard_check(ord("S"))||keyboard_check(vk_down)) {
+	physics_apply_force(x,y)
+}
+if (keyboard_check(ord("A"))||keyboard_check(vk_left)) {
+	fake_direction -= 3.65
+}
+if (keyboard_check(ord("D"))||keyboard_check(vk_right)) {
+	fake_direction += 3.65
+}
+
 //if (mouse_check_button(mb_right) || keyboard_check(ord("X"))) {
 //	 sendPosPack = true
 //	x = x - sin(degtorad(dir))
