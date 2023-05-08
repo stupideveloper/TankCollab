@@ -15,6 +15,12 @@ function PacketFunctions(){
 //function Run(command) {
 //	return external_call(external_define(DLL(),"RSC",dll_stdcall,ty_real,1,ty_string),command)
 //}
+function sin_(d) {
+	return sin(degtorad(d))
+}
+function cos_(d) {
+	return cos(degtorad(d))
+}
 function array_includes(array, value) {
 	for (var i = 0; i < array_length(array); i++) {
 			if (array[i] == value) return true
@@ -67,7 +73,9 @@ function handlePackets(packets) {
 				case "teleport": {
 					//show_debug_message(extra_packet)
 					multiplayer_handler.x = extra_packet.x
+					multiplayer_handler.phy_position_x = extra_packet.x
 					multiplayer_handler.y = extra_packet.y
+					multiplayer_handler.phy_position_y = extra_packet.y
 					multiplayer_handler.dir = extra_packet.dir
 					break;
 				}

@@ -5,6 +5,7 @@ const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
 const Collision = require("./rect_collisions.js");
 const { checkWalls } = require("./arenaCollisions.js");
+const { checkPlayer } = require("./playerCollisions.js")
 var server = net.createServer();
 let clientsPos = {}
 let clients = {
@@ -29,6 +30,10 @@ setInterval(async function SERVER_GAME_TICK(){
             projectile.dist_left -= 1
             if (projectile.dist_left <= 0) {
                 deletables.push(id)
+            }
+            if (checkPlayer(clientPackets,projectile.x,projectile.y,dir,projectile.shooter)) {
+                deletables.push(id)
+                return;
             }
             if (checkWalls({
                 ...bulletRect,

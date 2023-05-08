@@ -13,8 +13,8 @@ packet_queue = {
 }
 dir = 0
 spd = 90
-image_xscale = 0.1;
-image_yscale = 0.1;
+image_xscale = 0.3;
+image_yscale = 0.3;
 fake_direction = 0;
 global.other_player_xy = []
 global.other_players = {}

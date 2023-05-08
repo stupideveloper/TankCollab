@@ -17,6 +17,7 @@
   "ResourceOrderSettings": [
     {"name":"walls","order":1,"path":"objects/walls/walls.yy",},
     {"name":"wall_spr","order":2,"path":"sprites/wall_spr/wall_spr.yy",},
+    {"name":"BG_spr","order":3,"path":"sprites/BG_spr/BG_spr.yy",},
     {"name":"tank_spr","order":1,"path":"sprites/tank_spr/tank_spr.yy",},
   ],
 }

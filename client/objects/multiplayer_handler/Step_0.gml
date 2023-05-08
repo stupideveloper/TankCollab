@@ -30,12 +30,16 @@ if (mouse_check_button_pressed(mb_left)) {
 }
 var imageanglekey = 0b0000
 var _speed = 10
-
+phy_speed_x*=0.9
+phy_speed_y*=0.9
 if (keyboard_check(ord("W"))||keyboard_check(vk_up)) {
-	
+	sendPosPack = true
+	phy_speed_x=5*cos_(fake_direction)
+	phy_speed_y=5*sin_(fake_direction)
 }
 if (keyboard_check(ord("S"))||keyboard_check(vk_down)) {
-	physics_apply_force(x,y)
+	sendPosPack = true
+	physics_apply_force(x-100*cos_(fake_direction),y-100*sin_(fake_direction),500,500)
 }
 if (keyboard_check(ord("A"))||keyboard_check(vk_left)) {
 	fake_direction -= 3.65
@@ -44,11 +48,14 @@ if (keyboard_check(ord("D"))||keyboard_check(vk_right)) {
 	fake_direction += 3.65
 }
 
+
 //if (mouse_check_button(mb_right) || keyboard_check(ord("X"))) {
 //	 sendPosPack = true
 //	x = x - sin(degtorad(dir))
 //	y = y - cos(degtorad(dir))
 //}
+x=phy_position_x;
+y=phy_position_y
 if (sendPosPack) {
 	addPacket({
 	x: x,

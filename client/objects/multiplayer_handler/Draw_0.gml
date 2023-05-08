@@ -2,9 +2,10 @@
 // You can write your code in this editor
 
 draw_rectangle(200-15,200-15,200+15,200+15,false)
+draw_set_color(c_black)
 draw_line(x,y,x+20*cos(degtorad(fake_direction)),y+20*sin(degtorad(fake_direction)))
 if (mouse_check_button(mb_any)) draw_set_color(c_red)
-draw_sprite_ext(tank_spr,0,x,y,.1,.1,dir,-1,1)
+draw_sprite_ext(tank_spr,0,x,y,.3,.3,dir,-1,1)
 draw_set_color(c_white)
 for (var i = 0; i < array_length(global.other_player_xy); i++) {
 	//try {

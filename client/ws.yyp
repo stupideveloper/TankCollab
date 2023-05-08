@@ -36,6 +36,7 @@
     {"id":{"name":"multiplayer_handler","path":"objects/multiplayer_handler/multiplayer_handler.yy",},"order":0,},
     {"id":{"name":"wall_spr","path":"sprites/wall_spr/wall_spr.yy",},"order":0,},
     {"id":{"name":"bullet_spr","path":"sprites/bullet_spr/bullet_spr.yy",},"order":1,},
+    {"id":{"name":"BG_spr","path":"sprites/BG_spr/BG_spr.yy",},"order":0,},
     {"id":{"name":"tank_spr","path":"sprites/tank_spr/tank_spr.yy",},"order":0,},
     {"id":{"name":"GamePlayRenderer","path":"scripts/GamePlayRenderer/GamePlayRenderer.yy",},"order":1,},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},"order":0,},
