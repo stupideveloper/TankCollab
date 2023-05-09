@@ -1,1 +1,4 @@
-*.hidden
+*.hidden.ts
+*.hidden.js
+*.hidden.json
+*.hidden.dll
