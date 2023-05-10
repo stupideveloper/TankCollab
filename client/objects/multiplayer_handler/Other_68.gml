@@ -22,8 +22,12 @@ network_send_packet(client,buff,buffer_get_size(buff))
 		var data = ds_map_find_value(async_load,"buffer")
 		var s = buffer_read(data,buffer_string)
 		ticks_since_update = 0
+		try {
 		var packets = json_parse(s);
 		handlePackets(packets)
+		} catch (e) {
+			show_debug_message(e)
+		}
 		break;
 	};
 	case network_type_down: {

@@ -81,14 +81,25 @@ function handlePackets(packets) {
 				}
 				case "health_update": {
 					global.health = extra_packet.health
+					if (variable_struct_exists(extra_packet,"max_health")) {
+						global.maxhealth = extra_packet.max_health
+					}
 					break;
 				}
 				case "death": {
-					
+					global.dead = true
+					global.title = "You died! Respawning in %i seconds!"
+					break;
+				}
+				case "respawn": {
+					global.dead = false
+					global.health = extra_packet.max_health
+					global.maxhealth = extra_packet.max_health
 					break;
 				}
 			}
 		}
+		global.respawntime = packets.respawn_time
 		global.teams = packets.teamPlayers
 		global.projectiles = packets.projectiles
 		global.other_player_xy = packets.locations
