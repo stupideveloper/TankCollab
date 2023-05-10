@@ -2,3 +2,4 @@
 *.hidden.js
 *.hidden.json
 *.hidden.dll
+/tsfun/

@@ -83,8 +83,13 @@ function handlePackets(packets) {
 					global.health = extra_packet.health
 					break;
 				}
+				case "death": {
+					
+					break;
+				}
 			}
 		}
+		global.teams = packets.teamPlayers
 		global.projectiles = packets.projectiles
 		global.other_player_xy = packets.locations
 		//show_debug_message(array_length(variable_struct_get_names(packets.projectiles)))

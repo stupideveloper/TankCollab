@@ -16,7 +16,16 @@ let arenaBounds = {
     x_max: 7680,
     y_max: 4660
 }
-
+const bulletRect = {
+    w: 9,
+    h: 9,
+    rough_radius: Math.sqrt(9**2+9**2)
+}
+const tankRect = {
+    w: 63,
+    h: 63,
+    rough_radius: Math.sqrt(32**2+32**2)
+}
 const checkWallCollisions = function (rect) {
     const circleOfRect = {
         radius: rect.rough_radius,
@@ -45,5 +54,7 @@ const checkWallCollisions = function (rect) {
 }
 
 module.exports = {
-    checkWalls: checkWallCollisions
+    checkWalls: checkWallCollisions,
+    bulletRect,
+    tankRect
 }

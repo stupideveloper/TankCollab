@@ -4,8 +4,9 @@ const uuid = require("crypto").randomUUID
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
 const Collision = require("./rect_collisions.js");
-const { checkWalls } = require("./arenaCollisions.js");
+const { checkWalls, bulletRect, tankRect } = require("./arenaCollisions.js");
 const { checkPlayer } = require("./playerCollisions.js")
+
 var server = net.createServer();
 let clientsPos = {}
 let clients = {
@@ -14,7 +15,34 @@ let clients = {
 let packetListeners = {
 
 }
-const do_lag_back = false
+const teams = {
+    TEAM_A: "A",
+    TEAM_B: "B"
+}
+let lastSelected = 0
+let teamSizes = {A:0,B:0}
+let teamSelector = ()=>{
+    if (teamSizes[teams.TEAM_A] == teamSizes[teams.TEAM_B]) {
+        return Math.random()>0.5?teams.TEAM_A:teams.TEAM_B;
+    }
+    return teamSizes[teams.TEAM_A]>teamSizes[teams.TEAM_B]?teams.TEAM_B:teams.TEAM_A;
+}
+let upgradeTiers = {
+    damage: [10,12,14,16,18,20,22],
+    bulletSpeed: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
+}
+let teamUpgrades = {
+    "A": {
+        damage: 0,
+        bulletSpeed: 0
+    },
+    "B": {
+        damage: 0,
+        bulletSpeed: 0
+    }
+}
+const teamUpgradesDefault = JSON.stringify(teamUpgrades)
+const do_lag_back = true
 setInterval(async function SERVER_GAME_TICK(){
     Object.keys(packetListeners).map(player=>{
         packetListeners[player]()
@@ -25,14 +53,25 @@ setInterval(async function SERVER_GAME_TICK(){
             var projectile = rooms[room].projectiles[id]
             var dir = projectile.dir
             var vel = projectile.vel
+            var damage = projectile.damage
             projectile.x = projectile.x - (Math.sin(toRadians(dir))*vel)
             projectile.y = projectile.y - (Math.cos(toRadians(dir))*vel)
             projectile.dist_left -= 1
             if (projectile.dist_left <= 0) {
                 deletables.push(id)
             }
-            if (checkPlayer(clientPackets,projectile.x,projectile.y,dir,projectile.shooter)) {
+            let hits = checkPlayer(
+                clients,
+                clientsPos,
+                projectile.x,
+                projectile.y,
+                dir,
+                projectile.shooter,
+                projectile.damage,
+                room)
+            if (hits.length != 0) {
                 deletables.push(id)
+                hits.map(p=>{damagePlayer(p,room,damage)})
                 return;
             }
             if (checkWalls({
@@ -49,16 +88,6 @@ setInterval(async function SERVER_GAME_TICK(){
         })
     })
 }, 1e3/60);
-let bulletRect = {
-    w: 4,
-    h: 7,
-    rough_radius: 8.1
-}
-let tankRect = {
-    w: 21,
-    h: 21,
-    rough_radius: Math.sqrt(32**2+32**2)
-}
 let rooms = {
     "lobby": {
         projectiles: {
@@ -77,20 +106,40 @@ let clientPackets = {}
 function doCollisions() {
 
 }
-function fireBullet(x=0,y=0,dir=0,shooter=uuid(),room="lobby") {
+function damagePlayer(id,room,damage) {
+    console.log(id,room,damage)
+    clientsPos[id].health -= damage;
+    clientPackets[id].push({
+        type: "health_update",
+        health: clientsPos[id].health
+    })
+    if (clientsPos[id].health < 0) {
+        clientPackets[id].push({
+            type: "death",
+        })
+        clientsPos[id].hidden = true
+        clientsPos[id].respawnTime = 5 * 60
+    }
+}
+let teamMap = {}
+function fireBullet(x=0,y=0,dir=0,shooter=uuid(),damage=1,room="lobby") {
     rooms[room].projectiles[uuid()] = {
         x: x,
         y,
         dir,
         vel: 10,
         dist_left: 100,
-        shooter: shooter
+        damage,
+        shooter: shooter,
     }
 }
 server.on('connection', function (conn)
 {
     var remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
     const id = uuid()
+    const team = teamSelector()
+    teamSizes[team]+=1
+    teamMap[id]=team;
     console.log('[DEBUG] + %s', id);
     let currentRoom = "lobby"
     clients[currentRoom].add(id)
@@ -99,13 +148,17 @@ server.on('connection', function (conn)
         id: id,
         x: 120,
         y: 120,
-        dir: 0
+        dir: 0,
+        health: 100,
+        hidden: false,
+        respawnTime: -1
     }
     clients[currentRoom].forEach(client=>{
         if (client == id) return;
         clientPackets[client].push({
             type: "playerjoin",
             player: id,
+            ally: teamMap[client]==team
         })
     })
     function moveRoom(newRoom) {
@@ -116,10 +169,29 @@ server.on('connection', function (conn)
     }
     
     packetListeners[id] = function(){
-        let visiblePlayers = [...clients[currentRoom].keys()]
+        let visiblePlayers = [...clients[currentRoom].keys()].filter(
+            a=>{
+                return !clientsPos[a].hidden
+            }
+        )
+        if (clientsPos[id].respawnTime != -1) {
+            clientsPos[id].respawnTime -= 1
+        }
+        if (clientsPos[id].respawnTime == 0) {
+            clientPackets[id].respawnTime = -1
+            clientPackets[id].push({
+                type: "respawn"
+            })
+            clientsPos[id].hidden = false
+        }
         conn.write(JSON.stringify({
             type: "positions",
+            teamPlayers: [...Object.keys(teamMap)].map(t=>{return {id: t, ally: teamMap[t]==team}}).reduce((p,c)=>{
+                p[c.id]=c.ally
+                return p
+            },{}),
             playerlist: [...clients[currentRoom].keys()],
+            upgrades: teamUpgrades[team],
             locations: visiblePlayers.map(id=>clientsPos[id]),
             projectiles: rooms[currentRoom].projectiles,
             misc_packets: clientPackets[id]
@@ -192,7 +264,7 @@ server.on('connection', function (conn)
                 if (bulletPacketLimiter) continue;
                 sendBulletPack = true;
                 bulletPacketLimiter = true;
-                fireBullet(clientsPos[id].x,clientsPos[id].y,clientsPos[id].dir,id)
+                fireBullet(clientsPos[id].x,clientsPos[id].y,clientsPos[id].dir,id,teamUpgrades[team].damage)
             } else {
                 console.log(packet)
             }
@@ -210,6 +282,8 @@ server.on('connection', function (conn)
         clients[currentRoom].delete(id)
         delete clientPackets[id]
         delete packetListeners[id]
+        delete teamMap[id]
+        teamSizes[team]-=1;
         clients[currentRoom].forEach(client=>{
             clientPackets[client].push({
                 type: "playerleave",
