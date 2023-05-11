@@ -60,6 +60,7 @@ function handlePackets(packets) {
 		for (var i = 0; i < array_length(packets.misc_packets); i++) {
 			var extra_packet = packets.misc_packets[i];
 			//show_debug_message(extra_packet)
+			try {
 			switch extra_packet.type {
 				case "animation": {
 					if (extra_packet.player == global.this_id) break;
@@ -97,8 +98,18 @@ function handlePackets(packets) {
 					global.maxhealth = extra_packet.max_health
 					break;
 				}
+				case "screenshake": {
+					global.shake = true
+					global.shake_time = extra_packet.time;
+					global.shake_magnitude = extra_packet.magnitude;
+					global.shake_fade = extra_packet.fade;
+					break;
+				}
 			}
+			} catch (e) {e=e}
 		}
+		global.upgrades = packets.upgrades
+		global.speeed = global.upgrades.speed
 		global.respawntime = packets.respawn_time
 		global.teams = packets.teamPlayers
 		global.projectiles = packets.projectiles

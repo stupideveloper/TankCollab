@@ -1,6 +1,7 @@
 const net = require("net")
-const gamemakerMagic = "\udec0\uadde\u0c00\u0000\u4000\u0000"
+const gamemakerMagic = "dec0adde0c"
 const uuid = require("crypto").randomUUID
+const fs = require("fs")
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
 const Collision = require("./rect_collisions.js");
@@ -32,6 +33,7 @@ let upgradeTiers = {
     bulletSpeed: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6],
     health: [100, 120, 128, 135, 141, 146, 150],
     damageResistance: [0, 4, 8, 11, 14, 17, 20], // %
+    speed: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
 }
 let teamData = {
     "A": {
@@ -46,13 +48,15 @@ let teamUpgrades = {
         damage: 0,
         bulletSpeed: 0,
         health: 0,
-        damageResistance: 0
+        damageResistance: 0,
+        speed: 0
     },
     "B": {
         damage: 0,
         bulletSpeed: 0,
         health: 0,
-        damageResistance: 0
+        damageResistance: 0,
+        speed: 0
     }
 }
 const teamUpgradesDefault = JSON.stringify(teamUpgrades)
@@ -241,8 +245,8 @@ server.on('connection', function (conn) {
     conn.on('error', onConnError);
     function onConnData(d) {
         var sendBulletPack = false
-        if (Buffer.from(d).toString().split(gamemakerMagic).length != 1) {
-            console.log("Multiple packets detected! Dropping last sent packet!")
+        if (Buffer.from(d).toString("hex").split(gamemakerMagic).length >= 3) {
+            console.log("Multiple packets detected! Dropping last sent packet! %s",Buffer.from(d).toString("hex").split(gamemakerMagic).length)
             clientPackets[id].push({
                 type: "teleport",
                 x: clientsPos[id].x,
@@ -299,6 +303,12 @@ server.on('connection', function (conn) {
                     if (clientsPos[id].respawnTime>=0) continue;
                     sendBulletPack = true;
                     bulletPacketLimiter = true;
+                    clientPackets[id].push({
+                        type: "screenshake",
+                        time: 60,
+                        magnitude: 2,
+                        fade: .2
+                    })
                     fireBullet(
                         clientsPos[id].x,
                         clientsPos[id].y,
@@ -310,6 +320,7 @@ server.on('connection', function (conn) {
                 }
             }
         } catch {
+            fs.writeFileSync("./error.hex",Buffer.from(d).toString("hex"));
             console.log("|The following json caused an error :/|\n" + Buffer.from(d).toString() + "\n||")
         }
         bulletPacketLimiter = sendBulletPack && bulletPacketLimiter

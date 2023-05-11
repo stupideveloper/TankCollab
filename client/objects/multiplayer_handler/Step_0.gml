@@ -39,7 +39,7 @@ if (keyboard_check(ord("W"))||keyboard_check(vk_up)) {
 }
 if (keyboard_check(ord("S"))||keyboard_check(vk_down)) {
 	sendPosPack = true
-	physics_apply_force(x-100*cos_(fake_direction),y-100*sin_(fake_direction),500,500)
+	physics_apply_force(x-global.speeed*100*cos_(fake_direction),y-global.speeed*100*sin_(fake_direction),500,500)
 }
 if (keyboard_check(ord("A"))||keyboard_check(vk_left)) {
 	fake_direction -= 3.65
@@ -64,7 +64,26 @@ if (sendPosPack) {
 	type: "pos"
 	})
 }
-camera_set_view_pos(view_camera[0],x-camera_get_view_width(view_camera[0])/2,y-camera_get_view_height(view_camera[0])/2)
+if (global.shake) 
+{ 
+   global.shake_time -= 1; 
+   var _xval = choose(-global.shake_magnitude, global.shake_magnitude); 
+   var _yval = choose(-global.shake_magnitude, global.shake_magnitude); 
+   camera_set_view_pos(view_camera[0],x-camera_get_view_width(view_camera[0])/2+_xval,y-camera_get_view_height(view_camera[0])/2+_yval) 
+
+   if (global.shake_time <= 0) 
+   { 
+      global.shake_magnitude -= global.shake_fade; 
+      if (global.shake_magnitude <= 0) 
+      { 
+         camera_set_view_pos(view_camera[0],x-camera_get_view_width(view_camera[0])/2,y-camera_get_view_height(view_camera[0])/2)
+         global.shake = false; 
+      } 
+   } 
+} else {
+	camera_set_view_pos(view_camera[0],x-camera_get_view_width(view_camera[0])/2,y-camera_get_view_height(view_camera[0])/2)
+}
+//camera_set_view_pos(view_camera[0],x-camera_get_view_width(view_camera[0])/2,y-camera_get_view_height(view_camera[0])/2)
 sendPacket()
 
 
