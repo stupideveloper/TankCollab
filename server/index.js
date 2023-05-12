@@ -244,6 +244,68 @@ server.on('connection', function (conn) {
             disconnect()
         }
     }
+    function handlePacket(newpos) {
+        for (let packet of newpos.packets) {
+            if (packet.type == "pos") {
+                let distanceTraveledSquared = (packet.x - clientsPos[id].x) ** 2 + (packet.y - clientsPos[id].y) ** 2
+                if (distanceTraveledSquared >= 25 ** 2) {
+                    clientPackets[id].push({
+                        type: "teleport",
+                        x: clientsPos[id].x,
+                        y: clientsPos[id].y,
+                        dir: clientsPos[id].dir
+                    })
+                    continue;
+                }
+                if (checkWalls({
+                    ...tankRect,
+                    x: packet.x,
+                    y: packet.y,
+                    angle: packet.dir || 0
+                }) && do_lag_back) {
+                    clientPackets[id].push({
+                        type: "teleport",
+                        x: clientsPos[id].x,
+                        y: clientsPos[id].y,
+                        dir: clientsPos[id].dir
+                    })
+                } else {
+                    clientsPos[id].x = packet.x
+                    clientsPos[id].y = packet.y
+                    clientsPos[id].dir = packet.dir || 0
+                }
+            } else if (packet.type == "keepalive") {
+            } else if (packet.type == "animation") {
+                clients[currentRoom].forEach(client => {
+                    if (client == id) return;
+                    clientPackets[client].push({
+                        type: "animation",
+                        player: id,
+                        data: packet.data
+                    })
+                })
+            } else if (packet.type == "fire_bullet") {
+                if (bulletPacketLimiter) continue;
+                if (clientsPos[id].respawnTime>=0) continue;
+                sendBulletPack = true;
+                bulletPacketLimiter = true;
+                clientPackets[id].push({
+                    type: "screenshake",
+                    time: 60,
+                    magnitude: 2,
+                    fade: .2
+                })
+                fireBullet(
+                    clientsPos[id].x - (Math.sin(toRadians(clientsPos[id].dir)) * 50),
+                    clientsPos[id].y - (Math.cos(toRadians(clientsPos[id].dir)) * 50),
+                    clientsPos[id].dir,
+                    id,
+                    upgradeTiers.damage[teamUpgrades[team].damage])
+            } else {
+                console.log(packet)
+            }
+        }
+    }
     var bulletPacketLimiter = false;
     conn.on('data', onConnData);
     conn.once('close', onConnClose);
@@ -252,7 +314,21 @@ server.on('connection', function (conn) {
     function onConnData(d) {
         lastPacketTime = 0;
         var sendBulletPack = false
-        if (Buffer.from(d).toString("hex").split(gamemakerMagic).length >= 3) {
+        let packets = Buffer.from(d).toString("hex").split(gamemakerMagic).length - 1;
+        if (packets >= 2) {
+            let packets_raw = Buffer.from(d).toString("hex").split(gamemakerMagic).map(v=>{
+                return Buffer.from(v,"hex").toString("utf8")
+            }).filter(v=>{return !!v})
+            for (let packet of packets_raw) {
+                try {
+                var newpos = JSON.parse(/{.+}/g.exec(packet)[0].replaceAll(/[^\u0000-\u007F]+/g, ""))
+                
+                handlePacket(newpos)
+                } catch {
+                    console.log(packet)
+                }
+            }
+            
             //console.log("Multiple packets detected! Dropping last sent packet! %s",Buffer.from(d).toString("hex").split(gamemakerMagic).length)
             // clientPackets[id].push({
             //     type: "teleport",
@@ -261,80 +337,84 @@ server.on('connection', function (conn) {
             //     dir: clientsPos[id].dir
             // })
             // return;
-        }
+        } else {
         try {
             //console.log('connection data from %s: %j', remoteAddress, d);
             //console.log(Buffer.from(d).toString())
             //console.log(`|${Buffer.from(d).toString("hex")}|`)
             var newpos = JSON.parse(/{.+}/g.exec(Buffer.from(d).toString())[0].replaceAll(/[^\u0000-\u007F]+/g, ""))
-            for (let packet of newpos.packets) {
-                if (packet.type == "pos") {
-                    let distanceTraveledSquared = (packet.x - clientsPos[id].x) ** 2 + (packet.y - clientsPos[id].y) ** 2
-                    if (distanceTraveledSquared >= 25 ** 2) {
-                        clientPackets[id].push({
-                            type: "teleport",
-                            x: clientsPos[id].x,
-                            y: clientsPos[id].y,
-                            dir: clientsPos[id].dir
-                        })
-                        continue;
-                    }
-                    if (checkWalls({
-                        ...tankRect,
-                        x: packet.x,
-                        y: packet.y,
-                        angle: packet.dir || 0
-                    }) && do_lag_back) {
-                        clientPackets[id].push({
-                            type: "teleport",
-                            x: clientsPos[id].x,
-                            y: clientsPos[id].y,
-                            dir: clientsPos[id].dir
-                        })
-                    } else {
-                        clientsPos[id].x = packet.x
-                        clientsPos[id].y = packet.y
-                        clientsPos[id].dir = packet.dir || 0
-                    }
-                } else if (packet.type == "keepalive") {
-                } else if (packet.type == "animation") {
-                    clients[currentRoom].forEach(client => {
-                        if (client == id) return;
-                        clientPackets[client].push({
-                            type: "animation",
-                            player: id,
-                            data: packet.data
-                        })
-                    })
-                } else if (packet.type == "fire_bullet") {
-                    if (bulletPacketLimiter) continue;
-                    if (clientsPos[id].respawnTime>=0) continue;
-                    sendBulletPack = true;
-                    bulletPacketLimiter = true;
-                    clientPackets[id].push({
-                        type: "screenshake",
-                        time: 60,
-                        magnitude: 2,
-                        fade: .2
-                    })
-                    fireBullet(
-                        clientsPos[id].x - (Math.sin(toRadians(clientsPos[id].dir)) * 50),
-                        clientsPos[id].y - (Math.cos(toRadians(clientsPos[id].dir)) * 50),
-                        clientsPos[id].dir,
-                        id,
-                        upgradeTiers.damage[teamUpgrades[team].damage])
-                } else {
-                    console.log(packet)
-                }
-            }
+            handlePacket(newpos)
+            // for (let packet of newpos.packets) {
+            //     if (packet.type == "pos") {
+            //         let distanceTraveledSquared = (packet.x - clientsPos[id].x) ** 2 + (packet.y - clientsPos[id].y) ** 2
+            //         if (distanceTraveledSquared >= 25 ** 2) {
+            //             clientPackets[id].push({
+            //                 type: "teleport",
+            //                 x: clientsPos[id].x,
+            //                 y: clientsPos[id].y,
+            //                 dir: clientsPos[id].dir
+            //             })
+            //             continue;
+            //         }
+            //         if (checkWalls({
+            //             ...tankRect,
+            //             x: packet.x,
+            //             y: packet.y,
+            //             angle: packet.dir || 0
+            //         }) && do_lag_back) {
+            //             clientPackets[id].push({
+            //                 type: "teleport",
+            //                 x: clientsPos[id].x,
+            //                 y: clientsPos[id].y,
+            //                 dir: clientsPos[id].dir
+            //             })
+            //         } else {
+            //             clientsPos[id].x = packet.x
+            //             clientsPos[id].y = packet.y
+            //             clientsPos[id].dir = packet.dir || 0
+            //         }
+            //     } else if (packet.type == "keepalive") {
+            //     } else if (packet.type == "animation") {
+            //         clients[currentRoom].forEach(client => {
+            //             if (client == id) return;
+            //             clientPackets[client].push({
+            //                 type: "animation",
+            //                 player: id,
+            //                 data: packet.data
+            //             })
+            //         })
+            //     } else if (packet.type == "fire_bullet") {
+            //         if (bulletPacketLimiter) continue;
+            //         if (clientsPos[id].respawnTime>=0) continue;
+            //         sendBulletPack = true;
+            //         bulletPacketLimiter = true;
+            //         clientPackets[id].push({
+            //             type: "screenshake",
+            //             time: 60,
+            //             magnitude: 2,
+            //             fade: .2
+            //         })
+            //         fireBullet(
+            //             clientsPos[id].x - (Math.sin(toRadians(clientsPos[id].dir)) * 50),
+            //             clientsPos[id].y - (Math.cos(toRadians(clientsPos[id].dir)) * 50),
+            //             clientsPos[id].dir,
+            //             id,
+            //             upgradeTiers.damage[teamUpgrades[team].damage])
+            //     } else {
+            //         console.log(packet)
+            //     }
+            // }
         } catch {
             // fs.writeFileSync("./error.hex",Buffer.from(d).toString("hex"));
             // console.log("|The following json caused an error :/|\n" + Buffer.from(d).toString() + "\n||")
         }
+    }
         bulletPacketLimiter = sendBulletPack && bulletPacketLimiter
         //conn.write(d);  
     }
+    let disconnected = false
     function disconnect() {
+        disconnected = true;
         conn.end()
         console.log('[DEBUG] - %s', id);
         delete clientsPos[id]
@@ -351,7 +431,7 @@ server.on('connection', function (conn) {
         })
     }
     function onConnClose() {
-        disconnect()
+        if (!disconnected) disconnect()
     }
     function onConnError(err) {
         console.log('Connection %s error: %s', remoteAddress, err.message);
