@@ -3,3 +3,4 @@
 *.hidden.json
 *.hidden.dll
 /tsfun/
+*.resource_order

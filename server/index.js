@@ -223,6 +223,7 @@ server.on('connection', function (conn) {
             teleport(id,teamData[team].spawnpoint[0],teamData[team].spawnpoint[1])
             clientsPos[id].hidden = false
         }
+        lastPacketTime += 1
         conn.write(JSON.stringify({
             type: "positions",
             this_id: id,
@@ -235,26 +236,31 @@ server.on('connection', function (conn) {
             respawn_time: clientsPos[id].respawnTime,
             locations: visiblePlayers.map(id => clientsPos[id]),
             projectiles: rooms[currentRoom].projectiles,
-            misc_packets: clientPackets[id]
+            misc_packets: clientPackets[id],
         }))
         //console.log(clientPackets[id])
         clientPackets[id] = []
+        if (lastPacketTime >= 60) {
+            disconnect()
+        }
     }
     var bulletPacketLimiter = false;
     conn.on('data', onConnData);
     conn.once('close', onConnClose);
     conn.on('error', onConnError);
+    var lastPacketTime = 0
     function onConnData(d) {
+        lastPacketTime = 0;
         var sendBulletPack = false
         if (Buffer.from(d).toString("hex").split(gamemakerMagic).length >= 3) {
-            console.log("Multiple packets detected! Dropping last sent packet! %s",Buffer.from(d).toString("hex").split(gamemakerMagic).length)
-            clientPackets[id].push({
-                type: "teleport",
-                x: clientsPos[id].x,
-                y: clientsPos[id].y,
-                dir: clientsPos[id].dir
-            })
-            return;
+            //console.log("Multiple packets detected! Dropping last sent packet! %s",Buffer.from(d).toString("hex").split(gamemakerMagic).length)
+            // clientPackets[id].push({
+            //     type: "teleport",
+            //     x: clientsPos[id].x,
+            //     y: clientsPos[id].y,
+            //     dir: clientsPos[id].dir
+            // })
+            // return;
         }
         try {
             //console.log('connection data from %s: %j', remoteAddress, d);
@@ -312,8 +318,8 @@ server.on('connection', function (conn) {
                         fade: .2
                     })
                     fireBullet(
-                        clientsPos[id].x,
-                        clientsPos[id].y,
+                        clientsPos[id].x - (Math.sin(toRadians(clientsPos[id].dir)) * 50),
+                        clientsPos[id].y - (Math.cos(toRadians(clientsPos[id].dir)) * 50),
                         clientsPos[id].dir,
                         id,
                         upgradeTiers.damage[teamUpgrades[team].damage])
@@ -322,13 +328,14 @@ server.on('connection', function (conn) {
                 }
             }
         } catch {
-            fs.writeFileSync("./error.hex",Buffer.from(d).toString("hex"));
-            console.log("|The following json caused an error :/|\n" + Buffer.from(d).toString() + "\n||")
+            // fs.writeFileSync("./error.hex",Buffer.from(d).toString("hex"));
+            // console.log("|The following json caused an error :/|\n" + Buffer.from(d).toString() + "\n||")
         }
         bulletPacketLimiter = sendBulletPack && bulletPacketLimiter
         //conn.write(d);  
     }
-    function onConnClose() {
+    function disconnect() {
+        conn.end()
         console.log('[DEBUG] - %s', id);
         delete clientsPos[id]
         clients[currentRoom].delete(id)
@@ -343,8 +350,11 @@ server.on('connection', function (conn) {
             })
         })
     }
+    function onConnClose() {
+        disconnect()
+    }
     function onConnError(err) {
-        //console.log('Connection %s error: %s', remoteAddress, err.message);
+        console.log('Connection %s error: %s', remoteAddress, err.message);
     }
     conn.write(JSON.stringify({
         type: "id",

@@ -17,9 +17,9 @@ let arenaBounds = {
     y_max: 4660
 }
 const bulletRect = {
-    w: 9,
-    h: 9,
-    rough_radius: Math.sqrt(9**2+9**2)
+    w: .4 * 64,
+    h: .4 * 64,
+    rough_radius: Math.sqrt((.4 * 64)**2+(.4 * 64)**2)
 }
 const tankRect = {
     w: 63,
