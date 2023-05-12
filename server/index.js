@@ -225,6 +225,7 @@ server.on('connection', function (conn) {
         }
         conn.write(JSON.stringify({
             type: "positions",
+            this_id: id,
             teamPlayers: [...Object.keys(teamMap)].map(t => { return { id: t, ally: teamMap[t] == team } }).reduce((p, c) => {
                 p[c.id] = c.ally
                 return p
@@ -253,6 +254,7 @@ server.on('connection', function (conn) {
                 y: clientsPos[id].y,
                 dir: clientsPos[id].dir
             })
+            return;
         }
         try {
             //console.log('connection data from %s: %j', remoteAddress, d);

@@ -44,7 +44,9 @@ network_send_packet(multiplayer_handler.client,buff,buffer_get_size(buff))
 }
 function handlePackets(packets) {
 	try {
+		
 	if (packets.type == "positions") {
+		global.this_id = packets.this_id
 		for (var i = 0; i < array_length(packets.playerlist); i++) {
 			if (!variable_struct_exists(global.other_players,packets.playerlist[i])) {
 				variable_struct_set(global.other_players,packets.playerlist[i],{colour: "normal"})
