@@ -28,7 +28,7 @@ for (var i = 0; i < array_length(global.other_player_xy); i++) {
 for (var i = 0; i < array_length(variable_struct_get_names(global.projectiles)); i++) {
 			var projectile = variable_struct_get(global.projectiles,variable_struct_get_names(global.projectiles)[i])
 			draw_set_color(c_red)
-		draw_sprite_ext(bullet_spr,0,projectile.x,projectile.y,.01,.01,projectile.dir+90,-1,1)
+		draw_sprite_ext(bullet_spr,0,projectile.x,projectile.y,0.4,0.4,projectile.dir+90,-1,1)
 		//draw_rectangle(global.other_player_xy[i][1]-10,global.other_player_xy[i][2]-10,global.other_player_xy[i][1]+10,global.other_player_xy[i][2]+10,false)
 		draw_set_color(c_white)
 		}

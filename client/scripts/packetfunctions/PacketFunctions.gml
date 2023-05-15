@@ -113,6 +113,9 @@ function handlePackets(packets) {
 		global.upgrades = packets.upgrades
 		global.speeed = global.upgrades.speed
 		global.respawntime = packets.respawn_time
+		if (global.respawntime == -1) {
+			global.dead = false	
+		}
 		global.teams = packets.teamPlayers
 		global.projectiles = packets.projectiles
 		global.other_player_xy = packets.locations
