@@ -291,7 +291,7 @@ server.on('connection', function (conn) {
                 bulletPacketLimiter = true;
                 clientPackets[id].push({
                     type: "screenshake",
-                    time: 60,
+                    time: 5,
                     magnitude: 2,
                     fade: .2
                 })

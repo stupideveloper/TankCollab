@@ -12,7 +12,7 @@ packet_queue = {
 	packets: []
 }
 dir = 0
-spd = 90
+spd = 200
 global.shake = false;
 global.shake_time = 0;
 global.shake_magnitude = 0;
