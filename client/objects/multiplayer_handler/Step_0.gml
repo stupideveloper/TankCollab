@@ -22,33 +22,40 @@ if (ticks_since_update % 300 == 299 ) {
 last_pack_ticks += 1
 ticks_since_update += 1
 
-if (mouse_check_button_pressed(mb_left)) {
+if (mouse_check_button_pressed(mb_left) || keyboard_check_pressed(vk_space)) {
 	last_was_clicked = true
 	addPacket({
 		type: "fire_bullet",
 	})
 }
 var imageanglekey = 0b0000
-var _speed = 10
-//phy_speed_x*=0.9
-//phy_speed_y*=0.9
+var _speed = 10 * global.speeed
+phy_speed_x*=0.9
+phy_speed_y*=0.9
 if (keyboard_check(ord("W"))||keyboard_check(vk_up)) {
 	sendPosPack = true
-	//phy_speed_x=5*cos_(fake_direction)
-	phy_speed_y=-5//*sin_(fake_direction)
+	if (global.control_style=="classic") {
+		phy_speed_x=5*cos_(fake_direction)
+		phy_speed_y=5*sin_(fake_direction)
+	}
+	else phy_speed_y=-_speed//*sin_(fake_direction)
 }
 if (keyboard_check(ord("S"))||keyboard_check(vk_down)) {
+	// physics_apply_force(x-global.speeed*100*cos_(fake_direction),y-global.speeed*100*sin_(fake_direction),500,500)
 	sendPosPack = true
-	phy_speed_y=5
-	//physics_apply_force(x-global.speeed*100*cos_(fake_direction),y-global.speeed*100*sin_(fake_direction),500,500)
+	if (global.control_style=="classic") {
+		phy_speed_x=-5*cos_(fake_direction)
+		phy_speed_y=-5*sin_(fake_direction)
+	}
+	else phy_speed_y=_speed
 }
 if (keyboard_check(ord("A"))||keyboard_check(vk_left)) {
-	fake_direction -= 3.65
-	phy_speed_x=-5
+	if (global.control_style=="classic") fake_direction -= 3.65
+	else {phy_speed_x=-_speed;sendPosPack = true}
 }
 if (keyboard_check(ord("D"))||keyboard_check(vk_right)) {
-	phy_speed_x=5
-	fake_direction += 3.65
+	if (global.control_style=="classic") fake_direction += 3.65
+	else {phy_speed_x=_speed;sendPosPack = true}
 }
 
 
@@ -69,6 +76,10 @@ if (sendPosPack) {
 	type: "pos"
 	})
 }
+/**
+	Screenshake
+	Adding a whole new object when this object works fine would be unwise
+ */
 if (global.shake) 
 { 
    global.shake_time -= 1; 

@@ -1,3 +1,8 @@
+/*
+    Code shamelessly stolen from https://stackoverflow.com/a/62028170
+*/
+
+
 // Helpers
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
@@ -183,11 +188,24 @@ const isProjectionCollide = ({ rect, onRect }) =>
     });
     return isCollide;
 };
+/**
+ * Not stolen code, just really simple mathematics
+ */
 const isCircleCollide = (circleA,circleB) => {
     let dist = (circleA.x-circleB.x)**2+(circleA.y-circleB.y)**2
     let radiuses = (circleA.radius + circleB.radius)**2
     return dist < radiuses
 }
+/**
+ * Returns true if a point (x,y) is inside the rectangle (x_min,y_min), (x_max, y_max)
+ * @param {number} x 
+ * @param {number} y 
+ * @param {number} x_min 
+ * @param {number} x_max 
+ * @param {number} y_min 
+ * @param {number} y_max 
+ * @returns {boolean}
+ */
 const isPointInRect = function(x,y,x_min,x_max,y_min,y_max){
     if (x >= x_max || x <= x_min || y >= y_max || y <= y_min) return false;
     return true

@@ -13,14 +13,20 @@ packet_queue = {
 }
 dir = 0
 spd = 200
+/**
+   Screenshake variables
+ */
 global.shake = false;
 global.shake_time = 0;
 global.shake_magnitude = 0;
 global.shake_fade = 0.25;
+
+
 image_xscale = 0.3;
 image_yscale = 0.3;
 fake_direction = 0;
 global.speeed = 1
+global.control_style = "classic"//"easy"
 global.max_health = 100
 global.title = ""
 global.dead = false

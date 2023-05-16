@@ -1,26 +1,69 @@
+/**
+ * Whether to reset player location if the client goes too fast
+ */
+const do_lag_back = true
+
+/**
+ * Whether to allow friendly fire
+ */
+const do_friendly_fire = true;
+
+
+/**
+ * Import the networking library API
+ */
 const net = require("net")
+/** 
+ * The separator between two gamemaker packets
+ * Raw packets could be used, but gamemaker will concatenate them anyway, so this is easier
+ * */
 const gamemakerMagic = "dec0adde0c"
+/**
+ * Import the randomUUID function from `crypto`, which creates a cryptographically secure UUID
+ */
 const uuid = require("crypto").randomUUID
 const fs = require("fs")
+/**
+ * Converts a degree angle to radians
+ * @param {number} degrees 
+ * @returns {number}
+ */
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
 const Collision = require("./rect_collisions.js");
+/**
+ * Imports the collision helper functions
+ */
 const { checkWalls, bulletRect, tankRect } = require("./arenaCollisions.js");
 const { checkPlayer } = require("./playerCollisions.js")
 
 var server = net.createServer();
+/**
+ * An object that stores all of the positions for the clients
+ */
 let clientsPos = {}
+/**
+ * A set that contains additional information about the clients
+ */
 let clients = {
     "lobby": new Set()
 }
+/**
+ * An object containing packet listeners, each will be called every game tick
+ */
 let packetListeners = {
 
 }
+/**
+ * Different team names
+ */
 const teams = {
     TEAM_A: "A",
     TEAM_B: "B"
 }
-let lastSelected = 0
+/**
+ * Team selection algorithm
+ */
 let teamSizes = { A: 0, B: 0 }
 let teamSelector = () => {
     if (teamSizes[teams.TEAM_A] == teamSizes[teams.TEAM_B]) {
@@ -28,6 +71,10 @@ let teamSelector = () => {
     }
     return teamSizes[teams.TEAM_A] > teamSizes[teams.TEAM_B] ? teams.TEAM_B : teams.TEAM_A;
 }
+
+/**
+ * An object that stores different upgrades
+ */
 let upgradeTiers = {
     damage: [10, 12, 14, 16, 18, 20, 22],
     bulletSpeed: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6],
@@ -35,6 +82,10 @@ let upgradeTiers = {
     damageResistance: [0, 4, 8, 11, 14, 17, 20], // %
     speed: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
 }
+
+/**
+ * Includes team-specific data
+ */
 let teamData = {
     "A": {
         spawnpoint: [120, 120]
@@ -43,6 +94,10 @@ let teamData = {
         spawnpoint: [420, 120]
     }
 }
+
+/**
+ * Team-specific upgrades
+ */
 let teamUpgrades = {
     "A": {
         damage: 0,
@@ -59,25 +114,55 @@ let teamUpgrades = {
         speed: 0
     }
 }
+/**
+ * Default team upgrades, can be used to revert the above team upgrades
+ */
 const teamUpgradesDefault = JSON.stringify(teamUpgrades)
-const do_lag_back = true
+
+/**
+ * Every game tick this function runs
+ */
 setInterval(async function SERVER_GAME_TICK() {
+    /**
+     * Runs every packet listener, this acts more as a game tick listener
+     */
     Object.keys(packetListeners).map(player => {
         packetListeners[player]()
     })
+
+    /**
+     * For every room
+     */
     Object.keys(rooms).map(room => {
+        /**
+         * Projectiles to remove later, concurrent modification and iteration of an array could cause issues
+         */
         var deletables = []
+        /**
+         * Every projectile in that room, run ticking code
+         */
         Object.keys(rooms[room].projectiles).forEach(id => {
             var projectile = rooms[room].projectiles[id]
             var dir = projectile.dir
             var vel = projectile.vel
             var damage = projectile.damage
+            /**
+             * Move in the direction `dir`, with a velocity of `vel`
+             */
             projectile.x = projectile.x - (Math.sin(toRadians(dir)) * vel)
             projectile.y = projectile.y - (Math.cos(toRadians(dir)) * vel)
             projectile.dist_left -= 1
+
+            /**
+             * If the projectile runs out of distance, delte it
+             */
             if (projectile.dist_left <= 0) {
                 deletables.push(id)
             }
+
+            /**
+             * Runs player hit detection
+             */
             let hits = checkPlayer(
                 clients,
                 clientsPos,
@@ -87,11 +172,28 @@ setInterval(async function SERVER_GAME_TICK() {
                 projectile.shooter,
                 projectile.damage,
                 room)
+                /**
+                 * If there are hits
+                 */
             if (hits.length != 0) {
+                /**
+                 * Delete this projectile
+                 */
                 deletables.push(id)
-                hits.map(p => { damagePlayer(p, room, damage) })
+
+                hits.map(p => { 
+                    /**
+                     * If the shooter is on the same team, and friendly fire is disabled
+                     * Damage the player
+                     */
+                    if (teamMap[p] == teamMap[projectile.shooter] && !do_friendly_fire) return
+                    damagePlayer(p, room, damage) 
+                })
                 return;
             }
+            /**
+             * If the projectile hits a wall, delete it
+             */
             if (checkWalls({
                 ...bulletRect,
                 x: projectile.x,
@@ -101,11 +203,17 @@ setInterval(async function SERVER_GAME_TICK() {
                 deletables.push(id)
             }
         })
+        /**
+         * Prevent race conditions by deleting later
+         */
         deletables.map(id => {
             delete rooms[room].projectiles[id]
         })
     })
 }, 1e3 / 60);
+/**
+ * Contains room-specific data, such as projectiles
+ */
 let rooms = {
     "lobby": {
         projectiles: {
@@ -120,18 +228,39 @@ let rooms = {
         }
     }
 }
+/**
+ * An object containing packets that get sent to specific clients.
+ * 
+ * For example, client 12345678-90ab-4def-1234-567890abcdef would have a packet sent by 
+ * adding a packet to `clientPackets["12345678-90ab-4def-1234-567890abcdef"]`
+ */
 let clientPackets = {}
 function doCollisions() {
 
 }
+/**
+ * Apply damage to a player
+ * @param {import("crypto").UUID} id 
+ * @param {import("crypto").UUID|null} room 
+ * @param {number} damage 
+ */
 function damagePlayer(id, room, damage) {
+    /**
+     * Reduce the health on the server
+     */
     clientsPos[id].health -= damage;
+    /**
+     * Send a packet to the client with the new health
+     */
     clientPackets[id].push({
         type: "health_update",
         health: clientsPos[id].health,
         max_health: -1
     })
     if (clientsPos[id].health <= 0) {
+        /**
+         * If the player loses all health, send a death packet
+         */
         clientPackets[id].push({
             type: "death",
         })
@@ -139,7 +268,20 @@ function damagePlayer(id, room, damage) {
         clientsPos[id].respawnTime = 5 * 60
     }
 }
+/**
+ * An Object that maps the player to the team the player is on
+ */
 let teamMap = {}
+
+/**
+ * Fires a bullet
+ * @param {number} x 
+ * @param {number} y 
+ * @param {number} dir 
+ * @param {import("crypto").UUID} shooter 
+ * @param {number} damage 
+ * @param {import("crypto").UUID} room 
+ */
 function fireBullet(x = 0, y = 0, dir = 0, shooter = uuid(), damage = 1, room = "lobby") {
     rooms[room].projectiles[uuid()] = {
         x: x,
@@ -151,6 +293,14 @@ function fireBullet(x = 0, y = 0, dir = 0, shooter = uuid(), damage = 1, room = 
         shooter: shooter,
     }
 }
+
+/**
+ * Teleports a player
+ * @param {import("crypto").UUID} id 
+ * @param {number} x 
+ * @param {number} y 
+ * @param {number} dir 
+ */
 function teleport(id, x, y, dir) {
     clientsPos[id].x = x;
     clientsPos[id].y = y;
@@ -162,14 +312,31 @@ function teleport(id, x, y, dir) {
         dir: clientsPos[id].dir
     })
 }
+
+/**
+ * Main connection handler
+ */
 server.on('connection', function (conn) {
+    /**
+     * Client's IP Address
+     */
     var remoteAddress = conn.remoteAddress + ':' + conn.remotePort;
+    /**
+     * Assigns the player a unique id, UUIDv4 has a collision chance of like, close to zero
+     */
     const id = uuid()
+    /**
+     * Selects a team
+     */
     const team = teamSelector()
     teamSizes[team] += 1
     teamMap[id] = team;
-    console.log('[DEBUG] + %s', id);
+    // log that IP and ID
+    console.log('[DEBUG] + %s (%s)', id, remoteAddress);
     let currentRoom = "lobby"
+    /**
+     * Init all required variables
+     */
     clients[currentRoom].add(id)
     clientPackets[id] = [
         {
@@ -188,7 +355,10 @@ server.on('connection', function (conn) {
         respawnTime: -1
     }
     clientsPos[id].health = upgradeTiers.health[teamUpgrades[team].health]
-    teleport(id,teamData[team].spawnpoint[0],teamData[team].spawnpoint[1])
+    teleport(id, teamData[team].spawnpoint[0], teamData[team].spawnpoint[1])
+    /**
+     * Sends a join packet to all clients. Currently unrecieved
+     */
     clients[currentRoom].forEach(client => {
         if (client == id) return;
         clientPackets[client].push({
@@ -197,22 +367,37 @@ server.on('connection', function (conn) {
             ally: teamMap[client] == team
         })
     })
+    /**
+     * Function that can change the room, currently unused
+     * @param {import("crypto").UUID} newRoom 
+     */
     function moveRoom(newRoom) {
         if (!clients[newRoom]) clients[newRoom] = new Set()
         clients[currentRoom].delete(id)
         currentRoom = newRoom
         clients[currentRoom].add(id)
     }
-
+    /**
+     * Packet listener, more like a game tick listener
+     */
     packetListeners[id] = function () {
+        /**
+         * Players visible in the room
+         */
         let visiblePlayers = [...clients[currentRoom].keys()].filter(
             a => {
                 return !clientsPos[a].hidden
             }
         )
+        /**
+         * Reduces respawn time
+         */
         if (clientsPos[id].respawnTime != -1) {
             clientsPos[id].respawnTime -= 1
         }
+        /**
+         * If the client is no longer dead, send a respawn packet
+         */
         if (clientsPos[id].respawnTime == 0) {
             clientPackets[id].respawnTime = -1
             clientPackets[id].push({
@@ -220,10 +405,16 @@ server.on('connection', function (conn) {
                 max_health: upgradeTiers.health[teamUpgrades[team].health]
             })
             clientsPos[id].health = upgradeTiers.health[teamUpgrades[team].health]
-            teleport(id,teamData[team].spawnpoint[0],teamData[team].spawnpoint[1])
+            teleport(id, teamData[team].spawnpoint[0], teamData[team].spawnpoint[1])
             clientsPos[id].hidden = false
         }
+        /**
+         * Increases the last time a packet was received, for disconnect timeout reasons
+         */
         lastPacketTime += 1
+        /**
+         * Sends a packet to the client
+         */
         conn.write(JSON.stringify({
             type: "positions",
             this_id: id,
@@ -239,16 +430,35 @@ server.on('connection', function (conn) {
             misc_packets: clientPackets[id],
         }))
         //console.log(clientPackets[id])
+        /**
+         * Clear packet queue
+         */
         clientPackets[id] = []
+        /**
+         * If the client hasnt sent a packet withing 60 game ticks, disconnect them
+         */
         if (lastPacketTime >= 60) {
             disconnect()
         }
     }
+    /**
+     * Handle the packet sent
+     * @param {{packets:[{type:string}]}} newpos 
+     */
     function handlePacket(newpos) {
         for (let packet of newpos.packets) {
             if (packet.type == "pos") {
+                /**
+                 * Position update packet
+                 * {
+                 *  type: "pos",
+                 *  x: number,
+                 *  y: number,
+                 *  dir: number
+                 * }
+                 */
                 let distanceTraveledSquared = (packet.x - clientsPos[id].x) ** 2 + (packet.y - clientsPos[id].y) ** 2
-                if (distanceTraveledSquared >= 25 ** 2) {
+                if (distanceTraveledSquared >= 25 ** 2 && do_lag_back) {
                     clientPackets[id].push({
                         type: "teleport",
                         x: clientsPos[id].x,
@@ -275,7 +485,21 @@ server.on('connection', function (conn) {
                     clientsPos[id].dir = packet.dir || 0
                 }
             } else if (packet.type == "keepalive") {
+                /**
+                 * Keepalive packet
+                 * {
+                 *  type: "keepalive"
+                 * }
+                 */
             } else if (packet.type == "animation") {
+                /**
+                 * Animation packet
+                 * {
+                 *  type: "animation",
+                 *  player: UUID,
+                 *  data: AnimationData
+                 * }
+                 */
                 clients[currentRoom].forEach(client => {
                     if (client == id) return;
                     clientPackets[client].push({
@@ -285,8 +509,14 @@ server.on('connection', function (conn) {
                     })
                 })
             } else if (packet.type == "fire_bullet") {
+                /**
+                 * Fire bullet packet, overload is handled by server
+                 * {
+                 *  type: "fire_bullet",
+                 * }
+                 */
                 if (bulletPacketLimiter) continue;
-                if (clientsPos[id].respawnTime>=0) continue;
+                if (clientsPos[id].respawnTime >= 0) continue;
                 sendBulletPack = true;
                 bulletPacketLimiter = true;
                 clientPackets[id].push({
@@ -302,117 +532,63 @@ server.on('connection', function (conn) {
                     id,
                     upgradeTiers.damage[teamUpgrades[team].damage])
             } else {
+                /**
+                 * If the packet is not currently in the list, log so the structure can be replicated
+                 */
                 console.log(packet)
             }
         }
     }
+    /**
+     * Prevents the use of the "fire_bullet" packet every tick
+     */
     var bulletPacketLimiter = false;
+    /**
+     * Listeners
+     */
     conn.on('data', onConnData);
     conn.once('close', onConnClose);
     conn.on('error', onConnError);
-    var lastPacketTime = 0
+    var lastPacketTime = 0;
+
     function onConnData(d) {
         lastPacketTime = 0;
-        var sendBulletPack = false
+        var sendBulletPack = false;
+        /**
+         * Check how many packets gamemaker has sent
+         */
         let packets = Buffer.from(d).toString("hex").split(gamemakerMagic).length - 1;
         if (packets >= 2) {
-            let packets_raw = Buffer.from(d).toString("hex").split(gamemakerMagic).map(v=>{
-                return Buffer.from(v,"hex").toString("utf8")
-            }).filter(v=>{return !!v})
+            let packets_raw = Buffer.from(d).toString("hex").split(gamemakerMagic).map(v => {
+                return Buffer.from(v, "hex").toString("utf8")
+            }).filter(v => { return !!v })
             for (let packet of packets_raw) {
                 try {
-                var newpos = JSON.parse(/{.+}/g.exec(packet)[0].replaceAll(/[^\u0000-\u007F]+/g, ""))
-                
-                handlePacket(newpos)
+                    var newpos = JSON.parse(/{.+}/g.exec(packet)[0].replaceAll(/[^\u0000-\u007F]+/g, ""))
+
+                    handlePacket(newpos)
                 } catch {
                     console.log(packet)
                 }
             }
-            
-            //console.log("Multiple packets detected! Dropping last sent packet! %s",Buffer.from(d).toString("hex").split(gamemakerMagic).length)
-            // clientPackets[id].push({
-            //     type: "teleport",
-            //     x: clientsPos[id].x,
-            //     y: clientsPos[id].y,
-            //     dir: clientsPos[id].dir
-            // })
-            // return;
         } else {
-        try {
-            //console.log('connection data from %s: %j', remoteAddress, d);
-            //console.log(Buffer.from(d).toString())
-            //console.log(`|${Buffer.from(d).toString("hex")}|`)
-            var newpos = JSON.parse(/{.+}/g.exec(Buffer.from(d).toString())[0].replaceAll(/[^\u0000-\u007F]+/g, ""))
-            handlePacket(newpos)
-            // for (let packet of newpos.packets) {
-            //     if (packet.type == "pos") {
-            //         let distanceTraveledSquared = (packet.x - clientsPos[id].x) ** 2 + (packet.y - clientsPos[id].y) ** 2
-            //         if (distanceTraveledSquared >= 25 ** 2) {
-            //             clientPackets[id].push({
-            //                 type: "teleport",
-            //                 x: clientsPos[id].x,
-            //                 y: clientsPos[id].y,
-            //                 dir: clientsPos[id].dir
-            //             })
-            //             continue;
-            //         }
-            //         if (checkWalls({
-            //             ...tankRect,
-            //             x: packet.x,
-            //             y: packet.y,
-            //             angle: packet.dir || 0
-            //         }) && do_lag_back) {
-            //             clientPackets[id].push({
-            //                 type: "teleport",
-            //                 x: clientsPos[id].x,
-            //                 y: clientsPos[id].y,
-            //                 dir: clientsPos[id].dir
-            //             })
-            //         } else {
-            //             clientsPos[id].x = packet.x
-            //             clientsPos[id].y = packet.y
-            //             clientsPos[id].dir = packet.dir || 0
-            //         }
-            //     } else if (packet.type == "keepalive") {
-            //     } else if (packet.type == "animation") {
-            //         clients[currentRoom].forEach(client => {
-            //             if (client == id) return;
-            //             clientPackets[client].push({
-            //                 type: "animation",
-            //                 player: id,
-            //                 data: packet.data
-            //             })
-            //         })
-            //     } else if (packet.type == "fire_bullet") {
-            //         if (bulletPacketLimiter) continue;
-            //         if (clientsPos[id].respawnTime>=0) continue;
-            //         sendBulletPack = true;
-            //         bulletPacketLimiter = true;
-            //         clientPackets[id].push({
-            //             type: "screenshake",
-            //             time: 60,
-            //             magnitude: 2,
-            //             fade: .2
-            //         })
-            //         fireBullet(
-            //             clientsPos[id].x - (Math.sin(toRadians(clientsPos[id].dir)) * 50),
-            //             clientsPos[id].y - (Math.cos(toRadians(clientsPos[id].dir)) * 50),
-            //             clientsPos[id].dir,
-            //             id,
-            //             upgradeTiers.damage[teamUpgrades[team].damage])
-            //     } else {
-            //         console.log(packet)
-            //     }
-            // }
-        } catch {
-            // fs.writeFileSync("./error.hex",Buffer.from(d).toString("hex"));
-            // console.log("|The following json caused an error :/|\n" + Buffer.from(d).toString() + "\n||")
+            try {
+                var newpos = JSON.parse(/{.+}/g.exec(Buffer.from(d).toString())[0].replaceAll(/[^\u0000-\u007F]+/g, ""))
+                handlePacket(newpos)
+            } catch {
+                /**
+                 * Writes the buffer as a hex file to a file
+                 */
+                fs.writeFileSync("./error.hex", Buffer.from(d).toString("hex"));
+            }
         }
-    }
         bulletPacketLimiter = sendBulletPack && bulletPacketLimiter
-        //conn.write(d);  
     }
     let disconnected = false
+
+    /**
+     * Disconnect the current client
+     */
     function disconnect() {
         disconnected = true;
         conn.end()
@@ -434,14 +610,21 @@ server.on('connection', function (conn) {
         if (!disconnected) disconnect()
     }
     function onConnError(err) {
-        console.log('Connection %s error: %s', remoteAddress, err.message);
     }
+    /**
+     * Immediately send the player's ID to the socket,
+     * no longer needed, yet still here
+     */
     conn.write(JSON.stringify({
         type: "id",
         this_id: id
     }))
 });
 
+
+/**
+ * Start the server
+ */
 server.listen(9000, function () {
-    console.log('server listening to %j', server.address());
+    console.log('server listening to %j:%j', server.address().port, server.address().address);
 });
