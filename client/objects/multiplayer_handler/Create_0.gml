@@ -13,6 +13,8 @@ packet_queue = {
 }
 dir = 0
 spd = 200
+connected = false
+tics = 0
 /**
    Screenshake variables
  */

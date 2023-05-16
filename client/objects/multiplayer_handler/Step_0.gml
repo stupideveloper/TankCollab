@@ -1,6 +1,19 @@
 /// @description Insert description here
 // You can write your code in this editor
 
+if (keyboard_check_pressed(vk_escape)) {
+	room_goto(StartRoom)
+}
+if (!connected) {
+	tics += 1
+	if (tics == 100) {
+		global.failed = true
+		room_goto(StartRoom)
+		
+	}
+} else {
+	global.failed = false
+}
 // Queue of packets to send
 packet_queue = {
 	packets: []
@@ -113,8 +126,5 @@ if (global.shake)
 }
 //camera_set_view_pos(view_camera[0],x-camera_get_view_width(view_camera[0])/2,y-camera_get_view_height(view_camera[0])/2)
 sendPacket()
-
-
-
 
 

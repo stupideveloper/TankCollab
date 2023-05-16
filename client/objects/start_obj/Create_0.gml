@@ -1,5 +1,9 @@
 /// @description Insert description here
 // You can write your code in this editor
+if (!struct_exists(global,"failed")) {
+global.failed = false
+}
+has_success = false
 global.ip_construct = ""
 global.first_pointer = 0
 global.first_num = 0

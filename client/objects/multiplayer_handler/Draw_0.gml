@@ -1,6 +1,5 @@
 /// @description Insert description here
-// You can write your code in this editor
-
+// You can write your code in this 
 draw_rectangle(200-15,200-15,200+15,200+15,false)
 draw_set_color(c_black)
 //draw_line(x,y,x+20*cos(degtorad(fake_direction)),y+20*sin(degtorad(fake_direction)))
