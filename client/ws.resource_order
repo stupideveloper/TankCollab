@@ -22,5 +22,6 @@
     {"name":"BG_spr","order":3,"path":"sprites/BG_spr/BG_spr.yy",},
     {"name":"tank_spr","order":1,"path":"sprites/tank_spr/tank_spr.yy",},
     {"name":"GamePlayRenderer","order":1,"path":"scripts/GamePlayRenderer/GamePlayRenderer.yy",},
+    {"name":"Room1","order":1,"path":"rooms/Room1/Room1.yy",},
   ],
 }

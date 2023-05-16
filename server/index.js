@@ -621,10 +621,14 @@ server.on('connection', function (conn) {
     }))
 });
 
+/**
+ * Get the IP address
+ */
+const IP = require("./test.hidden.js").ip
 
 /**
  * Start the server
  */
 server.listen(9000, function () {
-    console.log('server listening to %j:%j', server.address().port, server.address().address);
+    console.log('server listening to %s:%j', IP, server.address().port);
 });

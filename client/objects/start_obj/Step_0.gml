@@ -31,6 +31,15 @@ if (keyboard_check_pressed(ord("8"))) {
 if (keyboard_check_pressed(ord("9"))) {
 	global.ip_construct += "9"
 }
-if (keyboard_check_pressed(vk_decimal)) {
+if (keyboard_check_pressed(190)) {
 	global.ip_construct += "."
+}
+if (keyboard_check_pressed(vk_backspace)) {
+	global.ip_construct = string_delete(global.ip_construct,string_length(global.ip_construct),1)
+}
+if (keyboard_check_pressed(vk_enter)) {
+	if (IPCheck(global.ip_construct)) {
+		global.IP_ADDR = global.ip_construct
+		room_goto(Room1)
+	}
 }

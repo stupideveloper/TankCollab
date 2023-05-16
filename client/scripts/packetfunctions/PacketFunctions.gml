@@ -1,5 +1,25 @@
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
+function IPCheck(ip_addr) {
+	var split = string_split(ip_addr,".")
+	if (array_length(split)==4) {
+		try {
+		var first = real(split[0])
+		var second = real(split[1])
+		var third = real(split[2])
+		var fourth = real(split[3])
+		if (first < 256 && second < 256 && third < 256 && fourth < 256) {
+			return true
+		} else {
+			return false
+		}
+		} catch (e) {
+			return false
+		}
+	} else {
+		return false
+	}
+}
 function PacketFunctions(){
 
 }

@@ -40,10 +40,12 @@
     {"id":{"name":"BG_spr","path":"sprites/BG_spr/BG_spr.yy",},"order":0,},
     {"id":{"name":"tank_spr","path":"sprites/tank_spr/tank_spr.yy",},"order":0,},
     {"id":{"name":"IP_fnt","path":"fonts/IP_fnt/IP_fnt.yy",},"order":0,},
+    {"id":{"name":"StartRoom","path":"rooms/StartRoom/StartRoom.yy",},"order":0,},
     {"id":{"name":"GamePlayRenderer","path":"scripts/GamePlayRenderer/GamePlayRenderer.yy",},"order":1,},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},"order":0,},
   ],
   "RoomOrderNodes": [
+    {"roomId":{"name":"StartRoom","path":"rooms/StartRoom/StartRoom.yy",},},
     {"roomId":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
   ],
   "TextureGroups": [
