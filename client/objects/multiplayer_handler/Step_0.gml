@@ -1,20 +1,32 @@
 /// @description Insert description here
 // You can write your code in this editor
+
+// Queue of packets to send
 packet_queue = {
 	packets: []
 }
+
+// Whether to send the position packet
 var sendPosPack = false
+
+// If the mouse has moved, re angle the tank
 if (!(mouse_x==old_x2 && mouse_y == old_y2)) {
+	// old direction, normalised
 	old_dir = (dir + 360) % 360
+	// direction to mouse
 	target_dir = point_direction(mouse_x,mouse_y,x,y) + 90
+	// difference between the two
 	diff = angle_difference(target_dir,old_dir); // The difference between the direction and the player's current angle
+	// new direction
 	dir = old_dir + clamp(diff,-spd,spd);
+	// set the old mouse pos to the new mouse pos
 	old_x2 = mouse_x
 	old_y2 = mouse_y
  sendPosPack = true
 }
+// if a disconnect is detected
 if (ticks_since_update % 300 == 299 ) {
-	var server = network_connect_raw_async( client,"localhost", 9000 );
+	var server = network_connect_raw_async( client,global.IP_ADDR, 9000 );
 }
 
 

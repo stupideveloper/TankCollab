@@ -48,5 +48,5 @@ ticks = 0
 halfit = false
 is_x = true;
 client = network_create_socket(network_socket_tcp);
-var server = network_connect_raw_async( client,"localhost", 9000 );
+var server = network_connect_raw_async( client,global.IP_ADDR, 9000 );
 show_debug_message(string(server))

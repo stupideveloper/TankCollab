@@ -15,6 +15,7 @@
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
   ],
   "ResourceOrderSettings": [
+    {"name":"start_obj","order":2,"path":"objects/start_obj/start_obj.yy",},
     {"name":"walls","order":1,"path":"objects/walls/walls.yy",},
     {"name":"wall_spr","order":2,"path":"sprites/wall_spr/wall_spr.yy",},
     {"name":"bullet_spr","order":1,"path":"sprites/bullet_spr/bullet_spr.yy",},

@@ -31,6 +31,7 @@
     "IDEVersion": "2023.1.0.58",
   },
   "resources": [
+    {"id":{"name":"start_obj","path":"objects/start_obj/start_obj.yy",},"order":0,},
     {"id":{"name":"walls","path":"objects/walls/walls.yy",},"order":0,},
     {"id":{"name":"PacketFunctions","path":"scripts/PacketFunctions/PacketFunctions.yy",},"order":0,},
     {"id":{"name":"multiplayer_handler","path":"objects/multiplayer_handler/multiplayer_handler.yy",},"order":0,},
@@ -38,6 +39,7 @@
     {"id":{"name":"bullet_spr","path":"sprites/bullet_spr/bullet_spr.yy",},"order":1,},
     {"id":{"name":"BG_spr","path":"sprites/BG_spr/BG_spr.yy",},"order":0,},
     {"id":{"name":"tank_spr","path":"sprites/tank_spr/tank_spr.yy",},"order":0,},
+    {"id":{"name":"IP_fnt","path":"fonts/IP_fnt/IP_fnt.yy",},"order":0,},
     {"id":{"name":"GamePlayRenderer","path":"scripts/GamePlayRenderer/GamePlayRenderer.yy",},"order":1,},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},"order":0,},
   ],
