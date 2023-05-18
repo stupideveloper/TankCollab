@@ -624,7 +624,7 @@ server.on('connection', function (conn) {
 /**
  * Get the IP address
  */
-const IP = require("./test.hidden.js").ip
+const IP = require("./iptest.hidden.js").ip
 
 /**
  * Start the server

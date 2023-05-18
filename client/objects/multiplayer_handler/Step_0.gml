@@ -1,8 +1,9 @@
 /// @description Insert description here
 // You can write your code in this editor
 
+
 if (keyboard_check_pressed(vk_escape)) {
-	room_goto(StartRoom)
+	global.gamemenu = !global.gamemenu
 }
 if (!connected) {
 	tics += 1
@@ -47,7 +48,7 @@ if (ticks_since_update % 300 == 299 ) {
 last_pack_ticks += 1
 ticks_since_update += 1
 
-if (mouse_check_button_pressed(mb_left) || keyboard_check_pressed(vk_space)) {
+if ((mouse_check_button_pressed(mb_left) || keyboard_check_pressed(vk_space))&&!global.gamemenu) {
 	last_was_clicked = true
 	addPacket({
 		type: "fire_bullet",

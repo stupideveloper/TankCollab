@@ -1,9 +1,12 @@
 /// @description Insert description here
 // You can write your code in this 
+
+// Draw a square (useless)
 draw_rectangle(200-15,200-15,200+15,200+15,false)
 draw_set_color(c_black)
 //draw_line(x,y,x+20*cos(degtorad(fake_direction)),y+20*sin(degtorad(fake_direction)))
 if (mouse_check_button(mb_any)) draw_set_color(c_red)
+// Alpha of the 
 var alpha = global.dead?0.5:1
 draw_sprite_ext(tank_spr,0,x,y,.3,.3,-fake_direction,-1,alpha)
 draw_set_color(c_white)
