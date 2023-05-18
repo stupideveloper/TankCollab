@@ -37,6 +37,12 @@ const tankRect = {
     h: 63,
     rough_radius: Math.sqrt(32**2+32**2)
 }
+const shieldGeneratorRect = {
+
+}
+const coreRect = {
+    
+}
 /**
  * 
  * @param {{

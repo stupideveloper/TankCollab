@@ -71,7 +71,34 @@ let teamSelector = () => {
     }
     return teamSizes[teams.TEAM_A] > teamSizes[teams.TEAM_B] ? teams.TEAM_B : teams.TEAM_A;
 }
-
+class GemType {
+    static BLUE = 0b00;
+    static GREEN = 0b01;
+    static PURPLE = 0b10;
+    static RED = 0b11;
+    static random() {
+        return (
+            (Math.random()>0.5)?(Math.random()>0.5)?this.BLUE:this.GREEN:(Math.random()>0.5)?this.PURPLE:this.RED
+        )
+    }
+}
+function randomGem(width,height,type=GemType.random()) {
+    var gran = 100
+    var widthQ, heightQ;
+    if (width > height) {
+        heightQ = gran;
+        widthQ = Math.floor(gran * (width/height))
+    } else {
+        widthQ = gran;
+        heightQ = Math.floor(gran * (height/width))
+    }
+    return {
+        type,
+        x: width * Math.floor(Math.random()*(widthQ+1)) / widthQ,
+        y: height * Math.floor(Math.random()*(heightQ+1)) / heightQ
+    }
+}
+console.log(randomGem(100,100))
 /**
  * An object that stores different upgrades
  */
@@ -88,9 +115,15 @@ let upgradeTiers = {
  */
 let teamData = {
     "A": {
+        coreHealth: 1000,
+        leftShield: 500,
+        rightShield: 500,
         spawnpoint: [120, 120]
     },
     "B": {
+        coreHealth: 1000,
+        leftShield: 500,
+        rightShield: 500,
         spawnpoint: [420, 120]
     }
 }
@@ -98,6 +131,19 @@ let teamData = {
 /**
  * Team-specific upgrades
  */
+function teamUpgradesToTiers(upgrades) {
+return Object.keys(upgradeTiers).map(v=>{
+    return {
+        key: v,
+        value: upgradeTiers[v][upgrades[v]]
+    }
+}).reduce((p,v)=>{
+    return {
+        ...p,
+        [v.key]: v.value
+    }
+},{})
+}
 let teamUpgrades = {
     "A": {
         damage: 0,
@@ -415,6 +461,7 @@ server.on('connection', function (conn) {
         /**
          * Sends a packet to the client
          */
+        
         conn.write(JSON.stringify({
             type: "positions",
             this_id: id,
@@ -423,7 +470,7 @@ server.on('connection', function (conn) {
                 return p
             }, {}),
             playerlist: [...clients[currentRoom].keys()],
-            upgrades: teamUpgrades[team],
+            upgrades: teamUpgradesToTiers(teamUpgrades[team]),
             respawn_time: clientsPos[id].respawnTime,
             locations: visiblePlayers.map(id => clientsPos[id]),
             projectiles: rooms[currentRoom].projectiles,
@@ -531,7 +578,13 @@ server.on('connection', function (conn) {
                     clientsPos[id].dir,
                     id,
                     upgradeTiers.damage[teamUpgrades[team].damage])
-            } else {
+            } else if (packet.type == "upgrade_thing") {
+                switch (packet.upgradeType) {
+                    // TODO: 
+                    default:
+                }
+            }
+            else {
                 /**
                  * If the packet is not currently in the list, log so the structure can be replicated
                  */
