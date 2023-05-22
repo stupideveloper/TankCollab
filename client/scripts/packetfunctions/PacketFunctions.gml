@@ -130,7 +130,9 @@ function handlePackets(packets) {
 				case "gem_spawn": {
 					instance_create_layer(extra_packet.x,extra_packet.y,"Instances",gem_obj,{image_index: extra_packet.gem_type,
 						image_xscale: 0.25,
-						image_yscale: 0.25})
+						image_yscale: 0.25,
+						uuid: extra_packet.uuid
+					})
 					
 					break;
 				}

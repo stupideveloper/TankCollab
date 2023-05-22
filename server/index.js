@@ -14,6 +14,15 @@ const gem_uuids = new Set()
  * Import the networking library API
  */
 const net = require("net")
+let REPLAY = {
+    recordFrame: ()=>{},
+    saveToFile: ()=>{}
+};
+try {
+REPLAY = require("./replay.hidden")
+} catch {
+    
+}
 /** 
  * The separator between two gamemaker packets
  * Raw packets could be used, but gamemaker will concatenate them anyway, so this is easier
@@ -36,7 +45,7 @@ const Collision = require("./rect_collisions.js");
  * Imports the collision helper functions
  */
 const { checkWalls, bulletRect, tankRect, gemRect } = require("./arenaCollisions.js");
-const { checkPlayer } = require("./playerCollisions.js")
+const { checkPlayer } = require("./playerCollisions.js");
 
 var server = net.createServer();
 /**
@@ -73,14 +82,47 @@ let teamSelector = () => {
     return teamSizes[teams.TEAM_A] > teamSizes[teams.TEAM_B] ? teams.TEAM_B : teams.TEAM_A;
 }
 class GemType {
-    static BLUE = 0b01;
-    static GREEN = 0b10;
-    static PURPLE = 0b11;
-    static RED = 0b00;
+    static BLUE = new GemType(0b01,"BLUE");
+    static GREEN = new GemType(0b10,"GREEN");
+    static PURPLE = new GemType(0b11,"PURPLE");
+    static RED = new GemType(0b00,"RED");
+    #id = 0b00
+    #name = ""
+    constructor(id,name) {
+        this.#id = id;
+        this.#name = name
+    }
+    getName() {
+        return this.#name
+    }
+    getId() {
+        return this.#id
+    }
+    /**
+     * 
+     * @returns {GemType} type
+     */
     static random() {
         return (
             (Math.random()>0.5)?(Math.random()>0.5)?this.BLUE:this.GREEN:(Math.random()>0.5)?this.PURPLE:this.RED
         )
+    }
+    /**
+     * 
+     * @param {*} id 
+     * @returns {GemType} type
+     */
+    static fromId(id) {
+        switch (id) {
+            case 0b01:
+                return this.BLUE
+            case 0b10: 
+                return this.GREEN
+            case 0b11:
+                return this.PURPLE
+            case 0b00:
+                return this.RED
+        }
     }
 }
 function randomGem(width,height,type=GemType.random()) {
@@ -102,9 +144,9 @@ function randomGem(width,height,type=GemType.random()) {
         y
     })) {
         let gemuuid = uuid()
-        gem_uuids.push(gemuuid)
+        gem_uuids.add(gemuuid)
     return {
-        type,
+        type: type.getId(),
         x,
         y,
         uuid: gemuuid
@@ -411,7 +453,13 @@ server.on('connection', function (conn) {
         dir: 0,
         health: 100,
         hidden: false,
-        respawnTime: -1
+        respawnTime: -1,
+        gems: {
+            [GemType.BLUE.getName()]: 0,
+            [GemType.RED.getName()]: 0,
+            [GemType.PURPLE.getName()]: 0,
+            [GemType.GREEN.getName()]: 0,
+        }
     }
     clientsPos[id].health = upgradeTiers.health[teamUpgrades[team].health]
     teleport(id, teamData[team].spawnpoint[0], teamData[team].spawnpoint[1])
@@ -460,7 +508,8 @@ server.on('connection', function (conn) {
             type: "gem_spawn",
             x: gem.x,
             y: gem.y,
-            gem_type: gem.type
+            gem_type: gem.type,
+            uuid: gem.uuid
         })
         //console.log(gem)
         /**
@@ -483,8 +532,7 @@ server.on('connection', function (conn) {
         /**
          * Sends a packet to the client
          */
-        
-        conn.write(JSON.stringify({
+        var packets = {
             type: "positions",
             this_id: id,
             teamPlayers: [...Object.keys(teamMap)].map(t => { return { id: t, ally: teamMap[t] == team } }).reduce((p, c) => {
@@ -497,7 +545,9 @@ server.on('connection', function (conn) {
             locations: visiblePlayers.map(id => clientsPos[id]),
             projectiles: rooms[currentRoom].projectiles,
             misc_packets: clientPackets[id],
-        }))
+        }
+        REPLAY.recordFrame(id,packets)
+        conn.write(JSON.stringify(packets))
         //console.log(clientPackets[id])
         /**
          * Clear packet queue
@@ -605,6 +655,12 @@ server.on('connection', function (conn) {
                     // TODO: 
                     default:
                 }
+            } else if (packet.type == "collect_gem") {
+                var legal = !!gem_uuids.has(packet.uuid)
+                if (!legal) continue;
+                gem_uuids.delete(packet.uuid)
+                var gem_type = GemType.fromId(clientsPos[id].gems)
+                clientsPos[id].gems[gem_type.getName()]++;
             }
             else {
                 /**
@@ -665,6 +721,7 @@ server.on('connection', function (conn) {
      * Disconnect the current client
      */
     function disconnect() {
+        REPLAY.saveToFile()
         disconnected = true;
         conn.end()
         console.log('[DEBUG] - %s', id);

@@ -1,4 +1,5 @@
 {
   "dependencies": {
+    "archiver": "^5.3.1"
   }
 }

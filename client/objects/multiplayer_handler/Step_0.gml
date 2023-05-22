@@ -83,7 +83,23 @@ if (keyboard_check(ord("D"))||keyboard_check(vk_right)) {
 	if (global.control_style=="classic") fake_direction += 3.65
 	else {phy_speed_x=_speed;sendPosPack = true}
 }
-
+x=phy_position_x
+y=phy_position_y
+var list = ds_list_create()
+instance_place_list(x,y,gem_obj,list,true)
+if (not ds_list_empty(list)) {
+	for (var i = 0; i < ds_list_size(list); i++) {
+		var coll = ds_list_find_value(list,i)
+		with (coll) {
+			addPacket({
+	type: "collect_gem",
+	uuid: uuid,
+	gem_type: image_index
+})
+			instance_destroy(coll)
+		}
+	}
+}
 
 //if (mouse_check_button(mb_right) || keyboard_check(ord("X"))) {
 //	 sendPosPack = true
