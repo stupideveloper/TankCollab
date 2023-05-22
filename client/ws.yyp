@@ -35,7 +35,9 @@
     "IDEVersion": "2023.4.0.84",
   },
   "resources": [
+    {"id":{"name":"upgrade_buttom_manager_obj","path":"objects/upgrade_buttom_manager_obj/upgrade_buttom_manager_obj.yy",},},
     {"id":{"name":"start_obj","path":"objects/start_obj/start_obj.yy",},},
+    {"id":{"name":"move_speed_spr","path":"sprites/move_speed_spr/move_speed_spr.yy",},},
     {"id":{"name":"bullet_speed_spr","path":"sprites/bullet_speed_spr/bullet_speed_spr.yy",},},
     {"id":{"name":"walls","path":"objects/walls/walls.yy",},},
     {"id":{"name":"PacketFunctions","path":"scripts/PacketFunctions/PacketFunctions.yy",},},
@@ -50,6 +52,7 @@
     {"id":{"name":"core_enemy_spr","path":"sprites/core_enemy_spr/core_enemy_spr.yy",},},
     {"id":{"name":"BG_spr","path":"sprites/BG_spr/BG_spr.yy",},},
     {"id":{"name":"tank_spr","path":"sprites/tank_spr/tank_spr.yy",},},
+    {"id":{"name":"bullet_damage_spr","path":"sprites/bullet_damage_spr/bullet_damage_spr.yy",},},
     {"id":{"name":"bullet_reload_spr","path":"sprites/bullet_reload_spr/bullet_reload_spr.yy",},},
     {"id":{"name":"IP_fnt","path":"fonts/IP_fnt/IP_fnt.yy",},},
     {"id":{"name":"StartRoom","path":"rooms/StartRoom/StartRoom.yy",},},
