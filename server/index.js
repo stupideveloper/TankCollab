@@ -8,6 +8,7 @@ const do_lag_back = true
  */
 const do_friendly_fire = true;
 
+const gem_uuids = new Set()
 
 /**
  * Import the networking library API
@@ -34,7 +35,7 @@ const Collision = require("./rect_collisions.js");
 /**
  * Imports the collision helper functions
  */
-const { checkWalls, bulletRect, tankRect } = require("./arenaCollisions.js");
+const { checkWalls, bulletRect, tankRect, gemRect } = require("./arenaCollisions.js");
 const { checkPlayer } = require("./playerCollisions.js")
 
 var server = net.createServer();
@@ -72,10 +73,10 @@ let teamSelector = () => {
     return teamSizes[teams.TEAM_A] > teamSizes[teams.TEAM_B] ? teams.TEAM_B : teams.TEAM_A;
 }
 class GemType {
-    static BLUE = 0b00;
-    static GREEN = 0b01;
-    static PURPLE = 0b10;
-    static RED = 0b11;
+    static BLUE = 0b01;
+    static GREEN = 0b10;
+    static PURPLE = 0b11;
+    static RED = 0b00;
     static random() {
         return (
             (Math.random()>0.5)?(Math.random()>0.5)?this.BLUE:this.GREEN:(Math.random()>0.5)?this.PURPLE:this.RED
@@ -83,7 +84,8 @@ class GemType {
     }
 }
 function randomGem(width,height,type=GemType.random()) {
-    var gran = 100
+    while (true) {
+    var gran = 1000
     var widthQ, heightQ;
     if (width > height) {
         heightQ = gran;
@@ -92,13 +94,24 @@ function randomGem(width,height,type=GemType.random()) {
         widthQ = gran;
         heightQ = Math.floor(gran * (height/width))
     }
+    var x = width * Math.floor(Math.random()*(widthQ+1)) / widthQ
+    var y = height * Math.floor(Math.random()*(heightQ+1)) / heightQ
+    if (!checkWalls({
+        ...gemRect,
+        x,
+        y
+    })) {
+        let gemuuid = uuid()
+        gem_uuids.push(gemuuid)
     return {
         type,
-        x: width * Math.floor(Math.random()*(widthQ+1)) / widthQ,
-        y: height * Math.floor(Math.random()*(heightQ+1)) / heightQ
+        x,
+        y,
+        uuid: gemuuid
     }
 }
-console.log(randomGem(100,100))
+}
+}
 /**
  * An object that stores different upgrades
  */
@@ -441,11 +454,20 @@ server.on('connection', function (conn) {
         if (clientsPos[id].respawnTime != -1) {
             clientsPos[id].respawnTime -= 1
         }
+
+        var gem = randomGem(3733,2330)
+        clientPackets[id].push({
+            type: "gem_spawn",
+            x: gem.x,
+            y: gem.y,
+            gem_type: gem.type
+        })
+        //console.log(gem)
         /**
          * If the client is no longer dead, send a respawn packet
          */
         if (clientsPos[id].respawnTime == 0) {
-            clientPackets[id].respawnTime = -1
+            clientsPos[id].respawnTime = -1
             clientPackets[id].push({
                 type: "respawn",
                 max_health: upgradeTiers.health[teamUpgrades[team].health]

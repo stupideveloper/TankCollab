@@ -127,8 +127,20 @@ function handlePackets(packets) {
 					global.shake_fade = extra_packet.fade;
 					break;
 				}
+				case "gem_spawn": {
+					instance_create_layer(extra_packet.x,extra_packet.y,"Instances",gem_obj,{image_index: extra_packet.gem_type,
+						image_xscale: 0.25,
+						image_yscale: 0.25})
+					
+					break;
+				}
+				default: {
+					show_debug_message(extra_packet)
+				}
 			}
-			} catch (e) {e=e}
+			} catch (e) {
+				show_debug_message(e)
+			}
 		}
 		global.upgrades = packets.upgrades
 		global.speeed = global.upgrades.speed
