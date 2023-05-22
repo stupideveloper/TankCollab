@@ -27,10 +27,15 @@
     {"name":"core_ememy_obj","order":3,"path":"objects/core_ememy_obj/core_ememy_obj.yy",},
     {"name":"shield_gen_spr","order":6,"path":"sprites/shield_gen_spr/shield_gen_spr.yy",},
     {"name":"shield_enemy_obj","order":4,"path":"objects/shield_enemy_obj/shield_enemy_obj.yy",},
+    {"name":"gem_spr","order":9,"path":"sprites/gem_spr/gem_spr.yy",},
     {"name":"core_enemy_spr","order":5,"path":"sprites/core_enemy_spr/core_enemy_spr.yy",},
     {"name":"BG_spr","order":3,"path":"sprites/BG_spr/BG_spr.yy",},
     {"name":"tank_spr","order":1,"path":"sprites/tank_spr/tank_spr.yy",},
+<<<<<<< HEAD
     {"name":"bullet_damage_spr","order":2,"path":"sprites/bullet_damage_spr/bullet_damage_spr.yy",},
+=======
+    {"name":"gem_obj","order":6,"path":"objects/gem_obj/gem_obj.yy",},
+>>>>>>> master
     {"name":"upgrade_button_obj","order":5,"path":"objects/upgrade_button_obj/upgrade_button_obj.yy",},
     {"name":"GamePlayRenderer","order":1,"path":"scripts/GamePlayRenderer/GamePlayRenderer.yy",},
     {"name":"Room1","order":1,"path":"rooms/Room1/Room1.yy",},

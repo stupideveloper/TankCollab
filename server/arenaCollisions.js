@@ -18,8 +18,8 @@ const arenaGeometry = [
 let arenaBounds = {
     x_min: 0,
     y_min: 0,
-    x_max: 7680,
-    y_max: 4660
+    x_max: 3733,
+    y_max: 2330
 }
 /**
  * Size of a bullet
@@ -37,11 +37,16 @@ const tankRect = {
     h: 63,
     rough_radius: Math.sqrt(32**2+32**2)
 }
+const gemRect = {
+    w: 43,
+    h: 43,
+    rough_radius: Math.ceil(Math.sqrt(43**2+43**2))
+}
 const shieldGeneratorRect = {
 
 }
 const coreRect = {
-    
+
 }
 /**
  * 
@@ -90,5 +95,8 @@ const checkWallCollisions = function (rect) {
 module.exports = {
     checkWalls: checkWallCollisions,
     bulletRect,
-    tankRect
+    tankRect,
+    gemRect,
+    coreRect,
+    shieldGeneratorRect
 }
