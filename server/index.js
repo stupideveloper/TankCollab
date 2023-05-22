@@ -535,6 +535,7 @@ server.on('connection', function (conn) {
         var packets = {
             type: "positions",
             this_id: id,
+            gems: clientsPos[id].gems,
             teamPlayers: [...Object.keys(teamMap)].map(t => { return { id: t, ally: teamMap[t] == team } }).reduce((p, c) => {
                 p[c.id] = c.ally
                 return p
