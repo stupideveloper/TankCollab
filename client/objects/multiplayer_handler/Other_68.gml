@@ -42,6 +42,6 @@ network_send_packet(client,buff,buffer_get_size(buff))
 		break;
 	}
 	default: {
-		show_debug_message(type)
+		// show_debug_message(type)
 	}
 }

@@ -1,15 +1,14 @@
-/// @description Insert description here
-// You can write your code in this editor
 var font = draw_get_font()
 draw_set_font(IP_fnt)
 draw_set_halign(fa_center)
-draw_set_valign(fa_center)
-if (global.failed) {
+draw_set_valign(fa_middle)
+if (struct_exists(global,"failed")) {
+	if (struct_get(global,"failed")) {
 	draw_text(
 	camera_get_view_width(view_camera[0])/2,
 	camera_get_view_height(view_camera[0])/2-120,
 	"Connection Failed!"
-)}
+)}}
 draw_text(
 	camera_get_view_width(view_camera[0])/2,
 	camera_get_view_height(view_camera[0])/2 - 40,
