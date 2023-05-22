@@ -3,6 +3,7 @@
 
 addPacket({
 	type: "collect_gem",
-	uuid: uuid
+	uuid: uuid,
+	gem_type: image_index
 })
 instance_destroy()

@@ -7,3 +7,8 @@
 *.hex
 .vscode/
 .vscode/launch.json
+*.record
+/server/node_modules/
+package-lock.json
+package.json
+/server/records/
