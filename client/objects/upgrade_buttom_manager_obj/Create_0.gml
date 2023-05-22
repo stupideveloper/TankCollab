@@ -11,5 +11,12 @@ for(i = 0; i < 4; ++i; ){
 	instance_create_layer(0,0,"upgrade_buttons",upgrade_button_obj,{x_offset:x_pos, y_offset:inital_y,spr:tile_sprts[i]})
 	x_pos=x_pos+offset_x
 }
+
+// Button States
+max_health = 0
+bullet_damage = 0
+bullet_speed = 0
+bullet_reload = 0
+move_speed = 0
   
 

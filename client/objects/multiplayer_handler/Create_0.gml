@@ -85,6 +85,13 @@ this_id = ""
 old_x = 0
 old_y = 0
 
+// Gem Inventory
+blue_n = 0
+green_n = 0
+red_n = 0
+purple_n = 0
+
+
 // [UNUSED]
 old_x2 = 0
 ticks_since_update = 0
@@ -99,3 +106,5 @@ is_x = true;
 client = network_create_socket(network_socket_tcp);
 var server = network_connect_raw_async( client,global.IP_ADDR, 9000 );
 show_debug_message(string(server))
+
+
