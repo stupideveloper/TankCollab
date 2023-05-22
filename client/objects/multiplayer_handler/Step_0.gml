@@ -61,8 +61,8 @@ phy_speed_y*=0.9
 if (keyboard_check(ord("W"))||keyboard_check(vk_up)) {
 	sendPosPack = true
 	if (global.control_style=="classic") {
-		phy_speed_x=5*cos_(fake_direction)
-		phy_speed_y=5*sin_(fake_direction)
+		phy_speed_x=_speed*cos_(fake_direction)
+		phy_speed_y=_speed*sin_(fake_direction)
 	}
 	else phy_speed_y=-_speed//*sin_(fake_direction)
 }
@@ -70,8 +70,8 @@ if (keyboard_check(ord("S"))||keyboard_check(vk_down)) {
 	// physics_apply_force(x-global.speeed*100*cos_(fake_direction),y-global.speeed*100*sin_(fake_direction),500,500)
 	sendPosPack = true
 	if (global.control_style=="classic") {
-		phy_speed_x=-5*cos_(fake_direction)
-		phy_speed_y=-5*sin_(fake_direction)
+		phy_speed_x=-_speed*cos_(fake_direction)
+		phy_speed_y=-_speed*sin_(fake_direction)
 	}
 	else phy_speed_y=_speed
 }
