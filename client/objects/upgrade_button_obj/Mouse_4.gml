@@ -14,6 +14,24 @@ switch (spr) {
 		})
 		break
 	}
+	case health_regen_spr: {
+		if (upgrade_buttom_manager_obj.health_regen != 6) upgrade_buttom_manager_obj.bullet_damage++
+		addPacket({
+		type: "upgrade_ability",
+		upgrade_type: "health_regen",
+		value: upgrade_buttom_manager_obj.health_regen
+		})
+		break
+	}
+	case max_health_spr: {
+		if (upgrade_buttom_manager_obj.max_health != 6) upgrade_buttom_manager_obj.bullet_damage++
+		addPacket({
+		type: "upgrade_ability",
+		upgrade_type: "max_health",
+		value: upgrade_buttom_manager_obj.max_health
+		})
+		break
+	}
 	case bullet_reload_spr: {
 		if (upgrade_buttom_manager_obj.bullet_reload != 6) upgrade_buttom_manager_obj.bullet_reload++
 			addPacket({

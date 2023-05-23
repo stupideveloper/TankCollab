@@ -165,6 +165,7 @@ function handlePackets(packets) {
 		global.teams = packets.teamPlayers
 		global.projectiles = packets.projectiles
 		global.other_player_xy = packets.locations
+		
 		//show_debug_message(array_length(variable_struct_get_names(packets.projectiles)))
 	} else if (packets.type == "id") {
 		global.this_id = packets.this_id

@@ -90,14 +90,33 @@ instance_place_list(x,y,gem_obj,list,true)
 if (not ds_list_empty(list)) {
 	for (var i = 0; i < ds_list_size(list); i++) {
 		var coll = ds_list_find_value(list,i)
-		with (coll) {
+		//with (coll) {
 			addPacket({
 	type: "collect_gem",
-	uuid: uuid,
-	gem_type: image_index
+	uuid: coll.uuid,
+	gem_type: coll.image_index
 })
+switch (coll.image_index) {
+	case 0: {
+		red_n++
+		break;
+	}
+	case 1: {
+		blue_n++
+		break;
+	}
+	case 2: {
+		green_n++
+		break;
+	}
+	case 3: {
+		purple_n++
+		break;
+	}
+	
+}
 			instance_destroy(coll)
-		}
+		//}
 	}
 }
 

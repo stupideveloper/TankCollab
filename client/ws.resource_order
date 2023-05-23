@@ -1,4 +1,7 @@
 {
   "FolderOrderSettings": [],
-  "ResourceOrderSettings": [],
+  "ResourceOrderSettings": [
+    {"name":"max_health_spr","order":2,"path":"sprites/max_health_spr/max_health_spr.yy",},
+    {"name":"health_regen_spr","order":1,"path":"sprites/health_regen_spr/health_regen_spr.yy",},
+  ],
 }
