@@ -8,8 +8,6 @@ const do_lag_back = true
  */
 const do_friendly_fire = true;
 
-const gem_uuids = new Set()
-
 /**
  * Import the networking library API
  */
@@ -41,6 +39,8 @@ const fs = require("fs")
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
 const Collision = require("./rect_collisions.js");
+const { teamSelector, teamUpgradesToTiers, teamSizes, upgradeTiers } = require("./teams.js")
+const { randomGem, GemType, gem_uuids} = require("./gems.js")
 /**
  * Imports the collision helper functions
  */
@@ -64,106 +64,11 @@ let clients = {
 let packetListeners = {
 
 }
-/**
- * Different team names
- */
-const teams = {
-    TEAM_A: "A",
-    TEAM_B: "B"
-}
-/**
- * Team selection algorithm
- */
-let teamSizes = { A: 0, B: 0 }
-let teamSelector = () => {
-    if (teamSizes[teams.TEAM_A] == teamSizes[teams.TEAM_B]) {
-        return Math.random() > 0.5 ? teams.TEAM_A : teams.TEAM_B;
-    }
-    return teamSizes[teams.TEAM_A] > teamSizes[teams.TEAM_B] ? teams.TEAM_B : teams.TEAM_A;
-}
-class GemType {
-    static BLUE = new GemType(0b01,"BLUE");
-    static GREEN = new GemType(0b10,"GREEN");
-    static PURPLE = new GemType(0b11,"PURPLE");
-    static RED = new GemType(0b00,"RED");
-    #id = 0b00
-    #name = ""
-    constructor(id,name) {
-        this.#id = id;
-        this.#name = name
-    }
-    getName() {
-        return this.#name
-    }
-    getId() {
-        return this.#id
-    }
-    /**
-     * 
-     * @returns {GemType} type
-     */
-    static random() {
-        return (
-            (Math.random()>0.5)?(Math.random()>0.5)?this.BLUE:this.GREEN:(Math.random()>0.5)?this.PURPLE:this.RED
-        )
-    }
-    /**
-     * 
-     * @param {*} id 
-     * @returns {GemType} type
-     */
-    static fromId(id) {
-        switch (id) {
-            case 0b01:
-                return this.BLUE
-            case 0b10: 
-                return this.GREEN
-            case 0b11:
-                return this.PURPLE
-            case 0b00:
-                return this.RED
-        }
-    }
-}
-function randomGem(width,height,type=GemType.random()) {
-    while (true) {
-    var gran = 1000
-    var widthQ, heightQ;
-    if (width > height) {
-        heightQ = gran;
-        widthQ = Math.floor(gran * (width/height))
-    } else {
-        widthQ = gran;
-        heightQ = Math.floor(gran * (height/width))
-    }
-    var x = width * Math.floor(Math.random()*(widthQ+1)) / widthQ
-    var y = height * Math.floor(Math.random()*(heightQ+1)) / heightQ
-    if (!checkWalls({
-        ...gemRect,
-        x,
-        y
-    })) {
-        let gemuuid = uuid()
-        gem_uuids.add(gemuuid)
-    return {
-        type: type.getId(),
-        x,
-        y,
-        uuid: gemuuid
-    }
-}
-}
-}
+
 /**
  * An object that stores different upgrades
  */
-let upgradeTiers = {
-    damage: [10, 12, 14, 16, 18, 20, 22],
-    bulletSpeed: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6],
-    health: [100, 120, 128, 135, 141, 146, 150],
-    damageResistance: [0, 4, 8, 11, 14, 17, 20], // %
-    speed: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
-}
+
 
 /**
  * Includes team-specific data
@@ -198,19 +103,7 @@ let teamData = {
 /**
  * Team-specific upgrades
  */
-function teamUpgradesToTiers(upgrades) {
-return Object.keys(upgradeTiers).map(v=>{
-    return {
-        key: v,
-        value: upgradeTiers[v][upgrades[v]]
-    }
-}).reduce((p,v)=>{
-    return {
-        ...p,
-        [v.key]: v.value
-    }
-},{})
-}
+
 let teamUpgrades = {
     "A": {
         damage: 0,
@@ -805,11 +698,15 @@ server.on('connection', function (conn) {
 /**
  * Get the IP address
  */
-//const IP = require("./iptest.hidden.js").ip
-
+let IP = "localhost";
+try {
+ IP = require("./iptest.hidden.js").ip
+} catch {
+    console.warn("[WARN] Create a iptest.hidden.js file to get your device's local IP")
+}
 /**
  * Start the server
  */
 server.listen(9000, function () {
-    console.log('server listening to %s:%j', /*IP,*/ server.address().port);
+    console.log('server listening to %s:%j', IP, server.address().port);
 });

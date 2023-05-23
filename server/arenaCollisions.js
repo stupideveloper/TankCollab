@@ -45,6 +45,13 @@ const gemRect = {
 const shieldGeneratorRect = {
 
 }
+const shieldGeneratorLocations = [
+    {
+        x: 100,
+        y: 100,
+        team: "A"
+    }
+]
 const coreRect = {
     w: 0,
     h: 0,
