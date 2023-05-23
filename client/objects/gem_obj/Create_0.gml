@@ -1,5 +1,4 @@
 /// @description Insert description here
 // You can write your code in this editor
 
-
-// show_debug_message(move_speed)
+struct_set(global.gems,uuid,self)

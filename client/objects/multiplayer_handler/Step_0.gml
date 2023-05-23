@@ -5,6 +5,7 @@
 if (keyboard_check_pressed(vk_escape)) {
 	global.gamemenu = !global.gamemenu
 }
+
 if (!connected) {
 	tics += 1
 	if (tics == 100) {
@@ -19,7 +20,6 @@ if (!connected) {
 packet_queue = {
 	packets: []
 }
-
 // Whether to send the position packet
 var sendPosPack = false
 
@@ -117,6 +117,9 @@ if (sendPosPack) {
 	dir: dir,
 	type: "pos"
 	})
+}
+if (keyboard_check_pressed(ord("P")) && global.gamemenu) {
+	addPacket({type: "begin"})
 }
 /**
 	Screenshake

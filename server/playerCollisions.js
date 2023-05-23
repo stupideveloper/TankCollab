@@ -83,7 +83,7 @@ function checkPlayerBullet(playerMap,playerLocMap,x,y,dir,shooter,damage,room) {
     return hits;
 }
 function checkCoreBullet(cores=[],shieldGenerators=[],x,y,dir,shooter) {
-
+    
 }
 
 module.exports = {

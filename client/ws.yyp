@@ -49,6 +49,7 @@
     {"id":{"name":"core_ememy_obj","path":"objects/core_ememy_obj/core_ememy_obj.yy",},},
     {"id":{"name":"shield_gen_spr","path":"sprites/shield_gen_spr/shield_gen_spr.yy",},},
     {"id":{"name":"shield_enemy_obj","path":"objects/shield_enemy_obj/shield_enemy_obj.yy",},},
+    {"id":{"name":"grayscale_blend","path":"shaders/grayscale_blend/grayscale_blend.yy",},},
     {"id":{"name":"gem_spr","path":"sprites/gem_spr/gem_spr.yy",},},
     {"id":{"name":"core_enemy_spr","path":"sprites/core_enemy_spr/core_enemy_spr.yy",},},
     {"id":{"name":"BG_spr","path":"sprites/BG_spr/BG_spr.yy",},},

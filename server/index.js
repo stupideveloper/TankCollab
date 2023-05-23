@@ -173,13 +173,25 @@ let teamData = {
         coreHealth: 1000,
         leftShield: 500,
         rightShield: 500,
-        spawnpoint: [120, 120]
+        spawnpoint: [120, 120],
+        getSpawnpoint: ()=>{
+            return [
+                800,
+                500 + (1830-500) * Math.random()
+            ]
+        }
     },
     "B": {
         coreHealth: 1000,
         leftShield: 500,
         rightShield: 500,
-        spawnpoint: [420, 120]
+        spawnpoint: [420, 120],
+        getSpawnpoint: ()=>{
+            return [
+                3733-800,
+                500 + (1830-500) * Math.random()
+            ]
+        }
     }
 }
 
@@ -220,6 +232,8 @@ let teamUpgrades = {
  */
 const teamUpgradesDefault = JSON.stringify(teamUpgrades)
 
+
+let started = false
 /**
  * Every game tick this function runs
  */
@@ -230,6 +244,18 @@ setInterval(async function SERVER_GAME_TICK() {
     Object.keys(packetListeners).map(player => {
         packetListeners[player]()
     })
+
+    if (started && Math.random() > 0.99) {
+        var gem = randomGem(3733,2330)
+        broadcast({
+            type: "gem_spawn",
+            x: gem.x,
+            y: gem.y,
+            gem_type: gem.type,
+            uuid: gem.uuid
+        })
+
+    }
 
     /**
      * For every room
@@ -330,10 +356,28 @@ let rooms = {
     }
 }
 /**
+ * Self explanitory, broadcasts a packet
+ * @param packet 
+ */
+function broadcast(packet) {
+    for (let key in clientPackets) {
+        clientPackets[key].push(packet)
+    }
+}
+function broadcastConditional(packet,condition) {
+    for (let key in clientPackets) {
+        if (condition(key)) {
+            clientPackets[key].push(packet)
+        }
+    }
+}
+/**
  * An object containing packets that get sent to specific clients.
  * 
  * For example, client 12345678-90ab-4def-1234-567890abcdef would have a packet sent by 
  * adding a packet to `clientPackets["12345678-90ab-4def-1234-567890abcdef"]`
+ * 
+ * @type {Map<import("crypto").UUID,Array<Packet>>}
  */
 let clientPackets = {}
 function doCollisions() {
@@ -462,7 +506,7 @@ server.on('connection', function (conn) {
         }
     }
     clientsPos[id].health = upgradeTiers.health[teamUpgrades[team].health]
-    teleport(id, teamData[team].spawnpoint[0], teamData[team].spawnpoint[1])
+    teleport(id, ...teamData[team].getSpawnpoint())
     /**
      * Sends a join packet to all clients. Currently unrecieved
      */
@@ -503,14 +547,7 @@ server.on('connection', function (conn) {
             clientsPos[id].respawnTime -= 1
         }
 
-        var gem = randomGem(3733,2330)
-        clientPackets[id].push({
-            type: "gem_spawn",
-            x: gem.x,
-            y: gem.y,
-            gem_type: gem.type,
-            uuid: gem.uuid
-        })
+        
         //console.log(gem)
         /**
          * If the client is no longer dead, send a respawn packet
@@ -522,7 +559,7 @@ server.on('connection', function (conn) {
                 max_health: upgradeTiers.health[teamUpgrades[team].health]
             })
             clientsPos[id].health = upgradeTiers.health[teamUpgrades[team].health]
-            teleport(id, teamData[team].spawnpoint[0], teamData[team].spawnpoint[1])
+            teleport(id, ...teamData[team].getSpawnpoint())
             clientsPos[id].hidden = false
         }
         /**
@@ -546,6 +583,7 @@ server.on('connection', function (conn) {
             locations: visiblePlayers.map(id => clientsPos[id]),
             projectiles: rooms[currentRoom].projectiles,
             misc_packets: clientPackets[id],
+            teamData: teamData[team]
         }
         REPLAY.recordFrame(id,packets)
         conn.write(JSON.stringify(packets))
@@ -566,6 +604,7 @@ server.on('connection', function (conn) {
      * @param {{packets:[{type:string}]}} newpos 
      */
     function handlePacket(newpos) {
+        //console.log(newpos)
         for (let packet of newpos.packets) {
             if (packet.type == "pos") {
                 /**
@@ -578,12 +617,12 @@ server.on('connection', function (conn) {
                  * }
                  */
                 let distanceTraveledSquared = (packet.x - clientsPos[id].x) ** 2 + (packet.y - clientsPos[id].y) ** 2
-                if (distanceTraveledSquared >= 25 ** 2 && do_lag_back) {
+                if (!started || distanceTraveledSquared >= 25 ** 2 && do_lag_back) {
                     clientPackets[id].push({
                         type: "teleport",
                         x: clientsPos[id].x,
                         y: clientsPos[id].y,
-                        dir: clientsPos[id].dir
+                        dir: packet.dir
                     })
                     continue;
                 }
@@ -629,6 +668,7 @@ server.on('connection', function (conn) {
                     })
                 })
             } else if (packet.type == "fire_bullet") {
+                if (!started) continue
                 /**
                  * Fire bullet packet, overload is handled by server
                  * {
@@ -660,8 +700,16 @@ server.on('connection', function (conn) {
                 var legal = !!gem_uuids.has(packet.uuid)
                 if (!legal) continue;
                 gem_uuids.delete(packet.uuid)
-                var gem_type = GemType.fromId(clientsPos[id].gems)
+                var gem_type = GemType.fromId(packet.gem_type)
                 clientsPos[id].gems[gem_type.getName()]++;
+                broadcast({
+                    type: "collect_gem",
+                    uuid: packet.uuid
+                })
+            }
+             else if (packet.type == "begin") {
+                //console.log(packet)
+                started = !started;
             }
             else {
                 /**

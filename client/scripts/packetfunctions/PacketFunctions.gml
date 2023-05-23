@@ -20,6 +20,9 @@ function IPCheck(ip_addr) {
 		return false
 	}
 }
+function spawnShields() {
+//instance_create_layer(shield_enemy_obj)
+}
 function PacketFunctions(){
 
 }
@@ -136,12 +139,20 @@ function handlePackets(packets) {
 					
 					break;
 				}
+				case "collect_gem": {
+					try {
+						var gemtodelete = struct_get(global.gems,extra_packet.uuid)
+						instance_destroy(gemtodelete)
+						struct_remove(global.gems,extra_packet.uuid)
+					} catch (e) {e=e}
+					break;
+				}
 				default: {
 					show_debug_message(extra_packet)
 				}
 			}
 			} catch (e) {
-				show_debug_message(e)
+				//show_debug_message(e)
 			}
 		}
 		global.upgrades = packets.upgrades
@@ -150,6 +161,7 @@ function handlePackets(packets) {
 		if (global.respawntime == -1) {
 			global.dead = false	
 		}
+		global.core_health = packets.teamData.coreHealth
 		global.teams = packets.teamPlayers
 		global.projectiles = packets.projectiles
 		global.other_player_xy = packets.locations

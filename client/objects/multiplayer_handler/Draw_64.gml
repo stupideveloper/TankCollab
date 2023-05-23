@@ -11,6 +11,14 @@ var width_new = (393-17)*(global.health/global.max_health)+17
 if (global.health > 0) {
 	draw_rectangle(17,17,width_new,43,false)
 }
+draw_set_color(c_black)
+draw_rectangle(5,58,405,95,false)
+draw_set_color(c_green)
+width_new = (393-17)*(global.core_health/1000)+17
+if (global.core_health > 0) {
+	draw_rectangle(17,70,width_new,83,false)
+}
+
 
 draw_text_ext_transformed(40,40,string_format(global.title,1,[global.respawntime]),0,0,4,4,0)
 

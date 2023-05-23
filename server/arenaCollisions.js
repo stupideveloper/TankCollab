@@ -46,7 +46,9 @@ const shieldGeneratorRect = {
 
 }
 const coreRect = {
-
+    w: 0,
+    h: 0,
+    rough_radius: 170
 }
 /**
  * 
