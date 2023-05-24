@@ -1,5 +1,12 @@
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
+global.right_shield_own_health = 0
+			global.left_shield_own_health = 0
+			global.right_shield_other_health = 0
+			global.left_shield_other_health = 0
+			global.core_own_health = 0
+			global.core_other_health = 0
+
 function IPCheck(ip_addr) {
 	var split = string_split(ip_addr,".")
 	if (array_length(split)==4) {
@@ -161,7 +168,17 @@ function handlePackets(packets) {
 		if (global.respawntime == -1) {
 			global.dead = false	
 		}
-		global.core_health = packets.teamData.coreHealth
+		try {
+			global.right_shield_own_health = packets.team_data.rightShieldHealth
+			global.left_shield_own_health = packets.team_data.rightShieldHealth
+			global.right_shield_other_health = packets.other_team_info.rightShield
+			global.left_shield_other_health = packets.other_team_info.leftShield
+			global.core_own_health = packets.team_data.coreHealth
+			global.core_other_health = packets.other_team_info.core
+		} catch (e) {
+		show_debug_message(e)
+		}
+		global.core_health = packets.team_data.coreHealth
 		global.teams = packets.teamPlayers
 		global.projectiles = packets.projectiles
 		global.gems = packets.gems
@@ -173,6 +190,6 @@ function handlePackets(packets) {
 		global.this_id = packets.this_id
 	}
 	} catch (e) {
-		//show_debug_message(e)
+		show_debug_message(e)
 	}
 }

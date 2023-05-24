@@ -40,7 +40,12 @@ draw_set_font(font)
 	}
 
 }
-
+try {
+draw_text(200,700,"LEFTS "+string(global.left_shield_own_health))
+draw_text(200,730,"RIGHTS "+string(global.right_shield_own_health))
+} catch (e) {
+//show_debug_message(e)
+}
 
 draw_set_color(c_white)
 

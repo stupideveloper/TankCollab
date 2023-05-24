@@ -542,8 +542,10 @@ server.on('connection', function (conn) {
          */
         let otherTeam = teamData[(team=="A")?"B":"A"]
         let otherTeamInfo = {
-            rightShield: otherTeam.rightShieldHealth > 0,
-            leftShield: otherTeam.leftShieldHealth > 0,
+            rightShield: otherTeam.rightShieldHealth,
+            rightShieldLoc: otherTeam.rightShield,
+            leftShield: otherTeam.leftShieldHealth,
+            leftShieldLoc: otherTeam.rightShield,
             core: otherTeam.coreHealth,
         }
         var packets = {
@@ -561,8 +563,8 @@ server.on('connection', function (conn) {
             locations: visiblePlayers.map(id => clientsPos[id]),
             projectiles: rooms[currentRoom].projectiles,
             misc_packets: clientPackets[id],
-            teamData: teamData[team],
-            otherTeamInfo
+            team_data: teamData[team],
+            other_team_info: otherTeamInfo
         }
         REPLAY.recordFrame(id,packets)
         conn.write(JSON.stringify(packets))

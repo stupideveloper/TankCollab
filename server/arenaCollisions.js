@@ -43,7 +43,7 @@ const gemRect = {
     rough_radius: Math.ceil(Math.sqrt(43**2+43**2))
 }
 const shieldGeneratorRect = {
-
+    rough_radius: 10
 }
 const shieldGeneratorLocations = [
     {
@@ -55,7 +55,7 @@ const shieldGeneratorLocations = [
 const coreRect = {
     w: 0,
     h: 0,
-    rough_radius: 170
+    rough_radius: 85
 }
 /**
  * 
