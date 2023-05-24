@@ -102,14 +102,23 @@ function checkCoreBullet(cores=[],shieldGenerators=[],x,y,dir,shooterTeam) {
     })
     let returns = []
     for (let coreCirc of coreCircles) {
-        if (coreCirc.team == shooterTeam) continue;
+        //if (coreCirc.id.startsWith(shooterTeam)) continue;
+        if (!coreCirc.alive) continue;
         if (Collisions.circle(coreCirc,damageCircle)) {
+            if (coreCirc.id.startsWith(shooterTeam)) {
+                returns.push(0)
+                continue;
+            };
             returns.push(coreCirc.id)
         }
     }
     for (let shieldCirc of shieldCircles) {
-        if (shieldCirc.team == shooterTeam) continue;
+        if (!shieldCirc.alive) continue;
         if (Collisions.circle(shieldCirc,damageCircle)) {
+            if (shieldCirc.id.startsWith(shooterTeam)) {
+                returns.push(0)
+                continue;
+            };
             returns.push(shieldCirc.id)
         }
     }

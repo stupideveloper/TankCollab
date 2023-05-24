@@ -1,8 +1,13 @@
 {
   "FolderOrderSettings": [],
   "ResourceOrderSettings": [
+    {"name":"shield_right_enemy_obj","order":3,"path":"objects/shield_right_enemy_obj/shield_right_enemy_obj.yy",},
     {"name":"Inventory_fnt","order":1,"path":"fonts/Inventory_fnt/Inventory_fnt.yy",},
     {"name":"max_health_spr","order":2,"path":"sprites/max_health_spr/max_health_spr.yy",},
+    {"name":"shield_left_self_obj","order":5,"path":"objects/shield_left_self_obj/shield_left_self_obj.yy",},
+    {"name":"core_self_obj","order":2,"path":"objects/core_self_obj/core_self_obj.yy",},
+    {"name":"shield_right_self_obj","order":4,"path":"objects/shield_right_self_obj/shield_right_self_obj.yy",},
+    {"name":"core_self_spr","order":2,"path":"sprites/core_self_spr/core_self_spr.yy",},
     {"name":"inventory_obj","order":1,"path":"objects/inventory_obj/inventory_obj.yy",},
     {"name":"inventory_spr","order":1,"path":"sprites/inventory_spr/inventory_spr.yy",},
     {"name":"health_regen_spr","order":1,"path":"sprites/health_regen_spr/health_regen_spr.yy",},

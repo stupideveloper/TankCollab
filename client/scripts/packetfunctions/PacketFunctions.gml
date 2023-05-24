@@ -6,7 +6,9 @@ global.right_shield_own_health = 0
 			global.left_shield_other_health = 0
 			global.core_own_health = 0
 			global.core_other_health = 0
-
+			global.this_team = "_"
+			global.has_spawned_shields = false
+global.remove_on_disconnect = []
 function IPCheck(ip_addr) {
 	var split = string_split(ip_addr,".")
 	if (array_length(split)==4) {
@@ -71,6 +73,12 @@ var json = json_stringify(multiplayer_handler.packet_queue)
 var buff = buffer_create(0,buffer_grow,1)
 buffer_write(buff,buffer_text,json)
 network_send_packet(multiplayer_handler.client,buff,buffer_get_size(buff))
+}
+function destroy_disconnect() {
+	for (var i = 0; i < array_length(global.remove_on_disconnect); i++) {
+		instance_destroy(global.remove_on_disconnect[i])
+	}
+	global.remove_on_disconnect = []
 }
 function handlePackets(packets) {
 	try {
@@ -137,6 +145,10 @@ function handlePackets(packets) {
 					global.shake_fade = extra_packet.fade;
 					break;
 				}
+				case "team_set": {
+					global.this_team = extra_packet.team
+					break;
+				}
 				case "gem_spawn": {
 					instance_create_layer(extra_packet.x,extra_packet.y,"Instances",gem_obj,{image_index: extra_packet.gem_type,
 						image_xscale: 1,
@@ -152,6 +164,62 @@ function handlePackets(packets) {
 						instance_destroy(gemtodelete)
 						struct_remove(global.gems,extra_packet.uuid)
 					} catch (e) {e=e}
+					break;
+				}
+				case "core_shield_destroy": {
+					switch (extra_packet.id) {
+						case "A:core": {
+							if (global.this_team == "A") {
+								core_self_obj.dead = true;
+							} else {
+								core_ememy_obj.dead = true;
+							}
+							break;
+						}
+						case "B:core": {
+							if (global.this_team == "B") {
+								core_self_obj.dead = true;
+							} else {
+								core_ememy_obj.dead = true;
+							}
+							break;
+						}
+						case "A:rshield": {
+							if (global.this_team == "A") {
+								shield_right_self_obj.dead = true;
+							} else {
+								shield_right_enemy_obj.dead = true;
+							}
+							break;
+						}
+						case "B:rshield": {
+							if (global.this_team == "B") {
+								shield_right_self_obj.dead = true;
+							} else {
+								shield_right_enemy_obj.dead = true;
+							}
+							break;
+						}
+						case "A:lshield": {
+							if (global.this_team == "A") {
+								shield_left_self_obj.dead = true;
+							} else {
+								shield_left_enemy_obj.dead = true;
+							}
+							break;
+						}
+						case "B:lshield": {
+							if (global.this_team == "B") {
+								shield_left_self_obj.dead = true;
+							} else {
+								shield_left_enemy_obj.dead = true;
+							}
+							break;
+						}
+						default: {
+							show_debug_message(extra_packet)
+						}
+					}
 					break;
 				}
 				default: {
@@ -175,6 +243,25 @@ function handlePackets(packets) {
 			global.left_shield_other_health = packets.other_team_info.leftShield
 			global.core_own_health = packets.team_data.coreHealth
 			global.core_other_health = packets.other_team_info.core
+			if (!global.has_spawned_shields) {
+				var sls = packets.team_data.leftShield
+				var sle = packets.other_team_info.leftShieldLoc
+				var srs = packets.team_data.rightShield
+				var sre = packets.other_team_info.rightShieldLoc
+				var ce = packets.other_team_info.coreLoc
+				var cs = packets.team_data.core
+				
+				
+				var a = instance_create_layer(sle.x,sle.y,"Instances",shield_left_enemy_obj,{sdead: !sle.alive, image_xscale: 0.5, image_yscale: 0.5})
+				var b = instance_create_layer(sls.x,sls.y,"Instances",shield_left_self_obj,{sdead: !sls.alive, image_xscale: 0.5, image_yscale: 0.5})
+				var c = instance_create_layer(srs.x,srs.y,"Instances",shield_right_self_obj, {sdead: !srs.alive, image_xscale: 0.5, image_yscale: 0.5})
+				var d = instance_create_layer(sre.x,sre.y,"Instances",shield_right_enemy_obj, {sdead: !sre.alive, image_xscale: 0.5, image_yscale: 0.5})
+				var e = instance_create_layer(ce.x,ce.y,"Instances",core_ememy_obj, {sdead: !ce.alive, image_xscale: 0.5, image_yscale: 0.5})
+				var f = instance_create_layer(cs.x,cs.y,"Instances",core_self_obj, {sdead: !cs.alive, image_xscale: 0.5, image_yscale: 0.5})
+				
+				global.has_spawned_shields = true;
+				array_push(global.remove_on_disconnect,a,b,c,d,e,f)
+			}
 		} catch (e) {
 		show_debug_message(e)
 		}

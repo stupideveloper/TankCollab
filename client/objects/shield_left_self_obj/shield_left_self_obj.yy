@@ -1,7 +1,7 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "core_ememy_obj",
+  "name": "shield_left_self_obj",
   "eventList": [
     {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,},
     {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,},
@@ -30,10 +30,10 @@
   "properties": [
     {"resourceType":"GMObjectProperty","resourceVersion":"1.0","name":"sdead","filters":[],"listItems":[],"multiselect":false,"rangeEnabled":false,"rangeMax":10.0,"rangeMin":0.0,"value":"0","varType":3,},
   ],
-  "solid": false,
+  "solid": true,
   "spriteId": {
-    "name": "core_enemy_spr",
-    "path": "sprites/core_enemy_spr/core_enemy_spr.yy",
+    "name": "shield_gen_spr",
+    "path": "sprites/shield_gen_spr/shield_gen_spr.yy",
   },
   "spriteMaskId": null,
   "visible": true,

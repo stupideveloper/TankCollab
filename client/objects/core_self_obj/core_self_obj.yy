@@ -1,7 +1,7 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "core_ememy_obj",
+  "name": "core_self_obj",
   "eventList": [
     {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,},
     {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,},
@@ -32,8 +32,8 @@
   ],
   "solid": false,
   "spriteId": {
-    "name": "core_enemy_spr",
-    "path": "sprites/core_enemy_spr/core_enemy_spr.yy",
+    "name": "core_self_spr",
+    "path": "sprites/core_self_spr/core_self_spr.yy",
   },
   "spriteMaskId": null,
   "visible": true,

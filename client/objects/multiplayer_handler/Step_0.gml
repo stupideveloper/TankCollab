@@ -40,6 +40,7 @@ if (!(mouse_x==old_x2 && mouse_y == old_y2)) {
 }
 // if a disconnect is detected
 if (ticks_since_update % 300 == 299 ) {
+    destroy_disconnect()
 	var server = network_connect_raw_async( client,global.IP_ADDR, 9000 );
 }
 

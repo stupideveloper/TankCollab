@@ -78,26 +78,29 @@ let teamData = {
         coreHealth: 1000,
         core: {
             id: "A:core",
-            x: 100,
-            y: 500
+            x: 450,
+            y: 500 + (1830-1000) * 0.5,
+            alive: true
         },
         leftShieldHealth: 500,
         leftShield: {
             id: "A:lshield",
-            x: 100,
-            y: 300
+            x: 400,
+            y: 500 + (1830-1000) * 1,
+            alive: true
         },
         rightShieldHealth: 500,
         rightShield: {
             id: "A:rshield",
-            x: 100,
-            y: 700
+            x: 400,
+            y: 500 + (1830-1000) * 0,
+            alive: true
         },
         spawnpoint: [120, 120],
         getSpawnpoint: ()=>{
             return [
                 800,
-                500 + (1830-500) * Math.random()
+                500 + (1830-1000) * Math.random()
             ]
         }
     },
@@ -105,26 +108,29 @@ let teamData = {
         coreHealth: 1000,
         core: {
             id: "B:core",
-            x: 500,
-            y: 500
+            x: 3733-450,
+            y: 500 + (1830-1000) * 0.5,
+            alive: true
         },
         leftShieldHealth: 500,
         leftShield: {
             id: "B:lshield",
-            x: 500,
-            y: 300
+            x: 3733-400,
+            y: 500 + (1830-1000) * 1,
+            alive: true
         },
         rightShieldHealth: 500,
         rightShield: {
             id: "B:rshield",
-            x: 500,
-            y: 700
+            x: 3733-400,
+            y: 500 + (1830-1000) * 0,
+            alive: true
         },
         spawnpoint: [420, 120],
         getSpawnpoint: ()=>{
             return [
                 3733-800,
-                500 + (1830-500) * Math.random()
+                500 + (1830-1000) * Math.random()
             ]
         }
     }
@@ -147,7 +153,14 @@ function damageCore(coreId="",damage) {
     } else {
         part = "leftShield"
     }
-    teamData[team][part].health-=damage
+    teamData[team][part+"Health"]-=damage
+    if (teamData[team][part+"Health"] < 0) {
+        teamData[team][part].alive = false
+        broadcast({
+            type: "core_shield_destroy",
+            id: coreId
+        })
+    }
 }
 
 function getCores() {
@@ -285,6 +298,7 @@ setInterval(async function SERVER_GAME_TICK() {
             );
             if (coreHits.length != 0) {
                 deletables.push(id)
+                coreHits=coreHits.filter(a=>{return a!=0})
                 coreHits.map(p=>{
                     damageCore(p,damage)
                 })
@@ -381,7 +395,13 @@ function damagePlayer(id, room, damage) {
             type: "death",
         })
         clientsPos[id].hidden = true
-        clientsPos[id].respawnTime = 5 * 60
+        if (teamData[teamMap[id]]["core"].alive) {
+            clientsPos[id].respawnTime = 5 * 60
+        } else {
+            clientPackets[id].push({
+                type: "final_death"
+            })
+        }
     }
 }
 /**
@@ -459,6 +479,10 @@ server.on('connection', function (conn) {
             type: "health_update",
             health: upgradeTiers.health[teamUpgrades[team].health],
             max_health: upgradeTiers.health[teamUpgrades[team].health]
+        },
+        {
+            type: "team_set",
+            team: team
         }
     ]
     clientsPos[id] = {
@@ -544,9 +568,13 @@ server.on('connection', function (conn) {
         let otherTeamInfo = {
             rightShield: otherTeam.rightShieldHealth,
             rightShieldLoc: otherTeam.rightShield,
+            rightShieldAlive: otherTeam.rightShield.alive,
             leftShield: otherTeam.leftShieldHealth,
-            leftShieldLoc: otherTeam.rightShield,
+            leftShieldLoc: otherTeam.leftShield,
+            leftShieldAlive: otherTeam.leftShield.alive,
             core: otherTeam.coreHealth,
+            coreLoc: otherTeam.core,
+            coreAlive: otherTeam.core.alive
         }
         var packets = {
             type: "positions",
