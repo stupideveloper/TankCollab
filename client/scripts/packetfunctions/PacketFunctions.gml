@@ -75,10 +75,10 @@ buffer_write(buff,buffer_text,json)
 network_send_packet(multiplayer_handler.client,buff,buffer_get_size(buff))
 }
 function destroy_disconnect() {
-	for (var i = 0; i < array_length(global.remove_on_disconnect); i++) {
-		instance_destroy(global.remove_on_disconnect[i])
-	}
-	global.remove_on_disconnect = []
+	//for (var i = 0; i < array_length(global.remove_on_disconnect); i++) {
+	//	instance_destroy(global.remove_on_disconnect[i])
+	//}
+	//global.remove_on_disconnect = []
 }
 function handlePackets(packets) {
 	try {

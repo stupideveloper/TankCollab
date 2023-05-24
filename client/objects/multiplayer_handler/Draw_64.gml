@@ -19,6 +19,24 @@ if (global.core_health > 0) {
 	draw_rectangle(17,70,width_new,83,false)
 }
 
+var centre = 205
+draw_set_color(c_black)
+draw_rectangle(5,95+3,centre,95+32+3,false)
+draw_set_color(c_green)
+width_new = ((centre-12)-17)*(global.right_shield_own_health/500)+17
+if (global.right_shield_own_health > 0) {
+	draw_rectangle(17,107+3,width_new,98+20,false)
+}
+
+draw_set_color(c_black)
+draw_rectangle(centre+2,98,405,98+32,false)
+draw_set_color(c_green)
+width_new = (393-(centre+14))*(global.left_shield_own_health/500) + (centre+14)
+if (global.left_shield_own_health > 0) {
+	draw_rectangle(centre+14,98+12,width_new,98+20,false)
+}
+
+
 
 draw_text_ext_transformed(40,40,string_format(global.title,1,[global.respawntime]),0,0,4,4,0)
 
