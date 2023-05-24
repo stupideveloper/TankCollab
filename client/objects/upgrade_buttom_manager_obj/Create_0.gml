@@ -1,7 +1,7 @@
 /// @description Insert description here
 // You can write your code in this editor
 
-inital_x = 200
+inital_x = 150
 x_pos=inital_x
 inital_y = 950
 offset_x = 140

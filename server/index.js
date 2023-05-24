@@ -45,7 +45,7 @@ const { randomGem, GemType, gem_uuids} = require("./gems.js")
  * Imports the collision helper functions
  */
 const { checkWalls, bulletRect, tankRect, gemRect } = require("./arenaCollisions.js");
-const { checkPlayer } = require("./playerCollisions.js");
+const { checkPlayer, checkCores } = require("./playerCollisions.js");
 
 var server = net.createServer();
 /**
@@ -76,8 +76,23 @@ let packetListeners = {
 let teamData = {
     "A": {
         coreHealth: 1000,
-        leftShield: 500,
-        rightShield: 500,
+        core: {
+            id: "A:core",
+            x: 100,
+            y: 500
+        },
+        leftShieldHealth: 500,
+        leftShield: {
+            id: "A:lshield",
+            x: 100,
+            y: 300
+        },
+        rightShieldHealth: 500,
+        rightShield: {
+            id: "A:rshield",
+            x: 100,
+            y: 700
+        },
         spawnpoint: [120, 120],
         getSpawnpoint: ()=>{
             return [
@@ -88,8 +103,23 @@ let teamData = {
     },
     "B": {
         coreHealth: 1000,
-        leftShield: 500,
-        rightShield: 500,
+        core: {
+            id: "B:core",
+            x: 500,
+            y: 500
+        },
+        leftShieldHealth: 500,
+        leftShield: {
+            id: "B:lshield",
+            x: 500,
+            y: 300
+        },
+        rightShieldHealth: 500,
+        rightShield: {
+            id: "B:rshield",
+            x: 500,
+            y: 700
+        },
         spawnpoint: [420, 120],
         getSpawnpoint: ()=>{
             return [
@@ -100,6 +130,39 @@ let teamData = {
     }
 }
 
+function damageCore(coreId="",damage) {
+    let team;
+    if (coreId.startsWith("A")) {
+        team = "A"
+    } else {
+        team = "B"
+    }
+    let part;
+    if (coreId.endsWith("core")) {
+        if (teamData[team].rightShieldHealth > 0) return
+        if (teamData[team].leftShieldHealth > 0) return
+        part = "core"
+    } else if (coreId.endsWith("rshield")) {
+        part = "rightShield"
+    } else {
+        part = "leftShield"
+    }
+    teamData[team][part].health-=damage
+}
+
+function getCores() {
+    let shields = {
+        [teamData["B"].rightShield.id]: {...(teamData["B"].rightShield),health: teamData["B"].rightShieldHealth},
+        [teamData["B"].leftShield.id]: {...(teamData["B"].leftShield),health: teamData["B"].leftShieldHealth},
+        [teamData["A"].rightShield.id]: {...(teamData["A"].rightShield),health: teamData["A"].rightShieldHealth},
+        [teamData["A"].leftShield.id]: {...(teamData["A"].leftShield),health: teamData["A"].leftShieldHealth},
+    }
+    let cores = {
+        [teamData["A"].core.id]: {...(teamData["A"].core),health: teamData["A"].coreHealth},
+        [teamData["B"].core.id]: {...(teamData["B"].core),health: teamData["B"].coreHealth}
+    }
+    return {shields,cores}
+}
 /**
  * Team-specific upgrades
  */
@@ -210,6 +273,21 @@ setInterval(async function SERVER_GAME_TICK() {
                     damagePlayer(p, room, damage) 
                 })
                 return;
+            }
+            let cores = getCores()
+            let coreHits = checkCores(
+                Object.values(cores.cores),
+                Object.values(cores.shields),
+                projectile.x,
+                projectile.y,
+                dir,
+                teamMap[projectile.shooter]
+            );
+            if (coreHits.length != 0) {
+                deletables.push(id)
+                coreHits.map(p=>{
+                    damageCore(p,damage)
+                })
             }
             /**
              * If the projectile hits a wall, delete it
@@ -462,10 +540,17 @@ server.on('connection', function (conn) {
         /**
          * Sends a packet to the client
          */
+        let otherTeam = teamData[(team=="A")?"B":"A"]
+        let otherTeamInfo = {
+            rightShield: otherTeam.rightShieldHealth > 0,
+            leftShield: otherTeam.leftShieldHealth > 0,
+            core: otherTeam.coreHealth,
+        }
         var packets = {
             type: "positions",
             this_id: id,
             gems: clientsPos[id].gems,
+            health: clientsPos[id].health,
             teamPlayers: [...Object.keys(teamMap)].map(t => { return { id: t, ally: teamMap[t] == team } }).reduce((p, c) => {
                 p[c.id] = c.ally
                 return p
@@ -476,7 +561,8 @@ server.on('connection', function (conn) {
             locations: visiblePlayers.map(id => clientsPos[id]),
             projectiles: rooms[currentRoom].projectiles,
             misc_packets: clientPackets[id],
-            teamData: teamData[team]
+            teamData: teamData[team],
+            otherTeamInfo
         }
         REPLAY.recordFrame(id,packets)
         conn.write(JSON.stringify(packets))

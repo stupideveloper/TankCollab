@@ -1,7 +1,7 @@
 {
   "resourceType": "GMFont",
   "resourceVersion": "1.0",
-  "name": "IP_fnt",
+  "name": "Inventory_fnt",
   "AntiAlias": 1,
   "applyKerning": 0,
   "ascender": 38,

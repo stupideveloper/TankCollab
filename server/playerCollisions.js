@@ -1,6 +1,6 @@
 const Collisions = require("./rect_collisions.js")
 
-let {bulletRect,tankRect} = require("./arenaCollisions.js")
+let {bulletRect,tankRect, coreRect, shieldGeneratorRect} = require("./arenaCollisions.js")
 /**
  * Returns if a bullet is colliding with a player
  * @param {{
@@ -82,10 +82,41 @@ function checkPlayerBullet(playerMap,playerLocMap,x,y,dir,shooter,damage,room) {
     }
     return hits;
 }
-function checkCoreBullet(cores=[],shieldGenerators=[],x,y,dir,shooter) {
-    
+function checkCoreBullet(cores=[],shieldGenerators=[],x,y,dir,shooterTeam) {
+    const damageCircle = {
+        radius: bulletRect.rough_radius,
+        x: x,
+        y: y
+    }
+    let coreCircles = cores.map(c=>{
+        return {
+            ...c,
+            radius: coreRect.rough_radius
+        }
+    })
+    let shieldCircles = shieldGenerators.map(c=>{
+        return {
+            ...c,
+            radius: shieldGeneratorRect.rough_radius
+        }
+    })
+    let returns = []
+    for (let coreCirc of coreCircles) {
+        if (coreCirc.team == shooterTeam) continue;
+        if (Collisions.circle(coreCirc,damageCircle)) {
+            returns.push(coreCirc.id)
+        }
+    }
+    for (let shieldCirc of shieldCircles) {
+        if (shieldCirc.team == shooterTeam) continue;
+        if (Collisions.circle(shieldCirc,damageCircle)) {
+            returns.push(shieldCirc.id)
+        }
+    }
+    return returns
 }
 
 module.exports = {
-    checkPlayer: checkPlayerBullet
+    checkPlayer: checkPlayerBullet,
+    checkCores: checkCoreBullet
 }

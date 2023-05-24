@@ -92,6 +92,12 @@ blue_n = 0
 green_n = 0
 red_n = 0
 purple_n = 0
+global.gems = {
+	BLUE: 0,
+	RED: 0,
+	GREEN: 0,
+	PURPLE: 0
+}
 
 
 // [UNUSED]

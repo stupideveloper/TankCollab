@@ -132,8 +132,8 @@ function handlePackets(packets) {
 				}
 				case "gem_spawn": {
 					instance_create_layer(extra_packet.x,extra_packet.y,"Instances",gem_obj,{image_index: extra_packet.gem_type,
-						image_xscale: 0.25,
-						image_yscale: 0.25,
+						image_xscale: 1,
+						image_yscale: 1,
 						uuid: extra_packet.uuid
 					})
 					
@@ -164,6 +164,8 @@ function handlePackets(packets) {
 		global.core_health = packets.teamData.coreHealth
 		global.teams = packets.teamPlayers
 		global.projectiles = packets.projectiles
+		global.gems = packets.gems
+		global.health = packets.health
 		global.other_player_xy = packets.locations
 		
 		//show_debug_message(array_length(variable_struct_get_names(packets.projectiles)))
