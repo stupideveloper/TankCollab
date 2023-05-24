@@ -8,7 +8,8 @@ draw_set_color(c_black)
 if (mouse_check_button(mb_any)) draw_set_color(c_red)
 // Alpha of the 
 var alpha = global.dead?0.5:1
-draw_sprite_ext(tank_spr,0,x,y,.3,.3,-fake_direction,-1,alpha)
+var chassis = (global.control_style=="classic")?0:4
+draw_sprite_ext(tank_spr,chassis,x,y,.3,.3,-fake_direction,-1,alpha)
 draw_set_color(c_white)
 for (var i = 0; i < array_length(global.other_player_xy); i++) {
 	//try {

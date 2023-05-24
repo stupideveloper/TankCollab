@@ -45,6 +45,15 @@ if (ticks_since_update % 300 == 299 ) {
 }
 
 
+if (keyboard_check_pressed(ord("C")) && global.gamemenu) {
+	if (global.control_style == "classic") {
+		global.control_style = "simple"
+		
+	} else {
+		global.control_style = "classic"
+	} 
+}
+
 
 last_pack_ticks += 1
 ticks_since_update += 1

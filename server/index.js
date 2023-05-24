@@ -16,6 +16,10 @@ let REPLAY = {
     recordFrame: ()=>{},
     saveToFile: ()=>{}
 };
+let splashData = {
+    ip: "unknown",
+    gameVersion: "1.0.0beta"
+}
 try {
 REPLAY = require("./replay.hidden")
 } catch {
@@ -592,7 +596,8 @@ server.on('connection', function (conn) {
             projectiles: rooms[currentRoom].projectiles,
             misc_packets: clientPackets[id],
             team_data: teamData[team],
-            other_team_info: otherTeamInfo
+            other_team_info: otherTeamInfo,
+            splashData
         }
         REPLAY.recordFrame(id,packets)
         conn.write(JSON.stringify(packets))
@@ -685,7 +690,7 @@ server.on('connection', function (conn) {
                  * }
                  */
                 if (bulletPacketLimiter) continue;
-                if (clientsPos[id].respawnTime >= 0) continue;
+                if (clientsPos[id].respawnTime != -1) continue;
                 sendBulletPack = true;
                 bulletPacketLimiter = true;
                 clientPackets[id].push({
@@ -817,6 +822,7 @@ server.on('connection', function (conn) {
 let IP = "localhost";
 try {
  IP = require("./iptest.hidden.js").ip
+ splashData.ip = IP;
 } catch {
     console.warn("[WARN] Create a iptest.hidden.js file to get your device's local IP")
 }

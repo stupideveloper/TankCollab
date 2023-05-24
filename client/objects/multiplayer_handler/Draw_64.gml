@@ -48,21 +48,19 @@ if (global.gamemenu) {
 	var font = draw_get_font()
 	draw_set_font(IP_fnt)
 	draw_set_halign(fa_center)
-	draw_set_valign(fa_center)
+	draw_set_valign(fa_bottom)
 	draw_text(
-	window_get_width()/2,window_get_height()/2-120,
+	window_get_width()/2,window_get_height()/2-190,
 		"Game Menu"
 	)
-
-draw_set_font(font)
+	draw_set_font(Inventory_fnt)
+	draw_text(
+	window_get_width()/2,window_get_height()/2-40,
+		$"Control Style: {global.control_style} (press C to change)\nServer IP: {global.splash_data.ip}\nConnected IP: {global.ip_construct}\nGame Version: {global.splash_data.gameVersion}"
+	)
+	draw_set_font(font)
 	}
 
-}
-try {
-draw_text(200,700,"LEFTS "+string(global.left_shield_own_health))
-draw_text(200,730,"RIGHTS "+string(global.right_shield_own_health))
-} catch (e) {
-//show_debug_message(e)
 }
 
 draw_set_color(c_white)

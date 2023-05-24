@@ -21,7 +21,7 @@ network_send_packet(client,buff,buffer_get_size(buff))
 	case network_type_data: {
 		if (!connected) {
 			with (gem_obj) {instance_destroy();}
-			global.gems = {}
+			global.spawned_gems = {}
 		}
 		connected = true;
 		var data = ds_map_find_value(async_load,"buffer")
