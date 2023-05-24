@@ -1,6 +1,4 @@
 /**
- * INDEX.JS: ≈951 Lines of Code
- * 
  * Whether to reset player location if the client goes too fast
  */
 const do_lag_back = true
@@ -225,6 +223,11 @@ let started = false
  * Every game tick this function runs
  */
 setInterval(async function SERVER_GAME_TICK() {
+
+    reset = Math.max(reset-1,-1)
+    if (reset == 0) {
+        process.exit()
+    }
     /**
      * Runs every packet listener, this acts more as a game tick listener
      */
@@ -385,6 +388,11 @@ let clientPackets = {}
 function doCollisions() {
 
 }
+
+/**
+ * Countdown to server reset
+ */
+let reset = -1
 /**
  * Apply damage to a player
  * @param {import("crypto").UUID} id 
@@ -428,15 +436,17 @@ function damagePlayer(id, room, damage) {
                     if (team == killedTeam) {
                         clientPackets[key].push({
                             type: "title",
-                            title: "YOU LOST",
+                            title: "YOU LOST\nServer will be reset soon",
                             time: -1
                         })
+                        reset = 5*60
                     } else {
                         clientPackets[key].push({
                             type: "title",
-                            title: "YOU WON",
+                            title: "YOU WON\nServer will be reset soon",
                             time: -1
                         })
+                        reset = 5*60
                     }
                 }
             } else {
@@ -463,12 +473,12 @@ let teamMap = {}
  * @param {number} damage 
  * @param {import("crypto").UUID} room 
  */
-function fireBullet(x = 0, y = 0, dir = 0, shooter = uuid(), damage = 1, room = "lobby") {
+function fireBullet(x = 0, y = 0, dir = 0, shooter = uuid(), damage = 1, vel = 10, room = "lobby") {
     rooms[room].projectiles[uuid()] = {
         x: x,
         y,
         dir,
-        vel: 10,
+        vel,
         dist_left: 100,
         damage,
         shooter: shooter,
@@ -665,8 +675,8 @@ server.on('connection', function (conn) {
             other_team_info: otherTeamInfo,
             splashData,
             availableUpgrades: teamData[team].availableUpgrades,
-            teamSizes: [...Object.keys(teamSizes)].map(t => { return { count: t == team, team: teamSizes[t]} }).reduce((p, c) => {
-                p[c.team?"own":"oth"] = c.count
+            teamSizes: [...Object.keys(teamAlive)].map(t => { return { count: t == team, team: teamAlive[t]} }).reduce((p, c) => {
+                p[c.count?"own":"oth"] = c.team
                 return p
             }, {}),
         }
@@ -777,7 +787,8 @@ server.on('connection', function (conn) {
                     clientsPos[id].y - (Math.cos(toRadians(clientsPos[id].dir)) * 50),
                     clientsPos[id].dir,
                     id,
-                    Upgrades.getUpgradeForTeam(team,UpgradeTypes.BulletDamage))
+                    Upgrades.getUpgradeForTeam(team,UpgradeTypes.BulletDamage),
+                    Upgrades.getUpgradeForTeam(team,UpgradeTypes.BulletSpeed))
             } else if (packet.type == "upgrade_ability") {
                 switch (packet.upgrade_type) {
                     case "bullet_damage": {
@@ -806,6 +817,7 @@ server.on('connection', function (conn) {
                     }
                     default: console.log(packet)
                 }
+                Upgrades.updateAvailability(team,teamData[team].availableUpgrades,teamData[team].gems)
             } else if (packet.type == "collect_gem") {
                 if (clientsPos[id].respawnTime != -1) continue;
                 var legal = !!gem_uuids.has(packet.uuid)
@@ -894,7 +906,7 @@ server.on('connection', function (conn) {
         if (teamAlive[team] == 0) {
             for (let key in clientPackets) {
                 let team2 = teamMap[key]
-                if (team2 == killedTeam) {
+                if (team2 == team) {
                     clientPackets[key].push({
                         type: "title",
                         title: "YOU LOST",

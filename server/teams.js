@@ -47,7 +47,7 @@ let upgradeTiers = {
     bulletDamage: [10, 12, 14, 16, 18, 20, 22],
     bulletSpeed: [10, 11, 12, 14, 16, 19, 22],
     bulletReload: [60, 40, 30, 20, 10, 5, 3],
-    moveSpeed: [10.0, 12.0, 12.8, 13.5, 14.1, 14.6, 15.0],
+    moveSpeed: [5.0, 6.0, 6.4, 6.8, 7.1, 7.3, 7.5],
     maxHealth: [100, 120, 128, 135, 141, 146, 150],
     healthRegen: [0, 1, 2, 4, 6, 9, 13]
 }
@@ -124,6 +124,9 @@ class UpgradeRequirements
             { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 }
         ]
     }
+    static getRequirement(team, type) {
+        return this.#reqs[type][Upgrades.getTier(team, type)]
+    }
     static checkRequirement(bank, team, type)
     {
         try
@@ -146,6 +149,13 @@ class UpgradeRequirements
             bank[GemType.GREEN] >= requirement[GemType.GREEN] &&
             bank[GemType.PURPLE] >= requirement[GemType.PURPLE]
         )
+    }
+    static deductRequirement(bank,requirement) {
+        bank[GemType.RED] = bank[GemType.RED] - requirement[GemType.RED]
+        bank[GemType.BLUE] = bank[GemType.BLUE] - requirement[GemType.BLUE]
+        bank[GemType.GREEN] = bank[GemType.GREEN] - requirement[GemType.GREEN]
+        bank[GemType.PURPLE] = bank[GemType.PURPLE] - requirement[GemType.PURPLE]
+        return bank
     }
 }
 class Upgrades
@@ -188,6 +198,8 @@ class Upgrades
     {
         if (this.canUpgrade(team, type, bank))
         {
+            var requirement = UpgradeRequirements.getRequirement(team,type)
+            UpgradeRequirements.deductRequirement(bank,requirement)
             teamUpgrades[team][type] += 1
         }
         return bank
