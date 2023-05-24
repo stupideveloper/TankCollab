@@ -44,7 +44,7 @@ image_yscale = 0.3;
 fake_direction = 0;
 
 // Speed of the tank
-global.speeed = 1
+global.speeed = 10
 
 /**
 Which control style to use.

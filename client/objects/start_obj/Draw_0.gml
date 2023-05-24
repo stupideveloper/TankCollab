@@ -17,7 +17,7 @@ draw_text(
 draw_text(
 	camera_get_view_width(view_camera[0])/2,
 	camera_get_view_height(view_camera[0])/2,
-	global.ip_construct
+	""+string(global.ip_construct)
 )
 if (IPCheck(global.ip_construct)) {
 	has_success = true;

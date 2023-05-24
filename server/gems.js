@@ -1,7 +1,6 @@
 const { checkWalls, gemRect } = require("./arenaCollisions.js")
 const uuid = require("crypto").randomUUID
 
-
 const gem_uuids = new Set()
 /**
  * Different team names
@@ -23,6 +22,9 @@ class GemType {
     }
     getId() {
         return this.#id
+    }
+    toString() {
+        return this.getName()
     }
     /**
      * 

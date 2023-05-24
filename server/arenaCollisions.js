@@ -93,7 +93,6 @@ const checkWallCollisions = function (rect) {
              * Runs an expensive rectangle check
              */
             if (Collisions.rect(rect,arenaPart)) {
-                //console.log(`Collision!`)
                 returnval=true;
             }
         }

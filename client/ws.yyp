@@ -50,6 +50,7 @@
     {"id":{"name":"shield_left_self_obj","path":"objects/shield_left_self_obj/shield_left_self_obj.yy",},},
     {"id":{"name":"wall_spr","path":"sprites/wall_spr/wall_spr.yy",},},
     {"id":{"name":"bullet_spr","path":"sprites/bullet_spr/bullet_spr.yy",},},
+    {"id":{"name":"disabled_spr","path":"sprites/disabled_spr/disabled_spr.yy",},},
     {"id":{"name":"core_ememy_obj","path":"objects/core_ememy_obj/core_ememy_obj.yy",},},
     {"id":{"name":"core_self_obj","path":"objects/core_self_obj/core_self_obj.yy",},},
     {"id":{"name":"shield_right_self_obj","path":"objects/shield_right_self_obj/shield_right_self_obj.yy",},},

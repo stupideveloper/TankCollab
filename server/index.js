@@ -21,7 +21,7 @@ let REPLAY = {
 };
 let splashData = {
     ip: "unknown",
-    gameVersion: "1.0.0beta"
+    gameVersion: "4223d63" // last commit ID
 }
 try {
 REPLAY = require("./replay.hidden")
@@ -46,7 +46,7 @@ const fs = require("fs")
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
 const Collision = require("./rect_collisions.js");
-const { teamSelector, teamUpgradesToTiers, teamSizes, upgradeTiers, UpgradeTypes, Upgrades } = require("./teams.js")
+const { teamSelector, teamUpgradesToTiers, teamSizes, upgradeTiers, UpgradeTypes, Upgrades, teamAlive } = require("./teams.js")
 const { randomGem, GemType, gem_uuids} = require("./gems.js")
 /**
  * Imports the collision helper functions
@@ -109,6 +109,20 @@ let teamData = {
                 800,
                 500 + (1830-1000) * Math.random()
             ]
+        },
+        gems: {
+            [GemType.BLUE.getName()]: 0,
+            [GemType.RED.getName()]: 0,
+            [GemType.PURPLE.getName()]: 0,
+            [GemType.GREEN.getName()]: 0,
+        },
+        availableUpgrades: {
+            [UpgradeTypes.BulletDamage]: false,
+            [UpgradeTypes.BulletReload]: false,
+            [UpgradeTypes.BulletSpeed]: false,
+            [UpgradeTypes.HealthRegen]: false,
+            [UpgradeTypes.MaxHealth]: false,
+            [UpgradeTypes.MoveSpeed]: false
         }
     },
     "B": {
@@ -139,9 +153,26 @@ let teamData = {
                 3733-800,
                 500 + (1830-1000) * Math.random()
             ]
+        },
+        gems: {
+            [GemType.BLUE.getName()]: 0,
+            [GemType.RED.getName()]: 0,
+            [GemType.PURPLE.getName()]: 0,
+            [GemType.GREEN.getName()]: 0,
+        },
+        availableUpgrades: {
+            [UpgradeTypes.BulletDamage]: false,
+            [UpgradeTypes.BulletReload]: false,
+            [UpgradeTypes.BulletSpeed]: false,
+            [UpgradeTypes.HealthRegen]: false,
+            [UpgradeTypes.MaxHealth]: false,
+            [UpgradeTypes.MoveSpeed]: false
         }
     }
 }
+
+Upgrades.updateAvailability("A",teamData.A.availableUpgrades,teamData.A.gems)
+Upgrades.updateAvailability("B",teamData.B.availableUpgrades,teamData.B.gems)
 
 function damageCore(coreId="",damage) {
     let team;
@@ -386,11 +417,33 @@ function damagePlayer(id, room, damage) {
             clientPackets[id].push({
                 type: "final_death"
             })
-            clientPackets[id].push({
-                type: "title",
-                title: "YOU HAVE BEEN ELIMINATED",
-                time: -1
-            })
+            
+            teamAlive[teamMap[id]] -= 1
+            let killedTeam = teamMap[id]
+            if (teamAlive[teamMap[id]] == 0) {
+                for (let key in clientPackets) {
+                    let team = teamMap[key]
+                    if (team == killedTeam) {
+                        clientPackets[key].push({
+                            type: "title",
+                            title: "YOU LOST",
+                            time: -1
+                        })
+                    } else {
+                        clientPackets[key].push({
+                            type: "title",
+                            title: "YOU WON",
+                            time: -1
+                        })
+                    }
+                }
+            } else {
+                clientPackets[id].push({
+                    type: "title",
+                    title: "YOU HAVE BEEN ELIMINATED",
+                    time: -1
+                })
+            }
         }
     }
 }
@@ -456,6 +509,7 @@ server.on('connection', function (conn) {
      */
     const team = teamSelector()
     teamSizes[team] += 1
+    teamAlive[team] += 1
     teamMap[id] = team;
     // log that IP and ID
     console.log('[DEBUG] + %s (%s)', id, remoteAddress);
@@ -464,33 +518,33 @@ server.on('connection', function (conn) {
      * Init all required variables
      */
     clients[currentRoom].add(id)
-    clientPackets[id] = [
-        {
-            type: "health_update",
-            health: Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth),
-            max_health: Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth)
-        },
-        {
-            type: "team_set",
-            team: team
-        },
-        {
-            type: "title",
-            title: "Welcome!",
-            time: 10
-        },
-        {
-            type: "gameplay_data_update",
-            shield_generator_max_health,
-            core_max_health
-        }
-    ]
+    clientPackets[id] = []
+    clientPackets[id].push({
+        type: "health_update",
+        health: Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth),
+        max_health: Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth)
+    },
+    {
+        type: "team_set",
+        team: team
+    },
+    {
+        type: "title",
+        title: "Welcome!",
+        time: 10
+    },
+    {
+        type: "gameplay_data_update",
+        shield_generator_max_health,
+        core_max_health
+    })
     clientsPos[id] = {
         id: id,
         x: 120,
         y: 120,
         dir: 0,
         health: 100,
+        max_health: 100,
         hidden: false,
         respawnTime: -1,
         gems: {
@@ -500,6 +554,7 @@ server.on('connection', function (conn) {
             [GemType.GREEN.getName()]: 0,
         }
     }
+    clientsPos[id].max_health = Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth)
     clientsPos[id].health = Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth)
     teleport(id, ...teamData[team].getSpawnpoint())
     /**
@@ -528,9 +583,19 @@ server.on('connection', function (conn) {
      * Packet listener, more like a game tick listener
      */
     packetListeners[id] = function () {
-        //console.log(bulletPacketLimiter)
+        let regen = Upgrades.getUpgradeForTeam(team,UpgradeTypes.HealthRegen);
+        clientsPos[id].health = Math.min(clientsPos[id].health+regen/60,clientsPos[id].max_health)
+
+        if (!clientsPos[id].max_health == Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth)) {
+            clientPackets[id].push({
+                type: "health_update",
+                health: Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth) * (clientsPos[id].health/clientsPos[id].max_health),
+                max_health: Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth)
+            })
+            clientsPos[id].health = Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth) * (clientsPos[id].health/clientsPos[id].max_health)
+            clientsPos[id].max_health = Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth)
+        }
         bulletPacketLimiter = Math.max(0,bulletPacketLimiter-1)
-        //console.log(bulletPacketLimiter)
         /**
          * Players visible in the room
          */
@@ -546,8 +611,6 @@ server.on('connection', function (conn) {
             clientsPos[id].respawnTime -= 1
         }
 
-        
-        //console.log(gem)
         /**
          * If the client is no longer dead, send a respawn packet
          */
@@ -583,7 +646,7 @@ server.on('connection', function (conn) {
         var packets = {
             type: "positions",
             this_id: id,
-            gems: clientsPos[id].gems,
+            gems: teamData[team].gems,
             health: clientsPos[id].health,
             teamPlayers: [...Object.keys(teamMap)].map(t => { return { id: t, ally: teamMap[t] == team } }).reduce((p, c) => {
                 p[c.id] = c.ally
@@ -598,11 +661,15 @@ server.on('connection', function (conn) {
             misc_packets: clientPackets[id],
             team_data: teamData[team],
             other_team_info: otherTeamInfo,
-            splashData
+            splashData,
+            availableUpgrades: teamData[team].availableUpgrades,
+            teamSizes: [...Object.keys(teamSizes)].map(t => { return { count: t == team, team: teamSizes[t]} }).reduce((p, c) => {
+                p[c.team?"own":"oth"] = c.count
+                return p
+            }, {}),
         }
         REPLAY.recordFrame(id,packets)
         conn.write(JSON.stringify(packets))
-        //console.log(clientPackets[id])
         /**
          * Clear packet queue
          */
@@ -623,7 +690,6 @@ server.on('connection', function (conn) {
      * @param {{packets:[{type:string}]}} newpos 
      */
     function handlePacket(newpos) {
-        //console.log(newpos)
         for (let packet of newpos.packets) {
             if (packet.type == "pos") {
                 /**
@@ -694,12 +760,10 @@ server.on('connection', function (conn) {
                  *  type: "fire_bullet",
                  * }
                  */
-                //console.log(bulletPacketLimiter)
                 if (bulletPacketLimiter != 0) continue;
                 if (clientsPos[id].respawnTime != -1) continue;
                 sendBulletPack = true;
                 bulletPacketLimiter = Upgrades.getUpgradeForTeam(team,UpgradeTypes.BulletReload);
-                //console.log(bulletPacketLimiter)
                 clientPackets[id].push({
                     type: "screenshake",
                     time: 5,
@@ -713,26 +777,29 @@ server.on('connection', function (conn) {
                     id,
                     Upgrades.getUpgradeForTeam(team,UpgradeTypes.BulletDamage))
             } else if (packet.type == "upgrade_ability") {
-                console.log(packet)
                 switch (packet.upgrade_type) {
                     case "bullet_damage": {
-                        Upgrades.doUpgrade(team,UpgradeTypes.BulletDamage,clientPackets[id].gems)
+                        Upgrades.doUpgrade(team,UpgradeTypes.BulletDamage,teamData[team].gems)
                         break
                     }
                     case "health_regen": {
+                        Upgrades.doUpgrade(team,UpgradeTypes.HealthRegen,teamData[team].gems)
                         break
                     }
                     case "max_health": {
+                        Upgrades.doUpgrade(team,UpgradeTypes.MaxHealth,teamData[team].gems)
                         break
                     }
                     case "bullet_reload": {
-                        Upgrades.doUpgrade(team,UpgradeTypes.BulletReload,clientPackets[id].gems)
+                        Upgrades.doUpgrade(team,UpgradeTypes.BulletReload,teamData[team].gems)
                         break
                     }
                     case "bullet_speed": {
+                        Upgrades.doUpgrade(team,UpgradeTypes.BulletSpeed,teamData[team].gems)
                         break
                     }
                     case "move_speed": {
+                        Upgrades.doUpgrade(team,UpgradeTypes.MoveSpeed,teamData[team].gems)
                         break
                     }
                     default: console.log(packet)
@@ -743,21 +810,29 @@ server.on('connection', function (conn) {
                 if (!legal) continue;
                 gem_uuids.delete(packet.uuid)
                 var gem_type = GemType.fromId(packet.gem_type)
-                clientsPos[id].gems[gem_type.getName()]++;
+                teamData[team].gems[gem_type.getName()]++;
+                Upgrades.updateAvailability(team,teamData[team].availableUpgrades,teamData[team].gems)
                 broadcast({
                     type: "collect_gem",
                     uuid: packet.uuid
                 })
             }
              else if (packet.type == "begin") {
-                //console.log(packet)
+                if (Object.values(teamSizes).reduce((p,v)=>p+v,0) < 2) {
+                    clientPackets[id].push({
+                        type: "title",
+                        time: 1,
+                        title: "Insufficient Players"
+                    })
+                    continue
+                }
                 started = !started;
             }
             else {
                 /**
                  * If the packet is not currently in the list, log so the structure can be replicated
                  */
-                //console.log(packet)
+                console.log(packet)
             }
         }
     }
@@ -811,13 +886,33 @@ server.on('connection', function (conn) {
         REPLAY.saveToFile()
         disconnected = true;
         conn.end()
-        console.log('[DEBUG] - %s', id);
+        if (clientsPos[id].respawnTime != -2) teamAlive[team] -= 1
         delete clientsPos[id]
-        clients[currentRoom].delete(id)
         delete clientPackets[id]
+        if (teamAlive[team] == 0) {
+            for (let key in clientPackets) {
+                let team2 = teamMap[key]
+                if (team2 == killedTeam) {
+                    clientPackets[key].push({
+                        type: "title",
+                        title: "YOU LOST",
+                        time: -1
+                    })
+                } else {
+                    clientPackets[key].push({
+                        type: "title",
+                        title: "YOU WON",
+                        time: -1
+                    })
+                }
+            }
+        }
+        console.log('[DEBUG] - %s', id);
+        clients[currentRoom].delete(id)
         delete packetListeners[id]
         delete teamMap[id]
         teamSizes[team] -= 1;
+        
         clients[currentRoom].forEach(client => {
             clientPackets[client].push({
                 type: "playerleave",
@@ -834,10 +929,10 @@ server.on('connection', function (conn) {
      * Immediately send the player's ID to the socket,
      * no longer needed, yet still here
      */
-    conn.write(JSON.stringify({
-        type: "id",
-        this_id: id
-    }))
+    // conn.write(JSON.stringify({
+    //     type: "id",
+    //     this_id: id
+    // }))
 });
 
 /**

@@ -37,8 +37,7 @@ if (!(mouse_x==old_x2 && mouse_y == old_y2)) {
 }
 // if a disconnect is detected
 if (ticks_since_update % 300 == 299 ) {
-    destroy_disconnect()
-	var server = network_connect_raw_async( client,global.IP_ADDR, 9000 );
+    room_goto(StartRoom)
 }
 
 
@@ -62,7 +61,7 @@ if ((mouse_check_button_pressed(mb_left) || keyboard_check_pressed(vk_space))&&!
 	})
 }
 var imageanglekey = 0b0000
-var _speed = 10 * global.speeed
+var _speed = global.speeed
 phy_speed_x*=0.9
 phy_speed_y*=0.9
 if (keyboard_check(ord("W"))||keyboard_check(vk_up)) {

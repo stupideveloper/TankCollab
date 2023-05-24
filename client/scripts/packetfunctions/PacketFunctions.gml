@@ -1,24 +1,6 @@
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
-global.right_shield_own_health = 0
-			global.left_shield_own_health = 0
-			global.right_shield_other_health = 0
-			global.left_shield_other_health = 0
-			global.core_own_health = 0
-			global.core_other_health = 0
-			global.this_team = "_"
-			global.has_spawned_shields = false
-global.remove_on_disconnect = []
-global.title_time = 0
-global.upgrade_tiers = {}
-global.console = {
-	log: function (f) {show_debug_message(f)}
-}
-global.constants = {
-	shield_generator_max_health: 500,
-	core_max_health: 1000
-}
-global.splash_data = {ip: "unknown",serverVersion: "unknown",clientVerson: "unknown"}
+
 function IPCheck(ip_addr) {
 	var split = string_split(ip_addr,".")
 	if (array_length(split)==4) {
@@ -158,6 +140,7 @@ function handlePackets(packets) {
 					break;
 				}
 				case "team_set": {
+					//show_debug_message(extra_packet)
 					global.this_team = extra_packet.team
 					break;
 				}
@@ -184,6 +167,7 @@ function handlePackets(packets) {
 				}
 				case "core_shield_destroy": {
 					show_debug_message(extra_packet)
+					show_debug_message(global.this_team)
 					switch (extra_packet.id) {
 						case "A:core": {
 							if (global.this_team == "A") {
@@ -313,6 +297,9 @@ function handlePackets(packets) {
 		global.health = packets.health
 		global.other_player_xy = packets.locations
 		global.splash_data = packets.splashData
+		global.teamsizes = packets.teamSizes;
+		global.available_upgrades = packets.availableUpgrades
+		// show_debug_message(packets.availableUpgrades)
 		//show_debug_message(array_length(variable_struct_get_names(packets.projectiles)))
 	} else if (packets.type == "id") {
 		global.this_id = packets.this_id

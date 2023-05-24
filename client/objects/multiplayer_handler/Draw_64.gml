@@ -37,18 +37,23 @@ if (global.left_shield_own_health > 0) {
 }
 draw_set_colour(c_black)
 //show_debug_message(global.title)
-if (global.title != "") {
 var font = draw_get_font()
 draw_set_font(Inventory_fnt)
+if (global.title != "") {
+
 	draw_text(
 	window_get_width()/2,100,
 		global.title
 	)
-draw_set_font(font)
 if (global.title_time--==0) {
 	global.title = ""
 }
 }
+draw_set_halign(fa_right)
+	draw_set_valign(fa_bottom)
+	try draw_text(window_get_width() - 12,window_get_height() - 12,$"Teammates left: {global.teamsizes.own}\nEnemies left: {global.teamsizes.oth}");
+	catch (e) e=e
+draw_set_font(font)
 if (global.gamemenu) {
 	draw_set_alpha(0.75)
 	draw_set_color(c_black)

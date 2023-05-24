@@ -5,6 +5,7 @@
     {"name":"Inventory_fnt","order":1,"path":"fonts/Inventory_fnt/Inventory_fnt.yy",},
     {"name":"max_health_spr","order":2,"path":"sprites/max_health_spr/max_health_spr.yy",},
     {"name":"shield_left_self_obj","order":5,"path":"objects/shield_left_self_obj/shield_left_self_obj.yy",},
+    {"name":"disabled_spr","order":3,"path":"sprites/disabled_spr/disabled_spr.yy",},
     {"name":"core_self_obj","order":2,"path":"objects/core_self_obj/core_self_obj.yy",},
     {"name":"shield_right_self_obj","order":4,"path":"objects/shield_right_self_obj/shield_right_self_obj.yy",},
     {"name":"core_self_spr","order":2,"path":"sprites/core_self_spr/core_self_spr.yy",},
