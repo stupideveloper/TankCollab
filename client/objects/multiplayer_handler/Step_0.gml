@@ -17,9 +17,6 @@ if (!connected) {
 	global.failed = false
 }
 // Queue of packets to send
-packet_queue = {
-	packets: []
-}
 // Whether to send the position packet
 var sendPosPack = false
 
@@ -95,6 +92,7 @@ if (keyboard_check(ord("D"))||keyboard_check(vk_right)) {
 }
 x=phy_position_x
 y=phy_position_y
+if (!global.dead) {
 var list = ds_list_create()
 instance_place_list(x,y,gem_obj,list,true)
 if (not ds_list_empty(list)) {
@@ -128,6 +126,7 @@ switch (coll.image_index) {
 			instance_destroy(coll)
 		//}
 	}
+}
 }
 
 //if (mouse_check_button(mb_right) || keyboard_check(ord("X"))) {

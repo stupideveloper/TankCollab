@@ -36,7 +36,4 @@ for (var i = 0; i < array_length(variable_struct_get_names(global.projectiles));
 		draw_set_color(c_white)
 		}
 		draw_sprite_ext(tank_spr,1,x,y,.3,.3,dir,-1,alpha)
-if (ticks_since_update > game_get_speed(gamespeed_fps)*5) {
-	draw_text(0,10,"Server Down! It has been "+string(floor(ticks_since_update/game_get_speed(gamespeed_fps)))+" seconds since last ACK!")
-}
 

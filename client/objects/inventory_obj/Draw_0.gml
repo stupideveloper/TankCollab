@@ -2,6 +2,8 @@
 // You can write your code in this editor
 
 draw_set_color(c_black)
+draw_set_halign(fa_center)
+draw_set_valign(fa_center)
 draw_set_font(Inventory_fnt)
 draw_sprite(inventory_spr,0,x,y)
 try {

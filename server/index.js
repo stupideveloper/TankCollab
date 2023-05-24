@@ -3,6 +3,9 @@
  */
 const do_lag_back = true
 
+const core_max_health = 1000
+const shield_generator_max_health = 500
+
 /**
  * Whether to allow friendly fire
  */
@@ -43,7 +46,7 @@ const fs = require("fs")
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
 const Collision = require("./rect_collisions.js");
-const { teamSelector, teamUpgradesToTiers, teamSizes, upgradeTiers } = require("./teams.js")
+const { teamSelector, teamUpgradesToTiers, teamSizes, upgradeTiers, UpgradeTypes, Upgrades } = require("./teams.js")
 const { randomGem, GemType, gem_uuids} = require("./gems.js")
 /**
  * Imports the collision helper functions
@@ -79,21 +82,21 @@ let packetListeners = {
  */
 let teamData = {
     "A": {
-        coreHealth: 1000,
+        coreHealth: core_max_health,
         core: {
             id: "A:core",
             x: 450,
             y: 500 + (1830-1000) * 0.5,
             alive: true
         },
-        leftShieldHealth: 500,
+        leftShieldHealth: shield_generator_max_health,
         leftShield: {
             id: "A:lshield",
             x: 400,
             y: 500 + (1830-1000) * 1,
             alive: true
         },
-        rightShieldHealth: 500,
+        rightShieldHealth: shield_generator_max_health,
         rightShield: {
             id: "A:rshield",
             x: 400,
@@ -109,21 +112,21 @@ let teamData = {
         }
     },
     "B": {
-        coreHealth: 1000,
+        coreHealth: core_max_health,
         core: {
             id: "B:core",
             x: 3733-450,
             y: 500 + (1830-1000) * 0.5,
             alive: true
         },
-        leftShieldHealth: 500,
+        leftShieldHealth: shield_generator_max_health,
         leftShield: {
             id: "B:lshield",
             x: 3733-400,
             y: 500 + (1830-1000) * 1,
             alive: true
         },
-        rightShieldHealth: 500,
+        rightShieldHealth: shield_generator_max_health,
         rightShield: {
             id: "B:rshield",
             x: 3733-400,
@@ -180,30 +183,8 @@ function getCores() {
     }
     return {shields,cores}
 }
-/**
- * Team-specific upgrades
- */
 
-let teamUpgrades = {
-    "A": {
-        damage: 0,
-        bulletSpeed: 0,
-        health: 0,
-        damageResistance: 0,
-        speed: 0
-    },
-    "B": {
-        damage: 0,
-        bulletSpeed: 0,
-        health: 0,
-        damageResistance: 0,
-        speed: 0
-    }
-}
-/**
- * Default team upgrades, can be used to revert the above team upgrades
- */
-const teamUpgradesDefault = JSON.stringify(teamUpgrades)
+
 
 
 let started = false
@@ -217,8 +198,7 @@ setInterval(async function SERVER_GAME_TICK() {
     Object.keys(packetListeners).map(player => {
         packetListeners[player]()
     })
-
-    if (started && Math.random() > 0.99) {
+    if (started && Math.random() > 0.995) {
         var gem = randomGem(3733,2330)
         broadcast({
             type: "gem_spawn",
@@ -402,8 +382,14 @@ function damagePlayer(id, room, damage) {
         if (teamData[teamMap[id]]["core"].alive) {
             clientsPos[id].respawnTime = 5 * 60
         } else {
+            clientsPos[id].respawnTime = -2
             clientPackets[id].push({
                 type: "final_death"
+            })
+            clientPackets[id].push({
+                type: "title",
+                title: "YOU HAVE BEEN ELIMINATED",
+                time: -1
             })
         }
     }
@@ -481,12 +467,22 @@ server.on('connection', function (conn) {
     clientPackets[id] = [
         {
             type: "health_update",
-            health: upgradeTiers.health[teamUpgrades[team].health],
-            max_health: upgradeTiers.health[teamUpgrades[team].health]
+            health: Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth),
+            max_health: Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth)
         },
         {
             type: "team_set",
             team: team
+        },
+        {
+            type: "title",
+            title: "Welcome!",
+            time: 10
+        },
+        {
+            type: "gameplay_data_update",
+            shield_generator_max_health,
+            core_max_health
         }
     ]
     clientsPos[id] = {
@@ -504,7 +500,7 @@ server.on('connection', function (conn) {
             [GemType.GREEN.getName()]: 0,
         }
     }
-    clientsPos[id].health = upgradeTiers.health[teamUpgrades[team].health]
+    clientsPos[id].health = Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth)
     teleport(id, ...teamData[team].getSpawnpoint())
     /**
      * Sends a join packet to all clients. Currently unrecieved
@@ -527,10 +523,14 @@ server.on('connection', function (conn) {
         currentRoom = newRoom
         clients[currentRoom].add(id)
     }
+    let bulletPacketLimiter = 0
     /**
      * Packet listener, more like a game tick listener
      */
     packetListeners[id] = function () {
+        //console.log(bulletPacketLimiter)
+        bulletPacketLimiter = Math.max(0,bulletPacketLimiter-1)
+        //console.log(bulletPacketLimiter)
         /**
          * Players visible in the room
          */
@@ -555,9 +555,9 @@ server.on('connection', function (conn) {
             clientsPos[id].respawnTime = -1
             clientPackets[id].push({
                 type: "respawn",
-                max_health: upgradeTiers.health[teamUpgrades[team].health]
+                max_health: Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth),
             })
-            clientsPos[id].health = upgradeTiers.health[teamUpgrades[team].health]
+            clientsPos[id].health = Upgrades.getUpgradeForTeam(team,UpgradeTypes.MaxHealth),
             teleport(id, ...teamData[team].getSpawnpoint())
             clientsPos[id].hidden = false
         }
@@ -590,7 +590,8 @@ server.on('connection', function (conn) {
                 return p
             }, {}),
             playerlist: [...clients[currentRoom].keys()],
-            upgrades: teamUpgradesToTiers(teamUpgrades[team]),
+            upgrades: Upgrades.convertToJson(team),
+            upgradeTiers: Upgrades.getTiersJson(team),
             respawn_time: clientsPos[id].respawnTime,
             locations: visiblePlayers.map(id => clientsPos[id]),
             projectiles: rooms[currentRoom].projectiles,
@@ -613,6 +614,10 @@ server.on('connection', function (conn) {
             disconnect()
         }
     }
+    /**
+     * Prevents the use of the "fire_bullet" packet every tick
+     */
+    
     /**
      * Handle the packet sent
      * @param {{packets:[{type:string}]}} newpos 
@@ -689,10 +694,12 @@ server.on('connection', function (conn) {
                  *  type: "fire_bullet",
                  * }
                  */
-                if (bulletPacketLimiter) continue;
+                //console.log(bulletPacketLimiter)
+                if (bulletPacketLimiter != 0) continue;
                 if (clientsPos[id].respawnTime != -1) continue;
                 sendBulletPack = true;
-                bulletPacketLimiter = true;
+                bulletPacketLimiter = Upgrades.getUpgradeForTeam(team,UpgradeTypes.BulletReload);
+                //console.log(bulletPacketLimiter)
                 clientPackets[id].push({
                     type: "screenshake",
                     time: 5,
@@ -704,13 +711,34 @@ server.on('connection', function (conn) {
                     clientsPos[id].y - (Math.cos(toRadians(clientsPos[id].dir)) * 50),
                     clientsPos[id].dir,
                     id,
-                    upgradeTiers.damage[teamUpgrades[team].damage])
-            } else if (packet.type == "upgrade_thing") {
-                switch (packet.upgradeType) {
-                    // TODO: 
-                    default:
+                    Upgrades.getUpgradeForTeam(team,UpgradeTypes.BulletDamage))
+            } else if (packet.type == "upgrade_ability") {
+                console.log(packet)
+                switch (packet.upgrade_type) {
+                    case "bullet_damage": {
+                        Upgrades.doUpgrade(team,UpgradeTypes.BulletDamage,clientPackets[id].gems)
+                        break
+                    }
+                    case "health_regen": {
+                        break
+                    }
+                    case "max_health": {
+                        break
+                    }
+                    case "bullet_reload": {
+                        Upgrades.doUpgrade(team,UpgradeTypes.BulletReload,clientPackets[id].gems)
+                        break
+                    }
+                    case "bullet_speed": {
+                        break
+                    }
+                    case "move_speed": {
+                        break
+                    }
+                    default: console.log(packet)
                 }
             } else if (packet.type == "collect_gem") {
+                if (clientsPos[id].respawnTime != -1) continue;
                 var legal = !!gem_uuids.has(packet.uuid)
                 if (!legal) continue;
                 gem_uuids.delete(packet.uuid)
@@ -729,14 +757,10 @@ server.on('connection', function (conn) {
                 /**
                  * If the packet is not currently in the list, log so the structure can be replicated
                  */
-                console.log(packet)
+                //console.log(packet)
             }
         }
     }
-    /**
-     * Prevents the use of the "fire_bullet" packet every tick
-     */
-    var bulletPacketLimiter = false;
     /**
      * Listeners
      */
@@ -776,7 +800,7 @@ server.on('connection', function (conn) {
                 fs.writeFileSync("./error.hex", Buffer.from(d).toString("hex"));
             }
         }
-        bulletPacketLimiter = sendBulletPack && bulletPacketLimiter
+        // bulletPacketLimiter = sendBulletPack && bulletPacketLimiter
     }
     let disconnected = false
 

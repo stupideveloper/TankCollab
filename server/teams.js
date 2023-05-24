@@ -13,12 +13,69 @@ let teamSelector = () => {
     return teamSizes[teams.TEAM_A] > teamSizes[teams.TEAM_B] ? teams.TEAM_B : teams.TEAM_A;
 }
 
+/**
+ * Team-specific upgrades
+ */
+
+let teamUpgrades = {
+    "A": {
+        bulletDamage: 0,
+    bulletSpeed: 0,
+    bulletReload: 0,
+    moveSpeed: 0,
+    maxHealth: 0,
+    healthRegen: 0
+    },
+    "B": {
+        bulletDamage: 0,
+    bulletSpeed: 0,
+    bulletReload: 0,
+    moveSpeed: 0,
+    maxHealth: 0,
+    healthRegen: 0
+    }
+}
+
 let upgradeTiers = {
-    damage: [10, 12, 14, 16, 18, 20, 22],
-    bulletSpeed: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6],
-    health: [100, 120, 128, 135, 141, 146, 150],
-    damageResistance: [0, 4, 8, 11, 14, 17, 20], // %
-    speed: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
+    bulletDamage: [10, 12, 14, 16, 18, 20, 22],
+    bulletSpeed: [10, 11, 12, 14, 16, 19, 22],
+    bulletReload: [60, 40, 30, 20, 10, 5, 3],
+    moveSpeed: [100, 120, 128, 135, 141, 146, 150],
+    maxHealth: [100, 120, 128, 135, 141, 146, 150],
+    healthRegen: [0, 1, 2, 4, 6, 9, 13]
+}
+
+class UpgradeTypes {
+    static BulletDamage = "bulletDamage"
+    static BulletSpeed = "bulletSpeed"
+    static BulletReload = "bulletReload"
+    static MoveSpeed = "moveSpeed"
+    static MaxHealth = "maxHealth"
+    static HealthRegen = "healthRegen"
+}
+class Upgrades {
+    /**
+     * 
+     * @param {*} team
+     * @param {UpgradeTypes.BulletDamage|UpgradeTypes.BulletSpeed|UpgradeTypes.BulletReload|UpgradeTypes.MoveSpeed|UpgradeTypes.MaxHealth|UpgradeTypes.HealthRegen} type
+     * @returns 
+     */
+    static getUpgradeForTeam(team,type) {
+        return upgradeTiers[type][teamUpgrades[team][type]]
+    }
+    static convertToJson(team) {
+        return teamUpgradesToTiers(teamUpgrades[team])
+    }
+    static getTiersJson(team) {
+        return teamUpgrades[team]
+    }
+    static canUpgrade(team,type,bank) {
+
+    }
+    static doUpgrade(team,type,bank) {
+        teamUpgrades[team][type]+=1
+        return bank
+    }
 }
 
 function teamUpgradesToTiers(upgrades) {
@@ -34,10 +91,17 @@ function teamUpgradesToTiers(upgrades) {
         }
     },{})
 }
+/**
+ * Default team upgrades, can be used to revert the above team upgrades
+ */
+const teamUpgradesDefault = JSON.stringify(teamUpgrades)
 
 module.exports = {
     teamSelector,
     teamSizes,
     upgradeTiers,
-    teamUpgradesToTiers
+    teamUpgradesToTiers,
+    teamUpgrades,
+    UpgradeTypes,
+    Upgrades
 }
