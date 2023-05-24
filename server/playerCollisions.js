@@ -1,6 +1,6 @@
-const Collisions = require("./rect_collisions.js")
+const Collisions = require("./rect_collisions")
 
-let {bulletRect,tankRect, coreRect, shieldGeneratorRect} = require("./arenaCollisions.js")
+let {bulletRect,tankRect, coreRect, shieldGeneratorRect} = require("./arenaCollisions")
 /**
  * Returns if a bullet is colliding with a player
  * @param {{

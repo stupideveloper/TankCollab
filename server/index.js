@@ -1,4 +1,6 @@
 /**
+ * INDEX.JS: ≈951 Lines of Code
+ * 
  * Whether to reset player location if the client goes too fast
  */
 const do_lag_back = true
@@ -45,14 +47,14 @@ const fs = require("fs")
  */
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
-const Collision = require("./rect_collisions.js");
-const { teamSelector, teamUpgradesToTiers, teamSizes, upgradeTiers, UpgradeTypes, Upgrades, teamAlive } = require("./teams.js")
-const { randomGem, GemType, gem_uuids} = require("./gems.js")
+const Collision = require("./rect_collisions");
+const { teamSelector, teamUpgradesToTiers, teamSizes, upgradeTiers, UpgradeTypes, Upgrades, teamAlive } = require("./teams")
+const { randomGem, GemType, gem_uuids} = require("./gems")
 /**
  * Imports the collision helper functions
  */
-const { checkWalls, bulletRect, tankRect, gemRect } = require("./arenaCollisions.js");
-const { checkPlayer, checkCores } = require("./playerCollisions.js");
+const { checkWalls, bulletRect, tankRect, gemRect } = require("./arenaCollisions");
+const { checkPlayer, checkCores } = require("./playerCollisions");
 
 var server = net.createServer();
 /**
@@ -925,14 +927,6 @@ server.on('connection', function (conn) {
     }
     function onConnError(err) {
     }
-    /**
-     * Immediately send the player's ID to the socket,
-     * no longer needed, yet still here
-     */
-    // conn.write(JSON.stringify({
-    //     type: "id",
-    //     this_id: id
-    // }))
 });
 
 /**
@@ -940,14 +934,18 @@ server.on('connection', function (conn) {
  */
 let IP = "localhost";
 try {
- IP = require("./iptest.hidden.js").ip
- splashData.ip = IP;
+    let iptest = require("./iptest")
+ IP = iptest.ip
+    if (iptest.oneninetwos.length > 1) console.log(`[WARN]  Multiple 192.168.x.x local IPs found!: ${iptest.oneninetwos.join(", ")}`)
+    if (iptest.oneninetwos.length == 0 && iptest.ips.length != 0) console.log(`[WARN]  No 192.168.x.x local IPs found!\n[WARN]  Other possible local IPs: ${iptest.ips.join(", ")}`)
+    if (iptest.oneninetwos.length == 0 && iptest.ips.length == 0) console.log(`[WARN]  No Network Interfaces found! Do you have Airplane mode enabled?`)
+    splashData.ip = IP;
 } catch {
-    console.warn("[WARN] Create a iptest.hidden.js file to get your device's local IP")
+    console.warn("[WARN]  Unable to get local IP, Multiplayer may not work!")
 }
 /**
  * Start the server
  */
 server.listen(9000, function () {
-    console.log('server listening to %s:%j', IP, server.address().port);
+    console.log('[INFO]  Server listening to %s:%j', IP, server.address().port);
 });

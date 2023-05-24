@@ -1,4 +1,4 @@
-const Collisions = require("./rect_collisions.js")
+const Collisions = require("./rect_collisions")
 /**
  * Add more arena geometry here
  */

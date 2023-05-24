@@ -1,4 +1,4 @@
-const { checkWalls, gemRect } = require("./arenaCollisions.js")
+const { checkWalls, gemRect } = require("./arenaCollisions")
 const uuid = require("crypto").randomUUID
 
 const gem_uuids = new Set()
