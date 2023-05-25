@@ -267,12 +267,6 @@ setInterval(async function SERVER_GAME_TICK() {
             var dir = projectile.dir
             var vel = projectile.vel
             var damage = projectile.damage
-            /**
-             * Move in the direction `dir`, with a velocity of `vel`
-             */
-            projectile.x = projectile.x - (Math.sin(toRadians(dir)) * vel)
-            projectile.y = projectile.y - (Math.cos(toRadians(dir)) * vel)
-            projectile.dist_left -= 1
 
             /**
              * If the projectile runs out of distance, delte it
@@ -316,18 +310,27 @@ setInterval(async function SERVER_GAME_TICK() {
             let coreHits = checkCores(
                 Object.values(cores.cores),
                 Object.values(cores.shields),
-                projectile.x,
-                projectile.y,
+                projectile.x - (Math.sin(toRadians(dir)) * vel),
+                projectile.y - (Math.cos(toRadians(dir)) * vel),
                 dir,
-                teamMap[projectile.shooter]
+                teamMap[projectile.shooter],
+                teamData
             );
-            if (coreHits.length != 0) {
+            if (coreHits.hits.length != 0) {
                 deletables.push(id)
-                coreHits = coreHits.filter(a => { return a != 0 })
-                coreHits.map(p => {
+                let coreHitsL = coreHits.hits.filter(a => { return a != 0 })
+                coreHitsL.map(p => {
                     damageCore(p, damage)
                 })
             }
+            projectile.dir = coreHits.dirUpdate
+
+            /**
+             * Move in the direction `dir`, with a velocity of `vel`
+             */
+            projectile.x = projectile.x - (Math.sin(toRadians(dir)) * vel)
+            projectile.y = projectile.y - (Math.cos(toRadians(dir)) * vel)
+            projectile.dist_left -= 1
             /**
              * If the projectile hits a wall, delete it
              */

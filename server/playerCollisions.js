@@ -82,7 +82,8 @@ function checkPlayerBullet(playerMap, playerLocMap, x, y, dir, shooter, damage, 
     }
     return hits;
 }
-function checkCoreBullet(cores = [], shieldGenerators = [], x, y, dir, shooterTeam) {
+console.log(Collisions.reflect(30,90))
+function checkCoreBullet(cores = [], shieldGenerators = [], x, y, dir, shooterTeam, teamData) {
     const damageCircle = {
         radius: bulletRect.rough_radius,
         x: x,
@@ -100,26 +101,37 @@ function checkCoreBullet(cores = [], shieldGenerators = [], x, y, dir, shooterTe
             radius: shieldGeneratorRect.rough_radius
         }
     })
-    let returns = []
+    let returns = {hits:[],dirUpdate: dir}
     for (let coreCirc of coreCircles) {
         //if (coreCirc.id.startsWith(shooterTeam)) continue;
         if (!coreCirc.alive) continue;
+        
         if (Collisions.circle(coreCirc, damageCircle)) {
+            if (coreCirc.id.startsWith("A")) {
+                team = "A"
+            } else {
+                team = "B"
+            }
+            if (teamData[team].rightShieldHealth > 0 || teamData[team].leftShieldHealth > 0) {
+                let inangle = Collisions.toDegrees(Math.atan2(x-coreCirc.x,y-coreCirc.y));
+                returns.dirUpdate = Collisions.reflect(dir,inangle-90)
+                continue
+            }
             if (coreCirc.id.startsWith(shooterTeam)) {
-                returns.push(0)
+                returns.hits.push(0)
                 continue;
             };
-            returns.push(coreCirc.id)
+            returns.hits.push(coreCirc.id)
         }
     }
     for (let shieldCirc of shieldCircles) {
         if (!shieldCirc.alive) continue;
         if (Collisions.circle(shieldCirc, damageCircle)) {
             if (shieldCirc.id.startsWith(shooterTeam)) {
-                returns.push(0)
+                returns.hits.push(0)
                 continue;
             };
-            returns.push(shieldCirc.id)
+            returns.hits.push(shieldCirc.id)
         }
     }
     return returns

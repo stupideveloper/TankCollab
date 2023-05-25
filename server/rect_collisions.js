@@ -7,10 +7,21 @@
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
 
+const dot = (a,b) => {return a[0]*b[0]+a[1]*b[1]} 
+
 // .1 - .3 > -0.19999999999999998
 // fixFloat(.1 - .3) > -0.2
 const fixFloat = (number, precision = Math.log10(1 / Number.EPSILON)) => number ? parseFloat(number.toFixed(precision)) : 0;
-
+function reflect(dir1,dirCirc) {
+    var dir = toRadians(dir1)
+    var r2dir = toRadians(dirCirc)
+     var Ri = [Math.sin(dir),Math.cos(dir)] 
+    var Norm = [Math.sin(r2dir),Math.cos(r2dir)] 
+    let vectorMult = (a,b)=>{return [(a[0]*b),(a[1]*b)]} 
+    let vectorTake = (a,b)=>{return [(a[0]-b[0]),(a[1]-b[1])]}
+    let resVector = vectorTake(vectorMult(vectorMult(Norm,2),dot(Ri,Norm)),Ri) 
+    return fixFloat(toDegrees(Math.atan2(resVector[0],resVector[1])),10)
+} 
 
 // Utils
 class Vector {
@@ -192,5 +203,8 @@ const isPointInRect = function (x, y, x_min, x_max, y_min, y_max) {
 module.exports = {
     rect: isRectCollide,
     circle: isCircleCollide,
-    point: isPointInRect
+    point: isPointInRect,
+    toDegrees,
+    toRadians,
+    reflect
 }
