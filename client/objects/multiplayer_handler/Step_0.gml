@@ -181,5 +181,21 @@ if (global.shake)
 }
 //camera_set_view_pos(view_camera[0],x-camera_get_view_width(view_camera[0])/2,y-camera_get_view_height(view_camera[0])/2)
 sendPacket()
+//global.started = global.beginned
+//try {
+//if (!global.beginned && !global.started && !audio_is_playing(Begin_sound)) {
+//	audio_play_sound(Begin_sound, 1, false)
+	
+//}
 
+//if (!audio_is_playing(Begin_sound) && !global.started) {
+//	global.started = true
+	
+//}
 
+//} catch (e) {
+//	e=e
+//}
+//try {
+//show_debug_message([global.beginned, global.started])
+//} catch (e) {}
