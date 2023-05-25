@@ -16,11 +16,10 @@ for (var i = 0; i < array_length(global.other_player_xy); i++) {
 	if (global.other_player_xy[i].id == global.this_id) continue;
 	if (global.other_player_xy[i].hidden == true) continue;
 	try {
-		draw_set_colour(c_black)
-		draw_rectangle(global.other_player_xy[i].x,global.other_player_xy[i].y,global.other_player_xy[i].x+50,global.other_player_xy[i].y+30, false)
-		draw_set_colour(c_green)
-		draw_rectangle(global.other_player_xy[i].x+5,global.other_player_xy[i].y+5,global.other_player_xy[i].x+45,global.other_player_xy[i].y+25, false)
-	} catch (e) {e=e}
+		var _x = global.other_player_xy[i].x
+		var _y = global.other_player_xy[i].y
+		draw_healthbar(_x-50,_y-65,_x+50,_y-50,(global.other_player_xy[i].health/global.other_player_xy[i].max_health)*100,c_black,c_red,c_green,0,true,true)
+	} catch (e) show_debug_message(e)
 	if (global.teams[$ global.other_player_xy[i].id] == true) {
 		draw_set_color(c_white)
 		draw_sprite_ext(tank_spr,3,global.other_player_xy[i].x,global.other_player_xy[i].y,.3,.3,global.other_player_xy[i].dir,-1,1)

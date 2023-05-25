@@ -594,8 +594,7 @@ server.on('connection', function (conn) {
      */
     packetListeners[id] = function () {
         let regen = Upgrades.getUpgradeForTeam(team, UpgradeTypes.HealthRegen);
-        clientsPos[id].health = Math.min(clientsPos[id].health + regen / 60, clientsPos[id].max_health)
-
+        if (clientsPos[id].health > 0) clientsPos[id].health = Math.min(clientsPos[id].health + regen / 60, clientsPos[id].max_health)
         if (!clientsPos[id].max_health == Upgrades.getUpgradeForTeam(team, UpgradeTypes.MaxHealth)) {
             clientPackets[id].push({
                 type: "health_update",
@@ -900,7 +899,7 @@ server.on('connection', function (conn) {
         REPLAY.saveToFile()
         disconnected = true;
         conn.end()
-        if (clientsPos[id].respawnTime != -2) teamAlive[team] -= 1
+        if (clientsPos[id].respawnTime >= -1) teamAlive[team] -= 1
         delete clientsPos[id]
         delete clientPackets[id]
         if (teamAlive[team] == 0 && started) {
