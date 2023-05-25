@@ -78,7 +78,7 @@ if (global.gamemenu) {
 
 }
 
-if (!global.started) {
+if (!global.started && connected) {
 draw_set_color(c_black)
 	draw_rectangle(0,0,window_get_width(),window_get_height(),false)
 	draw_set_alpha(1)
@@ -94,10 +94,13 @@ draw_set_color(c_black)
 
 	draw_set_font(Inventory_fnt)
 	try	draw_text(
-	window_get_width()/2,window_get_height()/2+40,
-		$"{global.teamsizes.oth+global.teamsizes.own} Players Waiting\n\nControl Style: {global.control_style} (press C to change)\nServer IP: {global.splash_data.ip}\nConnected IP: {global.ip_construct}\nGame Version: {global.splash_data.gameVersion}"
+	window_get_width()/2,window_get_height()/2+120,
+		$"{global.teamsizes.oth+global.teamsizes.own} Players Waiting\n\nControl Style: {global.control_style} (press C to change)\nServer IP: {global.splash_data.ip}\nConnected IP: {global.ip_construct}\nClient IP: {global.splash_data.connectionIp}\nGame Version: {global.splash_data.gameVersion}"
 	)
 	catch (e) e=e
+	draw_set_halign(fa_left)
+	draw_set_valign(fa_bottom)
+	//draw_text(0,window_get_height(),"Press F to toggle fullscreen")
 	draw_set_font(font)
 	draw_set_halign(fa_center)
 }

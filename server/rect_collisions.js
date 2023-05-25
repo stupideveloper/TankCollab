@@ -13,25 +13,21 @@ const fixFloat = (number, precision = Math.log10(1 / Number.EPSILON)) => number 
 
 
 // Utils
-class Vector
-{
-    constructor({ x = 0, y = 0 } = {})
-    {
+class Vector {
+    constructor({ x = 0, y = 0 } = {}) {
         this.x = x;
         this.y = y;
     }
 
 
-    get magnitude()
-    {
+    get magnitude() {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
     // Add(5)
     // Add(Vector)
     // Add({x, y})
-    Add(factor)
-    {
+    Add(factor) {
         const f = typeof factor === 'object'
             ? { x: 0, y: 0, ...factor }
             : { x: factor, y: factor }
@@ -41,8 +37,7 @@ class Vector
         })
     }
 
-    Minus(factor)
-    {
+    Minus(factor) {
         const f = typeof factor === 'object'
             ? { x: 0, y: 0, ...factor }
             : { x: factor, y: factor }
@@ -55,8 +50,7 @@ class Vector
     // Multiply(5)
     // Multiply(Vector)
     // Multiply({x, y})
-    Multiply(factor)
-    {
+    Multiply(factor) {
 
         // @LATER: Use an helper in order to transform `factor`
         //  into a Vector of same Dimensions than this
@@ -70,8 +64,7 @@ class Vector
         })
     }
 
-    Rotate(theta)
-    {
+    Rotate(theta) {
         // https://en.wikipedia.org/wiki/Rotation_matrix#In_two_dimensions
         return new Vector({
             x: this.x * Math.cos(theta) - this.y * Math.sin(theta),
@@ -82,8 +75,7 @@ class Vector
 
     // Todo: Use scalar product
 
-    Project(line)
-    {
+    Project(line) {
         let dotvalue = line.direction.x * (this.x - line.origin.x)
             + line.direction.y * (this.y - line.origin.y);
         return new Vector({
@@ -93,29 +85,24 @@ class Vector
     }
 }
 
-class Line
-{
-    constructor({ x = 0, y = 0, dx = 0, dy = 0 })
-    {
+class Line {
+    constructor({ x = 0, y = 0, dx = 0, dy = 0 }) {
         this.origin = new Vector({ x, y });
         this.direction = new Vector({ x: dx, y: dy });
     }
 }
-class Rect
-{
+class Rect {
     constructor({
         x = 0, y = 0, w = 10, h = 10,
         // 0 is Horizontal to right (following OX) - Rotate clockwise
         theta = null, angle = 0, // theta (rad) or angle (deg)
-    })
-    {
+    }) {
         this.center = new Vector({ x, y });
         this.size = new Vector({ x: w, y: h });
         this.theta = theta || toRadians(angle);
     }
 
-    getAxis()
-    {
+    getAxis() {
         const OX = new Vector({ x: 1, y: 0 });
         const OY = new Vector({ x: 0, y: 1 });
         const RX = OX.Rotate(this.theta);
@@ -126,8 +113,7 @@ class Rect
         ];
     }
 
-    getCorners()
-    {
+    getCorners() {
         const axis = this.getAxis();
         const RX = axis[0].direction.Multiply(this.size.x / 2);
         const RY = axis[1].direction.Multiply(this.size.y / 2);
@@ -139,8 +125,7 @@ class Rect
         ]
     }
 }
-const isRectCollide = (rectA, rectB) =>
-{
+const isRectCollide = (rectA, rectB) => {
 
     const rA = typeof rectA !== Rect ? new Rect(rectA) : rectA;
     const rB = typeof rectB !== Rect ? new Rect(rectB) : rectB;
@@ -149,40 +134,34 @@ const isRectCollide = (rectA, rectB) =>
         && isProjectionCollide({ rect: rB, onRect: rA });
 };
 
-const isProjectionCollide = ({ rect, onRect }) =>
-{
+const isProjectionCollide = ({ rect, onRect }) => {
     const lines = onRect.getAxis();
     const corners = rect.getCorners();
 
     let isCollide = true;
 
-    lines.forEach((line, dimension) =>
-    {
+    lines.forEach((line, dimension) => {
         let futhers = { min: null, max: null };
         // Size of onRect half size on line direction
         const rectHalfSize = (dimension === 0 ? onRect.size.x : onRect.size.y) / 2;
-        corners.forEach(corner =>
-        {
+        corners.forEach(corner => {
             const projected = corner.Project(line);
             const CP = projected.Minus(onRect.center);
             // Sign: Same directon of OnRect axis : true.
             const sign = (CP.x * line.direction.x) + (CP.y * line.direction.y) > 0;
             const signedDistance = CP.magnitude * (sign ? 1 : -1);
 
-            if (!futhers.min || futhers.min.signedDistance > signedDistance)
-            {
+            if (!futhers.min || futhers.min.signedDistance > signedDistance) {
                 futhers.min = { signedDistance, corner, projected };
             }
-            if (!futhers.max || futhers.max.signedDistance < signedDistance)
-            {
+            if (!futhers.max || futhers.max.signedDistance < signedDistance) {
                 futhers.max = { signedDistance, corner, projected };
             }
         });
 
         if (!(futhers.min.signedDistance < 0 && futhers.max.signedDistance > 0
             || Math.abs(futhers.min.signedDistance) < rectHalfSize
-            || Math.abs(futhers.max.signedDistance) < rectHalfSize))
-        {
+            || Math.abs(futhers.max.signedDistance) < rectHalfSize)) {
             isCollide = false;
         }
     });
@@ -191,9 +170,9 @@ const isProjectionCollide = ({ rect, onRect }) =>
 /**
  * Not stolen code, just really simple mathematics
  */
-const isCircleCollide = (circleA,circleB) => {
-    let dist = (circleA.x-circleB.x)**2+(circleA.y-circleB.y)**2
-    let radiuses = (circleA.radius + circleB.radius)**2
+const isCircleCollide = (circleA, circleB) => {
+    let dist = (circleA.x - circleB.x) ** 2 + (circleA.y - circleB.y) ** 2
+    let radiuses = (circleA.radius + circleB.radius) ** 2
     return dist < radiuses
 }
 /**
@@ -206,7 +185,7 @@ const isCircleCollide = (circleA,circleB) => {
  * @param {number} y_max 
  * @returns {boolean}
  */
-const isPointInRect = function(x,y,x_min,x_max,y_min,y_max){
+const isPointInRect = function (x, y, x_min, x_max, y_min, y_max) {
     if (x >= x_max || x <= x_min || y >= y_max || y <= y_min) return false;
     return true
 }

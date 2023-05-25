@@ -1,6 +1,9 @@
 /// @description Insert description here
 // You can write your code in this editor
-
+if (global.has_forced_server) {
+global.IP_ADDR = global.forced_server
+room_goto(Room1)
+}
 if (keyboard_check_pressed(ord("0"))) {
 	global.ip_construct += "0"
 }

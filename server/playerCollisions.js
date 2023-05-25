@@ -1,6 +1,6 @@
 const Collisions = require("./rect_collisions")
 
-let {bulletRect,tankRect, coreRect, shieldGeneratorRect} = require("./arenaCollisions")
+let { bulletRect, tankRect, coreRect, shieldGeneratorRect } = require("./arenaCollisions")
 /**
  * Returns if a bullet is colliding with a player
  * @param {{
@@ -18,11 +18,11 @@ let {bulletRect,tankRect, coreRect, shieldGeneratorRect} = require("./arenaColli
  * @param {string} room 
  * @returns 
  */
-function checkPlayerBullet(playerMap,playerLocMap,x,y,dir,shooter,damage,room) {
+function checkPlayerBullet(playerMap, playerLocMap, x, y, dir, shooter, damage, room) {
     /**
      * Gets a list of all players in the room
      */
-    const players = [...playerMap[room]?.keys()||[]];
+    const players = [...playerMap[room]?.keys() || []];
     /**
      * Rough rect of the bullet
      */
@@ -45,7 +45,7 @@ function checkPlayerBullet(playerMap,playerLocMap,x,y,dir,shooter,damage,room) {
      * All the players the bullet has hit
      */
     let hits = []
-    
+
     for (let player of players) {
         /**
          * Prevents the shooter from shooting themselves
@@ -57,8 +57,8 @@ function checkPlayerBullet(playerMap,playerLocMap,x,y,dir,shooter,damage,room) {
          */
         if (location.respawnTime != -1) continue;
         let tankCircle = {
-            x:location.x,
-            y:location.y,
+            x: location.x,
+            y: location.y,
             radius: tankRect.rough_radius
         }
         let tankColl = {
@@ -71,30 +71,30 @@ function checkPlayerBullet(playerMap,playerLocMap,x,y,dir,shooter,damage,room) {
         /**
          * Sees if the bullet and tank are close enough to justify using the rectangle function
          */
-        if (Collisions.circle(tankCircle,damageCircle)) {
+        if (Collisions.circle(tankCircle, damageCircle)) {
             /**
              * yet another use of the costly rectangle collision function
              */
-            if (Collisions.rect(bulletColl,tankColl)) {
+            if (Collisions.rect(bulletColl, tankColl)) {
                 hits.push(player)
             }
         }
     }
     return hits;
 }
-function checkCoreBullet(cores=[],shieldGenerators=[],x,y,dir,shooterTeam) {
+function checkCoreBullet(cores = [], shieldGenerators = [], x, y, dir, shooterTeam) {
     const damageCircle = {
         radius: bulletRect.rough_radius,
         x: x,
         y: y
     }
-    let coreCircles = cores.map(c=>{
+    let coreCircles = cores.map(c => {
         return {
             ...c,
             radius: coreRect.rough_radius
         }
     })
-    let shieldCircles = shieldGenerators.map(c=>{
+    let shieldCircles = shieldGenerators.map(c => {
         return {
             ...c,
             radius: shieldGeneratorRect.rough_radius
@@ -104,7 +104,7 @@ function checkCoreBullet(cores=[],shieldGenerators=[],x,y,dir,shooterTeam) {
     for (let coreCirc of coreCircles) {
         //if (coreCirc.id.startsWith(shooterTeam)) continue;
         if (!coreCirc.alive) continue;
-        if (Collisions.circle(coreCirc,damageCircle)) {
+        if (Collisions.circle(coreCirc, damageCircle)) {
             if (coreCirc.id.startsWith(shooterTeam)) {
                 returns.push(0)
                 continue;
@@ -114,7 +114,7 @@ function checkCoreBullet(cores=[],shieldGenerators=[],x,y,dir,shooterTeam) {
     }
     for (let shieldCirc of shieldCircles) {
         if (!shieldCirc.alive) continue;
-        if (Collisions.circle(shieldCirc,damageCircle)) {
+        if (Collisions.circle(shieldCirc, damageCircle)) {
             if (shieldCirc.id.startsWith(shooterTeam)) {
                 returns.push(0)
                 continue;

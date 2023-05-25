@@ -17,10 +17,8 @@ const teams = {
  */
 let teamSizes = { A: 0, B: 0 }
 let teamAlive = { A: 0, B: 0 }
-let teamSelector = () =>
-{
-    if (teamSizes[teams.TEAM_A] == teamSizes[teams.TEAM_B])
-    {
+let teamSelector = () => {
+    if (teamSizes[teams.TEAM_A] == teamSizes[teams.TEAM_B]) {
         return Math.random() > 0.5 ? teams.TEAM_A : teams.TEAM_B;
     }
     return teamSizes[teams.TEAM_A] > teamSizes[teams.TEAM_B] ? teams.TEAM_B : teams.TEAM_A;
@@ -58,8 +56,7 @@ let upgradeTiers = {
     healthRegen: [0, 1, 2, 4, 6, 9, 13]
 }
 
-class UpgradeTypes
-{
+class UpgradeTypes {
     static BulletDamage = "bulletDamage"
     static BulletSpeed = "bulletSpeed"
     static BulletReload = "bulletReload"
@@ -67,14 +64,7 @@ class UpgradeTypes
     static MaxHealth = "maxHealth"
     static HealthRegen = "healthRegen"
 }
-let bankType = {
-    [GemType.RED]: 0,
-    [GemType.BLUE]: 0,
-    [GemType.GREEN]: 0,
-    [GemType.PURPLE]: 0,
-}
-class UpgradeRequirements
-{
+class UpgradeRequirements {
     static #reqs = {
         [UpgradeTypes.BulletDamage]: [
             { [GemType.RED]: 1, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
@@ -145,11 +135,9 @@ class UpgradeRequirements
      * @param {AbstractUpgradeType} type 
      * @returns {boolean}
      */
-    static checkRequirement(bank, team, type)
-    {
-        try
-        {
-            return this.checkCostRequirement(bank, this.checkRequirement(team,type))
+    static checkRequirement(bank, team, type) {
+        try {
+            return this.checkCostRequirement(bank, this.getRequirement(team, type))
         } catch {
             return false;
         }
@@ -165,8 +153,7 @@ class UpgradeRequirements
         [GemType.BLUE]: 0,
         [GemType.GREEN]: 0,
         [GemType.PURPLE]: 0,
-    })
-    {
+    }) {
         return (
             bank[GemType.RED] >= requirement[GemType.RED] &&
             bank[GemType.BLUE] >= requirement[GemType.BLUE] &&
@@ -180,7 +167,7 @@ class UpgradeRequirements
      * @param {AbstractRequirement} requirement 
      * @returns {AbstractBank} a reference to the bank
      */
-    static deductRequirement(bank,requirement) {
+    static deductRequirement(bank, requirement) {
         bank[GemType.RED] = bank[GemType.RED] - requirement[GemType.RED]
         bank[GemType.BLUE] = bank[GemType.BLUE] - requirement[GemType.BLUE]
         bank[GemType.GREEN] = bank[GemType.GREEN] - requirement[GemType.GREEN]
@@ -188,8 +175,7 @@ class UpgradeRequirements
         return bank
     }
 }
-class Upgrades
-{
+class Upgrades {
     /**
      * get the current upgrade value for an upgrade
      * 
@@ -197,8 +183,7 @@ class Upgrades
      * @param {AbstractUpgradeType} type
      * @returns 
      */
-    static getUpgradeForTeam(team, type)
-    {
+    static getUpgradeForTeam(team, type) {
         return upgradeTiers[type][teamUpgrades[team][type]]
     }
     static getUpgrade = this.getUpgradeForTeam
@@ -207,8 +192,7 @@ class Upgrades
      * 
      * @param {AbstractTeam} team
      */
-    static convertToJson(team)
-    {
+    static convertToJson(team) {
         return teamUpgradesToTiers(teamUpgrades[team])
     }
     /**
@@ -216,8 +200,7 @@ class Upgrades
      * @param {AbstractTeam} team
      * @returns {AbstractUpgrades}
      */
-    static getTiersJson(team)
-    {
+    static getTiersJson(team) {
         return teamUpgrades[team]
     }
     /**
@@ -226,8 +209,7 @@ class Upgrades
      * @param {AbstractUpgradeType} type 
      * @returns {number}
      */
-    static getTier(team, type)
-    {
+    static getTier(team, type) {
         return teamUpgrades[team][type]
     }
     /**
@@ -236,11 +218,10 @@ class Upgrades
      * @param {*} availability 
      * @param {AbstractBank} bank 
      */
-    static updateAvailability(team, availability, bank) 
-    {
+    static updateAvailability(team, availability, bank) {
         let categories = Object.keys(availability)
         for (let type of categories) {
-            availability[type] = UpgradeRequirements.checkRequirement(bank,team,type);
+            availability[type] = UpgradeRequirements.checkRequirement(bank, team, type);
         }
     }
     /**
@@ -251,8 +232,7 @@ class Upgrades
      * @param {AbstractBank} bank bank of the team
      * @returns {boolean}
      */
-    static canUpgrade(team, type, bank)
-    {
+    static canUpgrade(team, type, bank) {
         return UpgradeRequirements.checkRequirement(bank, team, type)
     }
     /**
@@ -262,28 +242,23 @@ class Upgrades
      * @param {AbstractBank} bank the team's bank
      * @returns {AbstractBank} a reference to the team's bank
      */
-    static doUpgrade(team, type, bank)
-    {
-        if (this.canUpgrade(team, type, bank))
-        {
-            var requirement = UpgradeRequirements.getRequirement(team,type)
-            UpgradeRequirements.deductRequirement(bank,requirement)
+    static doUpgrade(team, type, bank) {
+        if (this.canUpgrade(team, type, bank)) {
+            var requirement = UpgradeRequirements.getRequirement(team, type)
+            UpgradeRequirements.deductRequirement(bank, requirement)
             teamUpgrades[team][type] += 1
         }
         return bank
     }
 }
 
-function teamUpgradesToTiers(upgrades)
-{
-    return Object.keys(upgradeTiers).map(v =>
-    {
+function teamUpgradesToTiers(upgrades) {
+    return Object.keys(upgradeTiers).map(v => {
         return {
             key: v,
             value: upgradeTiers[v][upgrades[v]]
         }
-    }).reduce((p, v) =>
-    {
+    }).reduce((p, v) => {
         return {
             ...p,
             [v.key]: v.value

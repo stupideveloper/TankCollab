@@ -27,7 +27,7 @@ let arenaBounds = {
 const bulletRect = {
     w: .4 * 64,
     h: .4 * 64,
-    rough_radius: Math.sqrt((.4 * 64)**2+(.4 * 64)**2)
+    rough_radius: Math.sqrt((.4 * 64) ** 2 + (.4 * 64) ** 2)
 }
 /**
  * Size of a tank
@@ -35,12 +35,12 @@ const bulletRect = {
 const tankRect = {
     w: 63,
     h: 63,
-    rough_radius: Math.sqrt(32**2+32**2)
+    rough_radius: Math.sqrt(32 ** 2 + 32 ** 2)
 }
 const gemRect = {
     w: 43,
     h: 43,
-    rough_radius: Math.ceil(Math.sqrt(43**2+43**2))
+    rough_radius: Math.ceil(Math.sqrt(43 ** 2 + 43 ** 2))
 }
 const shieldGeneratorRect = {
     rough_radius: 40
@@ -74,11 +74,11 @@ const checkWallCollisions = function (rect) {
         x: rect.x,
         y: rect.y
     }
-    if (!Collisions.point(rect.x,rect.y,arenaBounds.x_min,arenaBounds.x_max,arenaBounds.y_min,arenaBounds.y_max)) {
+    if (!Collisions.point(rect.x, rect.y, arenaBounds.x_min, arenaBounds.x_max, arenaBounds.y_min, arenaBounds.y_max)) {
         return true
     }
     let returnval = false
-    arenaGeometry.forEach(function(arenaPart){
+    arenaGeometry.forEach(function (arenaPart) {
         if (returnval) return;
         const circleOfPart = {
             radius: arenaPart.rough_radius,
@@ -88,12 +88,12 @@ const checkWallCollisions = function (rect) {
         /**
          * Checks whether the two objects are close enough to do the rectangle check
          */
-        if (Collisions.circle(circleOfRect,circleOfPart)) {
+        if (Collisions.circle(circleOfRect, circleOfPart)) {
             /**
              * Runs an expensive rectangle check
              */
-            if (Collisions.rect(rect,arenaPart)) {
-                returnval=true;
+            if (Collisions.rect(rect, arenaPart)) {
+                returnval = true;
             }
         }
     })
