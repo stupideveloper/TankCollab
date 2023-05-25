@@ -12,5 +12,7 @@
     {"name":"inventory_obj","order":1,"path":"objects/inventory_obj/inventory_obj.yy",},
     {"name":"inventory_spr","order":1,"path":"sprites/inventory_spr/inventory_spr.yy",},
     {"name":"health_regen_spr","order":1,"path":"sprites/health_regen_spr/health_regen_spr.yy",},
+    {"name":"wall_piece_spr","order":3,"path":"sprites/wall_piece_spr/wall_piece_spr.yy",},
+    {"name":"wall_piece_obj","order":6,"path":"objects/wall_piece_obj/wall_piece_obj.yy",},
   ],
 }

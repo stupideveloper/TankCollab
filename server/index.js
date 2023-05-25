@@ -228,11 +228,6 @@ let started = false
  */
 setInterval(async function SERVER_GAME_TICK() {
 
-    reset = Math.max(reset - 1, -1)
-    if (reset == 0) {
-        process.exit()
-    }
-
     /**
      * Runs every packet listener, this acts more as a game tick listener
      */
@@ -836,14 +831,15 @@ server.on('connection', function (conn) {
                 })
             }
             else if (packet.type == "begin") {
-                if (Object.values(teamSizes).reduce((p, v) => p + v, 0) < 2) {
-                    clientPackets[id].push({
-                        type: "title",
-                        time: 1,
-                        title: "Insufficient Players"
-                    })
-                    continue
-                }
+                //tmp
+                // if (Object.values(teamSizes).reduce((p, v) => p + v, 0) < 2) {
+                //     clientPackets[id].push({
+                //         type: "title",
+                //         time: 1,
+                //         title: "Insufficient Players"
+                //     })
+                //     continue
+                // }
                 started = !started;
             }
             else {
