@@ -106,6 +106,7 @@ function handlePackets(packets) {
 					break;	
 				}
 				case "teleport": {
+					
 					//show_debug_message(extra_packet)
 					multiplayer_handler.x = extra_packet.x
 					multiplayer_handler.phy_position_x = extra_packet.x
@@ -133,6 +134,7 @@ function handlePackets(packets) {
 					break;
 				}
 				case "screenshake": {
+					audio_play_sound(Shoot_sound, 2, false)
 					global.shake = true
 					global.shake_time = extra_packet.time;
 					global.shake_magnitude = extra_packet.magnitude;
@@ -154,6 +156,7 @@ function handlePackets(packets) {
 					break;
 				}
 				case "collect_gem": {
+					audio_play_sound(Pickup_sound, 2, false)
 					try {
 						var gemtodelete = struct_get(global.spawned_gems,extra_packet.uuid)
 						// show_debug_message(global.spawned_gems)
@@ -300,6 +303,7 @@ function handlePackets(packets) {
 		global.teamsizes = packets.teamSizes;
 		global.available_upgrades = packets.availableUpgrades
 		global.started = packets.beginned
+		//global.started = false
 		// show_debug_message(packets.availableUpgrades)
 		//show_debug_message(array_length(variable_struct_get_names(packets.projectiles)))
 	} else if (packets.type == "id") {
