@@ -221,6 +221,7 @@ function getCores() {
  */
 let reset = -1
 
+let spawnedGems = 0
 
 let started = false
 /**
@@ -234,7 +235,8 @@ setInterval(async function SERVER_GAME_TICK() {
     Object.keys(packetListeners).map(player => {
         packetListeners[player]()
     })
-    if (started && Math.random() > 0.995) {
+    if (started && spawnedGems < 20 && Math.random() > 0.995) {
+        spawnedGems++;
         var gem = randomGem(3733, 2330)
         broadcast({
             type: "gem_spawn",
@@ -820,6 +822,7 @@ server.on('connection', function (conn) {
                 if (clientsPos[id].respawnTime != -1) continue;
                 var legal = !!gem_uuids.has(packet.uuid)
                 if (!legal) continue;
+                spawnedGems--;
                 gem_uuids.delete(packet.uuid)
                 var gem_type = GemType.fromId(packet.gem_type)
                 teamData[team].gems[gem_type.getName()]++;

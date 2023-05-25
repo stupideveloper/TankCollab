@@ -14,7 +14,7 @@
   "enabled": true,
   "endColour": 16759552,
   "GMPresetName": "",
-  "gravityDirection": 270.0,
+  "gravityDirection": 227.0,
   "gravityForce": 0.0,
   "headPosition": 0.0,
   "lifetimeMax": 80.0,
