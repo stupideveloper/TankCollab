@@ -21,7 +21,7 @@ let REPLAY = {
 };
 let splashData = {
     ip: "unknown",
-    gameVersion: "e8101a9" // last commit ID
+    gameVersion: "03bd655" // last commit ID
 }
 try {
 REPLAY = require("./replay.hidden")

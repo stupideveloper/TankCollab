@@ -1,5 +1,11 @@
 
-/** JSDOC @typedef {"bulletDamage"|"bulletSpeed"|"bulletReload"|"moveSpeed"|"maxHealth"|"healthRegen"} AbstractUpgradeType @typedef {"A","B"} AbstractTeam*/
+/** JSDOC 
+ * @typedef {"bulletDamage"|"bulletSpeed"|"bulletReload"|"moveSpeed"|"maxHealth"|"healthRegen"} AbstractUpgradeType 
+ * @typedef {"A"|"B"} AbstractTeam
+ * @typedef {"RED","BLUE","GREEN","PURPLE"} AbstractGemType
+ * @typedef {{"RED":number,"BLUE":number,"GREEN":number,"PURPLE":number}} AbstractBank
+ * @typedef {{"RED":number,"BLUE":number,"GREEN":number,"PURPLE":number}} AbstractRequirement
+ * @typedef {{"bulletDamage":number,"bulletSpeed":number,"bulletReload":number,"moveSpeed":number,"maxHealth":number,"healthRegen":number}} AbstractUpgrades*/
 const { GemType } = require("./gems")
 
 const teams = {
@@ -124,18 +130,36 @@ class UpgradeRequirements
             { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 }
         ]
     }
+    /** 
+     * the requirement that an upgrade has
+     * @param {AbstractTeam} team 
+     * @param {AbstractUpgradeType} type 
+     * @returns {AbstractRequirement}
+     */
     static getRequirement(team, type) {
         return this.#reqs[type][Upgrades.getTier(team, type)]
     }
+    /** 
+     * see below
+     * @param {AbstractTeam} team 
+     * @param {AbstractUpgradeType} type 
+     * @returns {boolean}
+     */
     static checkRequirement(bank, team, type)
     {
         try
         {
-            return this.checkCostRequirement(bank, this.#reqs[type][Upgrades.getTier(team, type)])
+            return this.checkCostRequirement(bank, this.checkRequirement(team,type))
         } catch {
             return false;
         }
     }
+    /** 
+     * whether a bank can afford the requirements
+     * @param {AbstractBank} bank 
+     * @param {AbstractUpgradeType} requirement 
+     * @returns {boolean} whether or not it can
+     */
     static checkCostRequirement(bank, requirement = {
         [GemType.RED]: 0,
         [GemType.BLUE]: 0,
@@ -150,6 +174,12 @@ class UpgradeRequirements
             bank[GemType.PURPLE] >= requirement[GemType.PURPLE]
         )
     }
+    /**
+     * remove the required gems from a bank for an upgrade 
+     * @param {AbstractBank} bank 
+     * @param {AbstractRequirement} requirement 
+     * @returns {AbstractBank} a reference to the bank
+     */
     static deductRequirement(bank,requirement) {
         bank[GemType.RED] = bank[GemType.RED] - requirement[GemType.RED]
         bank[GemType.BLUE] = bank[GemType.BLUE] - requirement[GemType.BLUE]
@@ -161,6 +191,7 @@ class UpgradeRequirements
 class Upgrades
 {
     /**
+     * get the current upgrade value for an upgrade
      * 
      * @param {AbstractTeam} team
      * @param {AbstractUpgradeType} type
@@ -171,18 +202,40 @@ class Upgrades
         return upgradeTiers[type][teamUpgrades[team][type]]
     }
     static getUpgrade = this.getUpgradeForTeam
+    /**
+     * converts the team upgrades to a more friendly object for network transmission
+     * 
+     * @param {AbstractTeam} team
+     */
     static convertToJson(team)
     {
         return teamUpgradesToTiers(teamUpgrades[team])
     }
+    /**
+     * get a team's tiers
+     * @param {AbstractTeam} team
+     * @returns {AbstractUpgrades}
+     */
     static getTiersJson(team)
     {
         return teamUpgrades[team]
     }
+    /**
+     * get the tier of upgrades that an upgrade currently has
+     * @param {AbstractTeam} team 
+     * @param {AbstractUpgradeType} type 
+     * @returns {number}
+     */
     static getTier(team, type)
     {
         return teamUpgrades[team][type]
     }
+    /**
+     * update the greyed out upgrades
+     * @param {AbstractTeam} team 
+     * @param {*} availability 
+     * @param {AbstractBank} bank 
+     */
     static updateAvailability(team, availability, bank) 
     {
         let categories = Object.keys(availability)
@@ -190,10 +243,25 @@ class Upgrades
             availability[type] = UpgradeRequirements.checkRequirement(bank,team,type);
         }
     }
+    /**
+     * whether a team can upgrade an upgrade
+     * 
+     * @param {AbstractTeam} team team to test
+     * @param {AbstractUpgradeType} type type of upgrade to test
+     * @param {AbstractBank} bank bank of the team
+     * @returns {boolean}
+     */
     static canUpgrade(team, type, bank)
     {
         return UpgradeRequirements.checkRequirement(bank, team, type)
     }
+    /**
+     * 
+     * @param {AbstractTeam} team the team to upgrade
+     * @param {AbstractUpgradeType} type the type of upgrade to do
+     * @param {AbstractBank} bank the team's bank
+     * @returns {AbstractBank} a reference to the team's bank
+     */
     static doUpgrade(team, type, bank)
     {
         if (this.canUpgrade(team, type, bank))
