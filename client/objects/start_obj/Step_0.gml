@@ -46,6 +46,7 @@ if (keyboard_check(vk_backspace)) {
 }
 if (keyboard_check_pressed(vk_enter)) {
 	if (IPCheck(global.ip_construct)) {
+		if (global.ip_construct == "127.0.0.1") global.ip_construct = "localhost"
 		global.IP_ADDR = global.ip_construct
 		room_goto(Room1)
 	}

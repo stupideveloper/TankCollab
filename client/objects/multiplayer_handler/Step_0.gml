@@ -59,12 +59,6 @@ if (keyboard_check_pressed(ord("C")) && (global.gamemenu || !global.started)) {
 last_pack_ticks += 1
 ticks_since_update += 1
 
-if ((mouse_check_button_pressed(mb_left) || keyboard_check_pressed(vk_space))&&!global.gamemenu) {
-	last_was_clicked = true
-	addPacket({
-		type: "fire_bullet",
-	})
-}
 var imageanglekey = 0b0000
 var _speed = global.speeed
 phy_speed_x*=0.9
@@ -150,6 +144,15 @@ if (sendPosPack) {
 	type: "pos"
 	})
 }
+
+if ((mouse_check_button(mb_left) || keyboard_check(vk_space))&&!global.gamemenu) {
+	last_was_clicked = true
+	addPacket({
+		type: "fire_bullet",
+	})
+}
+
+
 if (keyboard_check_pressed(ord("P")) && (global.gamemenu || !global.started)) {
 	addPacket({type: "begin"})
 }

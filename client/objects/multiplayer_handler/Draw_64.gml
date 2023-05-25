@@ -20,20 +20,22 @@ if (global.core_health > 0) {
 }
 
 var centre = 205
+var ymin = 9
+var xmax = window_get_width() - 405 - 3
 draw_set_color(c_black)
-draw_rectangle(5,95+3,centre,95+32+3,false)
+draw_rectangle(5+xmax,ymin+3,centre+xmax,ymin+32+3,false)
 draw_set_color(c_green)
 width_new = ((centre-12)-17)*(global.right_shield_own_health/global.constants.shield_generator_max_health)+17
 if (global.right_shield_own_health > 0) {
-	draw_rectangle(17,107+3,width_new,98+20,false)
+	draw_rectangle(17+xmax,ymin+12+3,width_new+xmax,ymin+3+20,false)
 }
 
 draw_set_color(c_black)
-draw_rectangle(centre+2,98,405,98+32,false)
+draw_rectangle(centre+2+xmax,ymin+3,405+xmax,ymin+3+32,false)
 draw_set_color(c_green)
 width_new = (393-(centre+14))*(global.left_shield_own_health/global.constants.shield_generator_max_health) + (centre+14)
 if (global.left_shield_own_health > 0) {
-	draw_rectangle(centre+14,98+12,width_new,98+20,false)
+	draw_rectangle(centre+14+xmax,ymin+3+12,width_new+xmax,ymin+3+20,false)
 }
 draw_set_colour(c_black)
 //show_debug_message(global.title)
