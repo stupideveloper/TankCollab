@@ -16,10 +16,10 @@ const arenaGeometry = [
  * Bounding box of arena
  */
 let arenaBounds = {
-    x_min: 0,
-    y_min: 0,
-    x_max: 3733,
-    y_max: 2330
+    x_min: 100,
+    y_min: 100,
+    x_max: 3633,
+    y_max: 2230
 }
 /**
  * Size of a bullet
