@@ -51,7 +51,7 @@ let upgradeTiers = {
     bulletDamage: [2, 3, 4, 5, 6, 7, 8],
     bulletSpeed: [10, 11, 12, 14, 16, 19, 22],
     bulletReload: [10, 7, 5, 4, 3, 2, 1],
-    moveSpeed: [5.0, 6.0, 6.4, 6.8, 7.1, 7.3, 7.5],
+    moveSpeed: [6.25, 7.5, 8, 8.5, 8.875, 9.125, 9.375],
     maxHealth: [100, 120, 128, 135, 141, 146, 150],
     healthRegen: [0, 1, 2, 4, 6, 9, 13]
 }
