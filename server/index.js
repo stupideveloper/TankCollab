@@ -215,7 +215,10 @@ function getCores() {
     return {shields,cores}
 }
 
-
+/**
+ * Countdown to server reset
+ */
+let reset = -1
 
 
 let started = false
@@ -228,6 +231,7 @@ setInterval(async function SERVER_GAME_TICK() {
     if (reset == 0) {
         process.exit()
     }
+
     /**
      * Runs every packet listener, this acts more as a game tick listener
      */
@@ -388,11 +392,6 @@ let clientPackets = {}
 function doCollisions() {
 
 }
-
-/**
- * Countdown to server reset
- */
-let reset = -1
 /**
  * Apply damage to a player
  * @param {import("crypto").UUID} id 
@@ -903,21 +902,23 @@ server.on('connection', function (conn) {
         if (clientsPos[id].respawnTime != -2) teamAlive[team] -= 1
         delete clientsPos[id]
         delete clientPackets[id]
-        if (teamAlive[team] == 0) {
+        if (teamAlive[team] == 0 && started9) {
             for (let key in clientPackets) {
                 let team2 = teamMap[key]
                 if (team2 == team) {
                     clientPackets[key].push({
                         type: "title",
-                        title: "YOU LOST",
+                        title: "YOU LOST\nServer will be reset soon",
                         time: -1
                     })
+                    reset = 5*60
                 } else {
                     clientPackets[key].push({
                         type: "title",
-                        title: "YOU WON",
+                        title: "YOU WON\nServer will be reset soon",
                         time: -1
                     })
+                    reset = 5*60
                 }
             }
         }
