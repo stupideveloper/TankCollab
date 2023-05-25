@@ -299,6 +299,7 @@ function handlePackets(packets) {
 		global.splash_data = packets.splashData
 		global.teamsizes = packets.teamSizes;
 		global.available_upgrades = packets.availableUpgrades
+		global.started = packets.beginned
 		// show_debug_message(packets.availableUpgrades)
 		//show_debug_message(array_length(variable_struct_get_names(packets.projectiles)))
 	} else if (packets.type == "id") {

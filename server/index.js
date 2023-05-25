@@ -21,7 +21,7 @@ let REPLAY = {
 };
 let splashData = {
     ip: "unknown",
-    gameVersion: "4223d63" // last commit ID
+    gameVersion: "e8101a9" // last commit ID
 }
 try {
 REPLAY = require("./replay.hidden")
@@ -673,6 +673,7 @@ server.on('connection', function (conn) {
             team_data: teamData[team],
             other_team_info: otherTeamInfo,
             splashData,
+            beginned: started,
             availableUpgrades: teamData[team].availableUpgrades,
             teamSizes: [...Object.keys(teamAlive)].map(t => { return { count: t == team, team: teamAlive[t]} }).reduce((p, c) => {
                 p[c.count?"own":"oth"] = c.team
@@ -902,7 +903,7 @@ server.on('connection', function (conn) {
         if (clientsPos[id].respawnTime != -2) teamAlive[team] -= 1
         delete clientsPos[id]
         delete clientPackets[id]
-        if (teamAlive[team] == 0 && started9) {
+        if (teamAlive[team] == 0 && started) {
             for (let key in clientPackets) {
                 let team2 = teamMap[key]
                 if (team2 == team) {

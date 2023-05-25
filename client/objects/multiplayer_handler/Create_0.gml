@@ -18,6 +18,8 @@ packet_queue = {
 // Whether the game menu is open
 global.gamemenu = false
 
+global.paused = false
+
 global.spawned_gems = {}
 global.core_health = 1000
 // Direcion and speed (?unused?)

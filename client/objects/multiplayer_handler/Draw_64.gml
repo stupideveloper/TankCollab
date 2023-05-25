@@ -78,5 +78,29 @@ if (global.gamemenu) {
 
 }
 
+if (!global.started) {
+draw_set_color(c_black)
+	draw_rectangle(0,0,window_get_width(),window_get_height(),false)
+	draw_set_alpha(1)
+	var font = draw_get_font()
+	draw_set_font(IP_fnt)
+	draw_set_halign(fa_center)
+	draw_set_valign(fa_bottom)
+	draw_set_colour(c_white)
+	draw_text(
+	window_get_width()/2,window_get_height()/2-190,
+		global.paused?"Game Paused":"Waiting for Game Start"
+	)
+
+	draw_set_font(Inventory_fnt)
+	try	draw_text(
+	window_get_width()/2,window_get_height()/2+40,
+		$"{global.teamsizes.oth+global.teamsizes.own} Players Waiting\n\nControl Style: {global.control_style} (press C to change)\nServer IP: {global.splash_data.ip}\nConnected IP: {global.ip_construct}\nGame Version: {global.splash_data.gameVersion}"
+	)
+	catch (e) e=e
+	draw_set_font(font)
+	draw_set_halign(fa_center)
+}
+
 draw_set_color(c_white)
 

@@ -15,6 +15,7 @@ global.remove_on_disconnect = []
 global.title_time = 0
 global.upgrade_tiers = {}
 global.available_upgrades = {}
+global.started = false
 global.console = {
 	log: function (f) {show_debug_message(f)}
 }

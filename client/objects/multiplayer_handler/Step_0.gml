@@ -40,8 +40,9 @@ if (ticks_since_update % 300 == 299 ) {
     room_goto(StartRoom)
 }
 
+global.paused = global.paused || global.started
 
-if (keyboard_check_pressed(ord("C")) && global.gamemenu) {
+if (keyboard_check_pressed(ord("C")) && (global.gamemenu || !global.started)) {
 	if (global.control_style == "classic") {
 		global.control_style = "simple"
 		
@@ -145,7 +146,7 @@ if (sendPosPack) {
 	type: "pos"
 	})
 }
-if (keyboard_check_pressed(ord("P")) && global.gamemenu) {
+if (keyboard_check_pressed(ord("P")) && (global.gamemenu || !global.started)) {
 	addPacket({type: "begin"})
 }
 /**
