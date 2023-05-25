@@ -303,7 +303,8 @@ function handlePackets(packets) {
 		global.teamsizes = packets.teamSizes;
 		global.available_upgrades = packets.availableUpgrades
 		global.started = packets.beginned
-		//global.started = false
+		global.max_health = global.upgrades.maxHealth
+		//global.maxhealth = global.upgrades.maxHealth
 		// show_debug_message(packets.availableUpgrades)
 		//show_debug_message(array_length(variable_struct_get_names(packets.projectiles)))
 	} else if (packets.type == "id") {
