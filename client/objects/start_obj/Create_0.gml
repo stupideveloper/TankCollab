@@ -26,6 +26,6 @@ global.constants = {
 }
 global.splash_data = {ip: "unknown",gameVersion: "latest", connectionIp: "unknown"}
 has_success = false
-global.ip_construct = "127.0.0.1"
+global.ip_construct = ""
 pressed = 0
 global.IP_ADDR = global.ip_construct

@@ -4,22 +4,36 @@ const Collisions = require("./rect_collisions")
  */
 const arenaGeometry = [
     {
-        rough_radius: 14.2 * 9, // Rough radius for the circle filtering
-        x: 200, // Location X
-        y: 200, // Location Y
-        h: 30, // Height
-        w: 30, // Width
-        angle: 0 // Angle
+        rough_radius: Math.sqrt(980**2+500**2), // Rough radius for the circle filtering
+        x: 325, // Location X
+        y: 890, // Location Y
+        h: 980, // Height
+        w: 650, // Width
+        angle: 0, // Angle
+        bullet: false,
+        player: false,
+        gem: true
+    },
+    {
+        rough_radius: Math.sqrt(980**2+500**2), // Rough radius for the circle filtering
+        x: 3400, // Location X
+        y: 890, // Location Y
+        h: 980, // Height
+        w: 550, // Width
+        angle: 0, // Angle
+        bullet: false,
+        player: false,
+        gem: true
     }
 ]
 /**
  * Bounding box of arena
  */
 let arenaBounds = {
-    x_min: 0,
-    y_min: 0,
-    x_max: 3733,
-    y_max: 2330
+    x_min: 100,
+    y_min: 100,
+    x_max: 3633,
+    y_max: 2230
 }
 /**
  * Size of a bullet
@@ -58,6 +72,9 @@ const coreRect = {
     rough_radius: 85
 }
 /**
+ * @typedef {"bullet"|"player"|"gem"} CheckType
+ */
+/**
  * 
  * @param {{
  *  x: number,
@@ -66,9 +83,10 @@ const coreRect = {
  * h: number,
  * rough_radius: number
  * }} rect
+ * @param {CheckType} checkType
  * @returns 
  */
-const checkWallCollisions = function (rect) {
+const checkWallCollisions = function (rect, checkType = "player") {
     const circleOfRect = {
         radius: rect.rough_radius,
         x: rect.x,
@@ -80,6 +98,9 @@ const checkWallCollisions = function (rect) {
     let returnval = false
     arenaGeometry.forEach(function (arenaPart) {
         if (returnval) return;
+        if (checkType=="bullet" && !arenaPart.bullet) return;
+        if (checkType=="player" && !arenaPart.player) return;
+        if (checkType=="gem" && !arenaPart.gem) return;
         const circleOfPart = {
             radius: arenaPart.rough_radius,
             x: arenaPart.x,

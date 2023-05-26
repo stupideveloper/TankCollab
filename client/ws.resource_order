@@ -1,11 +1,15 @@
 {
   "FolderOrderSettings": [],
   "ResourceOrderSettings": [
+    {"name":"instructions_spr","order":5,"path":"sprites/instructions_spr/instructions_spr.yy",},
     {"name":"shield_right_enemy_obj","order":3,"path":"objects/shield_right_enemy_obj/shield_right_enemy_obj.yy",},
     {"name":"Inventory_fnt","order":1,"path":"fonts/Inventory_fnt/Inventory_fnt.yy",},
     {"name":"max_health_spr","order":2,"path":"sprites/max_health_spr/max_health_spr.yy",},
+    {"name":"BG_music","order":3,"path":"sounds/BG_music/BG_music.yy",},
     {"name":"shield_left_self_obj","order":5,"path":"objects/shield_left_self_obj/shield_left_self_obj.yy",},
     {"name":"disabled_spr","order":3,"path":"sprites/disabled_spr/disabled_spr.yy",},
+    {"name":"notifications_spr","order":7,"path":"sprites/notifications_spr/notifications_spr.yy",},
+    {"name":"notification_obj","order":7,"path":"objects/notification_obj/notification_obj.yy",},
     {"name":"label_fnt","order":2,"path":"fonts/label_fnt/label_fnt.yy",},
     {"name":"core_self_obj","order":2,"path":"objects/core_self_obj/core_self_obj.yy",},
     {"name":"shield_right_self_obj","order":4,"path":"objects/shield_right_self_obj/shield_right_self_obj.yy",},
@@ -17,6 +21,8 @@
     {"name":"health_regen_spr","order":1,"path":"sprites/health_regen_spr/health_regen_spr.yy",},
     {"name":"wall_piece_spr","order":3,"path":"sprites/wall_piece_spr/wall_piece_spr.yy",},
     {"name":"banner_spr","order":4,"path":"sprites/banner_spr/banner_spr.yy",},
+    {"name":"tip_spr","order":6,"path":"sprites/tip_spr/tip_spr.yy",},
     {"name":"wall_piece_obj","order":6,"path":"objects/wall_piece_obj/wall_piece_obj.yy",},
+    {"name":"DisplayAlert","order":1,"path":"scripts/DisplayAlert/DisplayAlert.yy",},
   ],
 }

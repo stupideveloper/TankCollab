@@ -102,6 +102,7 @@ if (not ds_list_empty(list)) {
 	uuid: coll.uuid,
 	gem_type: coll.image_index
 })
+audio_play_sound(Pickup_sound, 2, false)
 switch (coll.image_index) {
 	case 0: {
 		red_n++

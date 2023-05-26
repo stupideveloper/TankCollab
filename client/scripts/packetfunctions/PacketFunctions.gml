@@ -123,6 +123,7 @@ function handlePackets(packets) {
 					break;
 				}
 				case "death": {
+					DisplayAlert(4,4)
 					global.dead = true
 					// global.title = "You died! Respawning in %i seconds!"
 					break;
@@ -156,7 +157,7 @@ function handlePackets(packets) {
 					break;
 				}
 				case "collect_gem": {
-					audio_play_sound(Pickup_sound, 2, false)
+					
 					try {
 						var gemtodelete = struct_get(global.spawned_gems,extra_packet.uuid)
 						// show_debug_message(global.spawned_gems)
@@ -313,4 +314,82 @@ function handlePackets(packets) {
 	} catch (e) {
 		show_debug_message(e)
 	}
+}
+function toBase(number, radix, digits) {
+	number = argument0
+    radix = argument_count > 1 ? argument1 : 10;
+    digits = argument_count > 2 ? argument2 : "0123456789abcdefghijklmnopqrstuvwxyz";
+    if (radix > string_length(digits)) {
+		throw "invalid digits and radix"
+    }
+    if (number == 0) return string_char_at(digits, 1);
+    var a = [];
+    while (number != 0) {
+        array_insert(a,0, string_char_at(digits, number mod radix + 1));
+        number = floor(number / radix);
+    }
+    return string_join_ext("", a);
+};
+function parseInt(_string,_radix){
+    var number, oldbase, newbase, out;
+    number = string_upper(argument0);
+    oldbase = argument1;
+    newbase = 10;
+    out = "";
+    var len, tab;
+    len = string_length(number);
+    tab = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    var i, num;
+    for (i=0; i<len; i+=1) {
+        num[i] = string_pos(string_char_at(number, i+1), tab) - 1;
+    }
+    do {
+        var divide, newlen;
+        divide = 0;
+        newlen = 0;
+        for (i=0; i<len; i+=1) {
+            divide = divide * oldbase + num[i];
+            if (divide >= newbase) {
+                num[newlen] = divide div newbase;
+                newlen += 1;
+                divide = divide mod newbase;
+            } else if (newlen  > 0) {
+                num[newlen] = 0;
+                newlen += 1;
+            }
+        }
+        len = newlen;
+        out = string_char_at(tab, divide+1) + out;
+    } until (len == 0);
+    return real(out);
+}
+function decodeCode(code) {
+	var dictionary = string_split("0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z",",")
+	firstLetter = string_char_at(code,0)
+	var index = array_find_index(dictionary,function search(v){
+		return v == firstLetter
+	})
+	var randomLetter = index >> 1
+	var newcode = string_replace(code,firstLetter,dictionary[index & 0b1])
+	var binary = toBase(parseInt(newcode,36),2,"01")
+	if (string_length(binary) != 32) {
+		binary = string_repeat("0",32 - string_length(binary)) + binary
+	}
+	var segments = []
+	for (var i = 0; i < 4; i++) {
+		var parts = [
+			string_char_at(binary,8*i+1),
+			string_char_at(binary,8*i+2),
+			string_char_at(binary,8*i+3),
+			string_char_at(binary,8*i+4),
+			string_char_at(binary,8*i+5),
+			string_char_at(binary,8*i+6),
+			string_char_at(binary,8*i+7),
+			string_char_at(binary,8*i+8),
+		]
+		var section = string_join_ext("",parts)
+		var ip_part_xorred = parseInt(section,2)
+		array_push(segments,ip_part_xorred ^ randomLetter)
+	}
+	return string_join_ext(".",segments)
 }

@@ -21,7 +21,7 @@ let REPLAY = {
 };
 let splashData = {
     ip: "unknown",
-    gameVersion: "fcf22f1", // last commit ID
+    gameVersion: "0efe304", // last commit ID
     connectionIp: "unknown"
 }
 try {
@@ -228,7 +228,7 @@ let started = false
  * Every game tick this function runs
  */
 setInterval(async function SERVER_GAME_TICK() {
-
+    // console.log(`spawnedGem: ${spawnedGems}`)
     /**
      * Runs every packet listener, this acts more as a game tick listener
      */
@@ -236,6 +236,7 @@ setInterval(async function SERVER_GAME_TICK() {
         packetListeners[player]()
     })
     if (started && spawnedGems < 20 && Math.random() > 0.995) {
+        console.log(`I spawned gem number ${spawnedGems}`)
         spawnedGems++;
         var gem = randomGem(3733, 2330)
         broadcast({
@@ -336,7 +337,7 @@ setInterval(async function SERVER_GAME_TICK() {
                 x: projectile.x,
                 y: projectile.y,
                 angle: projectile.dir || 0
-            })) {
+            },"bullet")) {
                 deletables.push(id)
             }
         })
@@ -550,6 +551,15 @@ server.on('connection', function (conn) {
             shield_generator_max_health,
             core_max_health
         })
+        for (let gem of gem_uuids.values()) {
+            clientPackets[id].push({
+                type: "gem_spawn",
+                x: gem.x,
+                y: gem.y,
+                gem_type: gem.type,
+                uuid: gem.uuid
+            })
+        }
     clientsPos[id] = {
         id: id,
         x: 120,
@@ -728,7 +738,7 @@ server.on('connection', function (conn) {
                     x: packet.x,
                     y: packet.y,
                     angle: packet.dir || 0
-                }) && do_lag_back) {
+                },"player") && do_lag_back) {
                     clientPackets[id].push({
                         type: "teleport",
                         x: clientsPos[id].x,
@@ -949,11 +959,13 @@ server.on('connection', function (conn) {
  * Get the IP address
  */
 let IP = "localhost";
+let CODE = ""
 try {
     let iptest = require("./iptest")
     IP = iptest.ip
+    CODE = iptest.code
     if (iptest.oneninetwos.length > 1) console.log(`[WARN]  Multiple 192.168.x.x local IPs found!: ${iptest.oneninetwos.join(", ")}`)
-    if (iptest.oneninetwos.length == 0 && iptest.ips.length != 0) console.log(`[WARN]  No 192.168.x.x local IPs found!\n[WARN]  Other possible local IPs: ${iptest.ips.join(", ")}`)
+    if (iptest.oneninetwos.length == 0 && iptest.ips.length != 0) console.log(`[WARN]  No 192.168.x.x local IPs found!\n[WARN]  Other possible local IPs: ${iptest.ips.join(", ")}, with codes [${iptest.codes.join(", ")}]`)
     if (iptest.oneninetwos.length == 0 && iptest.ips.length == 0) console.log(`[WARN]  No Network Interfaces found! Do you have Airplane mode enabled?`)
     splashData.ip = IP;
 } catch {
@@ -964,4 +976,5 @@ try {
  */
 server.listen(9000, function () {
     console.log('[INFO]  Server listening to %s:%j', IP, server.address().port);
+    console.log(`[INFO]  Use the code [${CODE}]`)
 });
