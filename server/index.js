@@ -435,15 +435,15 @@ function damagePlayer(id, room, damage) {
                     let team = teamMap[key]
                     if (team == killedTeam) {
                         clientPackets[key].push({
-                            type: "title",
-                            title: "YOU LOST\nServer will be reset soon",
+                            type: "gamestate",
+                            title: "loss",
                             time: -1
                         })
                         reset = 5 * 60
                     } else {
                         clientPackets[key].push({
-                            type: "title",
-                            title: "YOU WON\nServer will be reset soon",
+                            type: "gamestate",
+                            title: "win",
                             time: -1
                         })
                         reset = 5 * 60
@@ -910,15 +910,15 @@ server.on('connection', function (conn) {
                 let team2 = teamMap[key]
                 if (team2 == team) {
                     clientPackets[key].push({
-                        type: "title",
-                        title: "YOU LOST\nServer will be reset soon",
+                        type: "gamestate",
+                        title: "loss",
                         time: -1
                     })
                     reset = 5 * 60
                 } else {
                     clientPackets[key].push({
-                        type: "title",
-                        title: "YOU WON\nServer will be reset soon",
+                        type: "gamestate",
+                        title: "win",
                         time: -1
                     })
                     reset = 5 * 60
