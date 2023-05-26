@@ -1,7 +1,7 @@
 const { checkWalls, gemRect } = require("./arenaCollisions")
 const uuid = require("crypto").randomUUID
 
-const gem_uuids = new Set()
+const gem_uuids = new Map()
 /**
  * Different team names
  */
@@ -70,9 +70,14 @@ function randomGem(width, height, type = GemType.random()) {
             ...gemRect,
             x,
             y
-        })) {
+        },"gem")) {
             let gemuuid = uuid()
-            gem_uuids.add(gemuuid)
+            gem_uuids.set(gemuuid,{
+                type: type.getId(),
+                x,
+                y,
+                uuid: gemuuid
+            })
             return {
                 type: type.getId(),
                 x,

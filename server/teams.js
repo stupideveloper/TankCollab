@@ -67,57 +67,57 @@ class UpgradeTypes {
 class UpgradeRequirements {
     static #reqs = {
         [UpgradeTypes.BulletDamage]: [
-            { [GemType.RED]: 1, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 }
+            { [GemType.RED]: 0, [GemType.BLUE]: 1, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 2, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 3, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 4, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 5, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 6, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 }
         ],
 
         [UpgradeTypes.BulletSpeed]: [
-            { [GemType.RED]: 0, [GemType.BLUE]: 1, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 }
+            { [GemType.RED]: 1, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 2, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 3, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 4, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 5, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 6, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 }
         ],
 
         [UpgradeTypes.BulletReload]: [
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 1, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 }
+            { [GemType.RED]: 1, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 2, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 3, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 5, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 8, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 10, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 }
         ],
 
         [UpgradeTypes.MoveSpeed]: [
             { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 1 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 }
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 2 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 3 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 4 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 5 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 6 }
         ],
 
         [UpgradeTypes.HealthRegen]: [
-            { [GemType.RED]: 1, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 }
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 1, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 2, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 3, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 4, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 5, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 6, [GemType.PURPLE]: 0 }
         ],
 
         [UpgradeTypes.MaxHealth]: [
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 },
-            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 0, [GemType.PURPLE]: 0 }
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 1, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 2, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 3, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 4, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 5, [GemType.PURPLE]: 0 },
+            { [GemType.RED]: 0, [GemType.BLUE]: 0, [GemType.GREEN]: 6, [GemType.PURPLE]: 0 }
         ]
     }
     /** 

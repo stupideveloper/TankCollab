@@ -123,6 +123,7 @@ function handlePackets(packets) {
 					break;
 				}
 				case "death": {
+					DisplayAlert(4,4)
 					global.dead = true
 					// global.title = "You died! Respawning in %i seconds!"
 					break;
@@ -156,7 +157,7 @@ function handlePackets(packets) {
 					break;
 				}
 				case "collect_gem": {
-					audio_play_sound(Pickup_sound, 2, false)
+					
 					try {
 						var gemtodelete = struct_get(global.spawned_gems,extra_packet.uuid)
 						// show_debug_message(global.spawned_gems)

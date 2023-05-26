@@ -1,5 +1,7 @@
 /// @description Insert description here
 // You can write your code in this editor
+
+music_readied = true
 // network_set_config(network_config_connect_timeout,10000)
 var gameId = "hi"
 // displays the command required to spawn another instance

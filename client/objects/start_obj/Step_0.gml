@@ -3,6 +3,7 @@
 if (global.has_forced_server) {
 global.IP_ADDR = global.forced_server
 room_goto(Room1)
+
 }
 
 if (string_length(global.ip_construct) < 7 && keyboard_check_pressed(ord("0"))) {
@@ -161,5 +162,6 @@ if (keyboard_check_pressed(vk_enter) && string_length(global.ip_construct) == 7)
 		if (ip == "127.0.0.1") ip = "localhost"
 		global.IP_ADDR = ip
 		room_goto(Room1)
+		
 	}
 }

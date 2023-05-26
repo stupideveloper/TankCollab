@@ -129,12 +129,19 @@ draw_set_color(c_black)
 	//draw_text(0,window_get_height(),"Press F to toggle fullscreen")
 	draw_set_font(font)
 	draw_set_halign(fa_center)
+} else {
+	if (music_readied) {
+		audio_play_sound(BG_music, 4, true)
+		notification_obj.visible = false
+		music_readied = false
+	}
 }
 
 draw_set_color(c_white)
 
 
 // Draw Banner
+if (global.started) {
 if (global.left_shield_other_health > 0 || global.right_shield_other_health > 0) {
 	draw_sprite(banner_spr, 0, (window_get_width()/2), 50)
 } else if (global.core_other_health > 0) {
@@ -142,5 +149,5 @@ if (global.left_shield_other_health > 0 || global.right_shield_other_health > 0)
 } else {
 	draw_sprite(banner_spr, 2, (window_get_width()/2) , 50)
 }
-
+}
 
