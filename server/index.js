@@ -21,7 +21,7 @@ let REPLAY = {
 };
 let splashData = {
     ip: "unknown",
-    gameVersion: "fcf22f1", // last commit ID
+    gameVersion: "0efe304", // last commit ID
     connectionIp: "unknown"
 }
 try {
@@ -949,11 +949,13 @@ server.on('connection', function (conn) {
  * Get the IP address
  */
 let IP = "localhost";
+let CODE = ""
 try {
     let iptest = require("./iptest")
     IP = iptest.ip
+    CODE = iptest.code
     if (iptest.oneninetwos.length > 1) console.log(`[WARN]  Multiple 192.168.x.x local IPs found!: ${iptest.oneninetwos.join(", ")}`)
-    if (iptest.oneninetwos.length == 0 && iptest.ips.length != 0) console.log(`[WARN]  No 192.168.x.x local IPs found!\n[WARN]  Other possible local IPs: ${iptest.ips.join(", ")}`)
+    if (iptest.oneninetwos.length == 0 && iptest.ips.length != 0) console.log(`[WARN]  No 192.168.x.x local IPs found!\n[WARN]  Other possible local IPs: ${iptest.ips.join(", ")}, with codes [${iptest.codes.join(", ")}]`)
     if (iptest.oneninetwos.length == 0 && iptest.ips.length == 0) console.log(`[WARN]  No Network Interfaces found! Do you have Airplane mode enabled?`)
     splashData.ip = IP;
 } catch {
@@ -964,4 +966,5 @@ try {
  */
 server.listen(9000, function () {
     console.log('[INFO]  Server listening to %s:%j', IP, server.address().port);
+    console.log(`[INFO]  Use the code [${CODE}]`)
 });
