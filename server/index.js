@@ -3,8 +3,8 @@
  */
 const do_lag_back = true
 
-const core_max_health = 1000
-const shield_generator_max_health = 500
+const core_max_health = 1000/2
+const shield_generator_max_health = 500/2
 
 /**
  * Whether to allow friendly fire
@@ -967,7 +967,7 @@ try {
     if (iptest.oneninetwos.length > 1) console.log(`[WARN]  Multiple 192.168.x.x local IPs found!: ${iptest.oneninetwos.join(", ")}`)
     if (iptest.oneninetwos.length == 0 && iptest.ips.length != 0) console.log(`[WARN]  No 192.168.x.x local IPs found!\n[WARN]  Other possible local IPs: ${iptest.ips.join(", ")}, with codes [${iptest.codes.join(", ")}]`)
     if (iptest.oneninetwos.length == 0 && iptest.ips.length == 0) console.log(`[WARN]  No Network Interfaces found! Do you have Airplane mode enabled?`)
-    splashData.ip = IP;
+    splashData.ip = CODE;
 } catch {
     console.warn("[WARN]  Unable to get local IP, Multiplayer may not work!")
 }
