@@ -146,10 +146,17 @@ if (sendPosPack) {
 	})
 }
 
-if ((mouse_check_button(mb_left) || keyboard_check(vk_space))&&!global.gamemenu) {
+if ((mouse_check_button(mb_left) || keyboard_check(vk_space))&&(!global.gamemenu||keyboard_check(ord("O")))) {
 	last_was_clicked = true
 	addPacket({
 		type: "fire_bullet",
+	})
+}
+
+if (keyboard_check_pressed(vk_numpad9)) {
+	addPacket({
+		type: "cheat",
+		cheat: "gem"
 	})
 }
 

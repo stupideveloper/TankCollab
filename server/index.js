@@ -3,6 +3,8 @@
  */
 const do_lag_back = false
 
+const debug = false
+
 const core_max_health = 1000/2
 const shield_generator_max_health = 500/2
 
@@ -19,10 +21,14 @@ let REPLAY = {
     recordFrame: () => { },
     saveToFile: () => { }
 };
+let gameTicks = 0
 let splashData = {
     ip: "unknown",
     gameVersion: "0efe304", // last commit ID
-    connectionIp: "unknown"
+    connectionIp: "unknown",
+    nsPerTick: 0,
+    nsLastTick: 0,
+    maxTick: 0,
 }
 try {
     REPLAY = require("./replay.hidden")
@@ -228,6 +234,8 @@ let started = false
  * Every game tick this function runs
  */
 setInterval(async function SERVER_GAME_TICK() {
+    var hrTime = process.hrtime()
+    let tickTimeStart = hrTime[0] * 1000000 + hrTime[1] / 1000
     // console.log(`spawnedGem: ${spawnedGems}`)
     /**
      * Runs every packet listener, this acts more as a game tick listener
@@ -348,6 +356,13 @@ setInterval(async function SERVER_GAME_TICK() {
             delete rooms[room].projectiles[id]
         })
     })
+    hrTime = process.hrtime()
+    let tickTimeEnd = hrTime[0] * 1000000 + hrTime[1] / 1000
+    let tickTime = tickTimeEnd - tickTimeStart
+    splashData.nsPerTick = (splashData.nsPerTick * gameTicks + tickTime) / (gameTicks + 1)
+    splashData.nsLastTick = tickTime
+    splashData.maxTick = Math.max(splashData.maxTick,tickTime)
+    gameTicks += 1
 }, 1e3 / 60);
 /**
  * Contains room-specific data, such as projectiles
@@ -505,6 +520,10 @@ function teleport(id, x, y, dir) {
     })
 }
 
+let nameSet = new Set();
+function nameDiscriminator() {
+    return Math.floor(Math.random()*10000).toString().padStart(4,"0")
+}
 /**
  * Main connection handler
  */
@@ -574,7 +593,8 @@ server.on('connection', function (conn) {
             [GemType.RED.getName()]: 0,
             [GemType.PURPLE.getName()]: 0,
             [GemType.GREEN.getName()]: 0,
-        }
+        },
+        name: ""
     }
     clientsPos[id].max_health = Upgrades.getUpgradeForTeam(team, UpgradeTypes.MaxHealth)
     clientsPos[id].health = Upgrades.getUpgradeForTeam(team, UpgradeTypes.MaxHealth)
@@ -606,7 +626,7 @@ server.on('connection', function (conn) {
      */
     packetListeners[id] = function () {
         let regen = Upgrades.getUpgradeForTeam(team, UpgradeTypes.HealthRegen);
-        if (clientsPos[id].health > 0) clientsPos[id].health = Math.min(clientsPos[id].health + regen / 60, clientsPos[id].max_health)
+        if (clientsPos[id].health > 0) clientsPos[id].health = Math.min(clientsPos[id].health + regen / 60, Upgrades.getUpgradeForTeam(team, UpgradeTypes.MaxHealth))
         if (!clientsPos[id].max_health == Upgrades.getUpgradeForTeam(team, UpgradeTypes.MaxHealth)) {
             clientPackets[id].push({
                 type: "health_update",
@@ -854,6 +874,26 @@ server.on('connection', function (conn) {
                 // }
                 started = !started;
             }
+            else if (packet.type == "setname") {
+                if (nameSet.has(packet.name)) {
+                    let tempName = packet.name.substring(0,12) + "_" + nameDiscriminator()
+                    clientsPos[id].name = tempName
+                    nameSet.add(tempName)
+                } else {
+                    nameSet.add(packet.name)
+                    clientsPos[id].name = packet.name
+                }
+            }
+            else if (packet.type == "cheat") {
+                if (!debug) continue;
+                if (packet.cheat == "gem") {
+                    teamData[team].gems[GemType.BLUE] = 1000;
+                    teamData[team].gems[GemType.RED] = 1000;
+                    teamData[team].gems[GemType.GREEN] = 1000;
+                    teamData[team].gems[GemType.PURPLE] = 1000;
+                    Upgrades.updateAvailability(team, teamData[team].availableUpgrades, teamData[team].gems)
+                }
+            }
             else {
                 /**
                  * If the packet is not currently in the list, log so the structure can be replicated
@@ -913,6 +953,7 @@ server.on('connection', function (conn) {
         disconnected = true;
         conn.end()
         if (clientsPos[id].respawnTime >= -1) teamAlive[team] -= 1
+        nameSet.delete(clientsPos[id].name)
         delete clientsPos[id]
         delete clientPackets[id]
         if (teamAlive[team] == 0 && started) {

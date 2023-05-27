@@ -5,8 +5,6 @@
 //}
 global.forced_server = "localhost"
 global.has_forced_server = false
-
-
 global.right_shield_own_health = 0
 global.left_shield_own_health = 0
 global.right_shield_other_health = 0
@@ -24,8 +22,9 @@ global.constants = {
 	shield_generator_max_health: 250,
 	core_max_health: 500
 }
-global.splash_data = {ip: "unknown",gameVersion: "latest", connectionIp: "unknown",nsPerTick: 0,nsLastTick: 0}
+global.splash_data = {ip: "unknown",gameVersion: "latest", connectionIp: "unknown",nsPerTick: 0,nsLastTick: 0,maxTick: 0}
 has_success = false
 global.ip_construct = "OVX687H"
+audio_stop_all()
 pressed = 0
 global.IP_ADDR = global.ip_construct
