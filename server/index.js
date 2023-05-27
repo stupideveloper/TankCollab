@@ -235,8 +235,8 @@ setInterval(async function SERVER_GAME_TICK() {
     Object.keys(packetListeners).map(player => {
         packetListeners[player]()
     })
-    if (started && spawnedGems < 20 && Math.random() > 0.995) {
-        console.log(`I spawned gem number ${spawnedGems}`)
+    if (started && spawnedGems < 40 && Math.random() > 0.995) {
+        // console.log(`I spawned gem number ${spawnedGems}`)
         spawnedGems++;
         var gem = randomGem(3733, 2330)
         broadcast({

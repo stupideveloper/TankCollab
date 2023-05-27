@@ -174,61 +174,76 @@ function handlePackets(packets) {
 					show_debug_message(global.this_team)
 					switch (extra_packet.id) {
 						case "A:core": {
+							audio_play_sound(Shutdown_sound, 1, false)
 							if (global.this_team == "A") {
-								global.title = "Core Destroyed!\nYou will no longer respawn"
+								DisplayAlert(5, 5)
 								global.title_time = -1
 								core_self_obj.dead = true;
 							} else {
+								DisplayAlert(6, 5)
 								core_ememy_obj.dead = true;
 							}
 							break;
 						}
 						case "B:core": {
+							audio_play_sound(Shutdown_sound, 1, false)
 							if (global.this_team == "B") {
-								global.title = "Core Destroyed!\nYou will no longer respawn"
+								DisplayAlert(5, 5)
 								global.title_time = -1
 								core_self_obj.dead = true;
 							} else {
+								DisplayAlert(6, 5)
+								
 								core_ememy_obj.dead = true;
 							}
 							break;
 						}
 						case "A:rshield": {
+							audio_play_sound(Shutdown_sound, 1, false)
 							if (global.this_team == "A") {
-								global.title = "Right Shield Destroyed!"
+								OwnShieldDestroyed()
+								
 								global.title_time = -1
 								shield_right_self_obj.dead = true;
 							} else {
+								EnemyShieldDestroyed()
 								shield_right_enemy_obj.dead = true;
 							}
 							break;
 						}
 						case "B:rshield": {
+							audio_play_sound(Shutdown_sound, 1, false)
 							if (global.this_team == "B") {
-								global.title = "Right Shield Destroyed!"
+								
+								OwnShieldDestroyed()
 								global.title_time = -1
 								shield_right_self_obj.dead = true;
 							} else {
+								EnemyShieldDestroyed()
 								shield_right_enemy_obj.dead = true;
 							}
 							break;
 						}
 						case "A:lshield": {
+							audio_play_sound(Shutdown_sound, 1, false)
 							if (global.this_team == "A") {
-								global.title = "Left Shield Destroyed!"
+								OwnShieldDestroyed()
 								global.title_time = -1
 								shield_left_self_obj.dead = true;
 							} else {
+								EnemyShieldDestroyed()
 								shield_left_enemy_obj.dead = true;
 							}
 							break;
 						}
 						case "B:lshield": {
+							audio_play_sound(Shutdown_sound, 1, false)
 							if (global.this_team == "B") {
-								global.title = "Left Shield Destroyed!"
+								OwnShieldDestroyed()
 								global.title_time = -1
 								shield_left_self_obj.dead = true;
 							} else {
+								EnemyShieldDestroyed()
 								shield_left_enemy_obj.dead = true;
 							}
 							break;

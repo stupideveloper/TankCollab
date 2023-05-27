@@ -96,7 +96,7 @@ if (global.gamemenu) {
 	draw_set_font(Inventory_fnt)
 	draw_text(
 	window_get_width()/2,window_get_height()/2-40,
-		$"Control Style: {global.control_style} (press C to change)\nServer IP: {global.splash_data.ip}\nConnected IP: {global.ip_construct}\nGame Version: {global.splash_data.gameVersion}"
+		$"Control Style: {global.control_style} (press C to change)\nServer Code: {global.splash_data.ip}\nConnected Code: {global.ip_construct}\nGame Version: {global.splash_data.gameVersion}"
 	)
 	draw_set_font(font)
 	draw_set_halign(fa_center)
