@@ -1,7 +1,7 @@
 /**
  * Whether to reset player location if the client goes too fast
  */
-const do_lag_back = true
+const do_lag_back = false
 
 const core_max_health = 1000/2
 const shield_generator_max_health = 500/2
@@ -235,7 +235,7 @@ setInterval(async function SERVER_GAME_TICK() {
     Object.keys(packetListeners).map(player => {
         packetListeners[player]()
     })
-    if (started && spawnedGems < 40 && Math.random() > 0.995) {
+    if (started && spawnedGems < 40 && Math.random() > 0.99) {
         // console.log(`I spawned gem number ${spawnedGems}`)
         spawnedGems++;
         var gem = randomGem(3733, 2330)
