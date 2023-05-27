@@ -21,10 +21,10 @@ global.upgrade_tiers = {}
 global.available_upgrades = {}
 global.started = false
 global.constants = {
-	shield_generator_max_health: 500,
-	core_max_health: 1000
+	shield_generator_max_health: 250,
+	core_max_health: 500
 }
-global.splash_data = {ip: "unknown",gameVersion: "latest", connectionIp: "unknown"}
+global.splash_data = {ip: "unknown",gameVersion: "latest", connectionIp: "unknown",nsPerTick: 0,nsLastTick: 0}
 has_success = false
 global.ip_construct = "OVX687H"
 pressed = 0

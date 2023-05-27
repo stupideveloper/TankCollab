@@ -255,6 +255,7 @@ function handlePackets(packets) {
 					break;
 				}
 				case "gameplay_data_update": {
+					show_debug_message(extra_packet)
 					global.constants.shield_generator_max_health = extra_packet.shield_generator_max_health;
 					global.constants.core_max_health = extra_packet.core_max_health;
 					break;
@@ -327,6 +328,7 @@ function handlePackets(packets) {
 		global.this_id = packets.this_id
 	}
 	} catch (e) {
+		show_debug_message(packets)
 		show_debug_message(e)
 	}
 }
