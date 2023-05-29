@@ -236,6 +236,12 @@ let started = false
 setInterval(async function SERVER_GAME_TICK() {
     var hrTime = process.hrtime()
     let tickTimeStart = hrTime[0] * 1000000 + hrTime[1] / 1000
+
+    // Server shutdown sequence, occurs if the game ends, it is far better to reset the server than reset every variable, also prevents memory leaks
+    reset = Math.max(reset - 1, -1)
+    if (reset == 0) {
+        process.exit()
+    }
     // console.log(`spawnedGem: ${spawnedGems}`)
     /**
      * Runs every packet listener, this acts more as a game tick listener
@@ -427,6 +433,8 @@ function damagePlayer(id, room, damage) {
         type: "health_update",
         health: clientsPos[id].health,
         max_health: -1
+    },{
+        type: "damage"
     })
     if (clientsPos[id].health <= 0) {
         /**

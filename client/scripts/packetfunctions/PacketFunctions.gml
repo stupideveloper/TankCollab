@@ -265,6 +265,17 @@ function handlePackets(packets) {
 					global.title_time = extra_packet.time * ceil(game_get_speed(gamespeed_fps))
 					break;
 				}
+				case "gamestate": {
+					if (extra_packet.title == "loss") {
+						global.gamestate = "loss"
+					} else {
+						global.gamestate = "win"
+					}
+					break;
+				}
+				case "damage": {
+					global.damage_flash = 10
+				}
 				default: {
 					show_debug_message(extra_packet)
 				}

@@ -3,6 +3,8 @@
 //if (!struct_exists(global,"failed")) {
 //global.failed = false
 //}
+global.damage_flash = 0
+global.gamestate = "ip_select"
 global.forced_server = "localhost"
 global.has_forced_server = false
 global.right_shield_own_health = 0

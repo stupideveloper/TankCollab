@@ -152,3 +152,11 @@ if (global.left_shield_other_health > 0 || global.right_shield_other_health > 0)
 }
 }
 
+
+
+// Draw either the win or lose sprite if applicable
+if (global.gamestate == "lost") {
+	draw_sprite(winlose_spr,0,0,0)
+} else if (global.gamestate == "won") {
+	draw_sprite(winlose_spr,1,0,0)
+}

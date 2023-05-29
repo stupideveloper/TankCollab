@@ -9,7 +9,12 @@ if (mouse_check_button(mb_any)) draw_set_color(c_red)
 // Alpha of the 
 var alpha = global.dead?0.5:1
 var chassis = (global.control_style=="classic")?0:4
+if (global.damage_flash > 0) {
+	shader_set(red_flash)
+	shader_set_uniform_f(flash,global.damage_flash/20)
+}
 draw_sprite_ext(tank_spr,chassis,x,y,.3,.3,-fake_direction,-1,alpha)
+shader_reset()
 draw_set_color(c_white)
 for (var i = 0; i < array_length(global.other_player_xy); i++) {
 	//try {
@@ -47,5 +52,12 @@ for (var i = 0; i < array_length(variable_struct_get_names(global.projectiles));
 		//draw_rectangle(global.other_player_xy[i][1]-10,global.other_player_xy[i][2]-10,global.other_player_xy[i][1]+10,global.other_player_xy[i][2]+10,false)
 		draw_set_color(c_white)
 		}
+		if (global.damage_flash > 0) {
+	shader_set(red_flash)
+	global.damage_flash -= 0
+	shader_set_uniform_f(flash,global.damage_flash/20)
+	global.damage_flash -= 1
+}
 		draw_sprite_ext(tank_spr,1,x,y,.3,.3,dir,-1,alpha)
+		shader_reset()
 
