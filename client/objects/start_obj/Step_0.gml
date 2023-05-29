@@ -1,5 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
+flasher ++
 if (global.has_forced_server) {
 global.IP_ADDR = global.forced_server
 room_goto(Room1)

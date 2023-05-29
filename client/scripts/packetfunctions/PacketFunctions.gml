@@ -170,8 +170,6 @@ function handlePackets(packets) {
 					break;
 				}
 				case "core_shield_destroy": {
-					show_debug_message(extra_packet)
-					show_debug_message(global.this_team)
 					switch (extra_packet.id) {
 						case "A:core": {
 							audio_play_sound(Shutdown_sound, 1, false)
@@ -255,7 +253,6 @@ function handlePackets(packets) {
 					break;
 				}
 				case "gameplay_data_update": {
-					show_debug_message(extra_packet)
 					global.constants.shield_generator_max_health = extra_packet.shield_generator_max_health;
 					global.constants.core_max_health = extra_packet.core_max_health;
 					break;
@@ -275,6 +272,7 @@ function handlePackets(packets) {
 				}
 				case "damage": {
 					global.damage_flash = 10
+					break;
 				}
 				default: {
 					show_debug_message(extra_packet)

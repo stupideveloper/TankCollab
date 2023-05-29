@@ -1,7 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
 global.gamestate = "play"
-application_surface_draw_enable(false);
 flash = shader_get_uniform(red_flash, "params");
 
 music_readied = true
@@ -11,7 +10,7 @@ var gameId = "hi"
 show_debug_message(parameter_string(0) + " " +
         parameter_string(1) + " " +
         parameter_string(2) + " " +
-        parameter_string(3) + " -secondary")
+        parameter_string(3))
 
 // Whether a bullet was fired last game tick
 last_was_clicked = false
@@ -58,7 +57,7 @@ Which control style to use.
 Classic: TR
 Easy: LK
  */
-global.control_style = "classic"//"easy"
+global.control_style = "easy"//"easy"
 
 // Maximum health
 global.max_health = 100

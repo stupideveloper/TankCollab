@@ -3,6 +3,7 @@
 //if (!struct_exists(global,"failed")) {
 //global.failed = false
 //}
+flasher = 0
 global.damage_flash = 0
 global.gamestate = "ip_select"
 global.forced_server = "localhost"

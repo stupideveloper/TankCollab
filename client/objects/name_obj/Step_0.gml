@@ -1,5 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
+flasher ++
 if (string_length(global.name) < 16 && keyboard_check_pressed(ord("A"))) {
     global.name += "A"
 }
@@ -117,6 +118,6 @@ if (keyboard_check(vk_backspace)) {
 } else {
 	pressed = 0
 }
-if (keyboard_check_pressed(vk_enter) && string_length(global.name) > 3 && string_length(global.name) < 16) {
+if (keyboard_check_pressed(vk_enter) && string_length(global.name) >= 3 && string_length(global.name) <= 16) {
 	room_goto(StartRoom)
 }
