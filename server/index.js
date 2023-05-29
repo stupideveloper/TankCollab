@@ -19,13 +19,10 @@ let REPLAY = {
     recordFrame: () => { },
     saveToFile: () => { }
 };
-let gameTicks = 0
 let splashData = {
     ip: "unknown",
     gameVersion: "0efe304", // last commit ID
-    connectionIp: "unknown",
-    nsPerTick: 0,
-    nsLastTick: 0
+    connectionIp: "unknown"
 }
 try {
     REPLAY = require("./replay.hidden")
@@ -231,8 +228,6 @@ let started = false
  * Every game tick this function runs
  */
 setInterval(async function SERVER_GAME_TICK() {
-    var hrTime = process.hrtime()
-    let tickStartTime = (hrTime[0] * 1000000 + hrTime[1] / 1000)
     // console.log(`spawnedGem: ${spawnedGems}`)
     /**
      * Runs every packet listener, this acts more as a game tick listener
@@ -240,8 +235,7 @@ setInterval(async function SERVER_GAME_TICK() {
     Object.keys(packetListeners).map(player => {
         packetListeners[player]()
     })
-    
-    if (started && spawnedGems < (25 * (teamSizes.A + teamSizes.B)) && Math.random() > 0.99) {
+    if (started && spawnedGems < 40 && Math.random() > 0.99) {
         // console.log(`I spawned gem number ${spawnedGems}`)
         spawnedGems++;
         var gem = randomGem(3733, 2330)
@@ -354,12 +348,6 @@ setInterval(async function SERVER_GAME_TICK() {
             delete rooms[room].projectiles[id]
         })
     })
-    hrTime = process.hrtime()
-    let tickEndTime = (hrTime[0] * 1000000 + hrTime[1] / 1000)
-    let tickTime = tickEndTime - tickStartTime
-    splashData.nsLastTick = tickTime
-    splashData.nsPerTick = (splashData.nsPerTick * gameTicks + tickTime) / (gameTicks + 1)
-    gameTicks = gameTicks + 1;
 }, 1e3 / 60);
 /**
  * Contains room-specific data, such as projectiles
@@ -618,7 +606,7 @@ server.on('connection', function (conn) {
      */
     packetListeners[id] = function () {
         let regen = Upgrades.getUpgradeForTeam(team, UpgradeTypes.HealthRegen);
-        if (clientsPos[id].health > 0) clientsPos[id].health = Math.min(clientsPos[id].health + regen / 60, Upgrades.getUpgradeForTeam(team, UpgradeTypes.MaxHealth))
+        if (clientsPos[id].health > 0) clientsPos[id].health = Math.min(clientsPos[id].health + regen / 60, clientsPos[id].max_health)
         if (!clientsPos[id].max_health == Upgrades.getUpgradeForTeam(team, UpgradeTypes.MaxHealth)) {
             clientPackets[id].push({
                 type: "health_update",
