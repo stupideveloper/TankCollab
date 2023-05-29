@@ -77,7 +77,7 @@ if (global.title_time--==0) {
 }
 draw_set_halign(fa_right)
 	draw_set_valign(fa_bottom)
-	try draw_text(window_get_width() - 12,window_get_height() - 12,$"Teammates left: {global.teamsizes.own}\nEnemies left: {global.teamsizes.oth}");
+	try draw_text(window_get_width() - 12,window_get_height() - 12,$"Teammates left: {global.teamsizes.own - 1}\nEnemies left: {global.teamsizes.oth}");
 	catch (e) e=e
 draw_set_font(font)
 if (global.gamemenu) {
@@ -95,8 +95,8 @@ if (global.gamemenu) {
 	)
 	draw_set_font(Inventory_fnt)
 	draw_text(
-	window_get_width()/2,window_get_height()/2-40,
-		$"Control Style: {global.control_style} (press C to change)\nServer Code: {global.splash_data.ip}\nConnected Code: {global.ip_construct}\nGame Version: {global.splash_data.gameVersion}"
+	window_get_width()/2,window_get_height()/2+60,
+		$"Control Style: {global.control_style} (press C to change)\nServer Code: {global.splash_data.ip}\nConnected Code: {global.ip_construct}\nGame Version: {global.splash_data.gameVersion}\nServer Avg Tick Time: {global.splash_data.nsPerTick}\nServer Last Tick Time: {global.splash_data.nsLastTick}\nMaximum Tick Time: {global.splash_data.maxTick}"
 	)
 	draw_set_font(font)
 	draw_set_halign(fa_center)
@@ -105,6 +105,7 @@ if (global.gamemenu) {
 }
 
 if (!global.started && connected) {
+	notification_obj.immediatelyhide = true
 draw_set_color(c_black)
 	draw_rectangle(0,0,window_get_width(),window_get_height(),false)
 	draw_set_alpha(1)
@@ -120,8 +121,8 @@ draw_set_color(c_black)
 
 	draw_set_font(Inventory_fnt)
 	try	draw_text(
-	window_get_width()/2,window_get_height()/2+120,
-		$"{global.teamsizes.oth+global.teamsizes.own} Players Waiting\n\nControl Style: {global.control_style} (press C to change)\nServer IP: {global.splash_data.ip}\nConnected IP: {global.ip_construct}\nClient IP: {global.splash_data.connectionIp}\nGame Version: {global.splash_data.gameVersion}"
+	window_get_width()/2,window_get_height()/2+140,
+		$"{global.teamsizes.oth+global.teamsizes.own} Players Waiting\n\nControl Style: {global.control_style} (press C to change)\nServer IP: {global.splash_data.ip}\nConnected IP: {global.ip_construct}\nClient IP: {global.splash_data.connectionIp}\nGame Version: {global.splash_data.gameVersion}\n{global.this_team=="A"?"Team A":"Team B"}"
 	)
 	catch (e) e=e
 	draw_set_halign(fa_left)
@@ -151,3 +152,11 @@ if (global.left_shield_other_health > 0 || global.right_shield_other_health > 0)
 }
 }
 
+
+
+// Draw either the win or lose sprite if applicable
+if (global.gamestate == "lost") {
+	draw_sprite(winlose_spr,0,0,0)
+} else if (global.gamestate == "won") {
+	draw_sprite(winlose_spr,1,0,0)
+}

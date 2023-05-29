@@ -1,5 +1,8 @@
 /// @description Insert description here
 // You can write your code in this editor
+global.gamestate = "play"
+application_surface_draw_enable(false);
+flash = shader_get_uniform(red_flash, "params");
 
 music_readied = true
 // network_set_config(network_config_connect_timeout,10000)

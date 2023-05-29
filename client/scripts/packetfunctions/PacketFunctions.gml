@@ -255,6 +255,7 @@ function handlePackets(packets) {
 					break;
 				}
 				case "gameplay_data_update": {
+					show_debug_message(extra_packet)
 					global.constants.shield_generator_max_health = extra_packet.shield_generator_max_health;
 					global.constants.core_max_health = extra_packet.core_max_health;
 					break;
@@ -263,6 +264,17 @@ function handlePackets(packets) {
 					global.title = extra_packet.title
 					global.title_time = extra_packet.time * ceil(game_get_speed(gamespeed_fps))
 					break;
+				}
+				case "gamestate": {
+					if (extra_packet.title == "loss") {
+						global.gamestate = "loss"
+					} else {
+						global.gamestate = "win"
+					}
+					break;
+				}
+				case "damage": {
+					global.damage_flash = 10
 				}
 				default: {
 					show_debug_message(extra_packet)
@@ -327,6 +339,7 @@ function handlePackets(packets) {
 		global.this_id = packets.this_id
 	}
 	} catch (e) {
+		show_debug_message(packets)
 		show_debug_message(e)
 	}
 }
