@@ -54,10 +54,10 @@ global.speeed = 10
 
 /**
 Which control style to use.
-Classic: TR
-Easy: LK
+Classic: Rotation and forward/backwards
+Simple: Standard WASD controls
  */
-global.control_style = "easy"//"easy"
+global.control_style = "simple"//"easy"
 
 // Maximum health
 global.max_health = 100
