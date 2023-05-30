@@ -54,6 +54,7 @@
     {"id":{"name":"shield_gen_part_btm","path":"particles/shield_gen_part_btm/shield_gen_part_btm.yy",},},
     {"id":{"name":"shield_left_self_obj","path":"objects/shield_left_self_obj/shield_left_self_obj.yy",},},
     {"id":{"name":"wall_spr","path":"sprites/wall_spr/wall_spr.yy",},},
+    {"id":{"name":"start_button_spr","path":"sprites/start_button_spr/start_button_spr.yy",},},
     {"id":{"name":"Shutdown_sound","path":"sounds/Shutdown_sound/Shutdown_sound.yy",},},
     {"id":{"name":"bullet_spr","path":"sprites/bullet_spr/bullet_spr.yy",},},
     {"id":{"name":"disabled_spr","path":"sprites/disabled_spr/disabled_spr.yy",},},

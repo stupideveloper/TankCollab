@@ -10,6 +10,7 @@
     {"name":"intro_obj","order":9,"path":"objects/intro_obj/intro_obj.yy",},
     {"name":"BG_music","order":3,"path":"sounds/BG_music/BG_music.yy",},
     {"name":"shield_left_self_obj","order":5,"path":"objects/shield_left_self_obj/shield_left_self_obj.yy",},
+    {"name":"start_button_spr","order":10,"path":"sprites/start_button_spr/start_button_spr.yy",},
     {"name":"Shutdown_sound","order":4,"path":"sounds/Shutdown_sound/Shutdown_sound.yy",},
     {"name":"disabled_spr","order":3,"path":"sprites/disabled_spr/disabled_spr.yy",},
     {"name":"notifications_spr","order":7,"path":"sprites/notifications_spr/notifications_spr.yy",},
