@@ -70,9 +70,9 @@ function randomGem(width, height, type = GemType.random()) {
             ...gemRect,
             x,
             y
-        },"gem")) {
+        }, "gem")) {
             let gemuuid = uuid()
-            gem_uuids.set(gemuuid,{
+            gem_uuids.set(gemuuid, {
                 type: type.getId(),
                 x,
                 y,

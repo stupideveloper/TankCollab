@@ -82,7 +82,6 @@ function checkPlayerBullet(playerMap, playerLocMap, x, y, dir, shooter, damage, 
     }
     return hits;
 }
-console.log(Collisions.reflect(30,90))
 function checkCoreBullet(cores = [], shieldGenerators = [], x, y, dir, shooterTeam, teamData) {
     const damageCircle = {
         radius: bulletRect.rough_radius,
@@ -101,11 +100,11 @@ function checkCoreBullet(cores = [], shieldGenerators = [], x, y, dir, shooterTe
             radius: shieldGeneratorRect.rough_radius
         }
     })
-    let returns = {hits:[],dirUpdate: dir}
+    let returns = { hits: [], dirUpdate: dir }
     for (let coreCirc of coreCircles) {
         //if (coreCirc.id.startsWith(shooterTeam)) continue;
         if (!coreCirc.alive) continue;
-        
+
         if (Collisions.circle(coreCirc, damageCircle)) {
             if (coreCirc.id.startsWith("A")) {
                 team = "A"
@@ -113,8 +112,8 @@ function checkCoreBullet(cores = [], shieldGenerators = [], x, y, dir, shooterTe
                 team = "B"
             }
             if (teamData[team].rightShieldHealth > 0 || teamData[team].leftShieldHealth > 0) {
-                let inangle = Collisions.toDegrees(Math.atan2(x-coreCirc.x,y-coreCirc.y));
-                returns.dirUpdate = Collisions.reflect(dir,inangle-90)
+                let inangle = Collisions.toDegrees(Math.atan2(x - coreCirc.x, y - coreCirc.y));
+                returns.dirUpdate = Collisions.reflect(dir, inangle - 90)
                 continue
             }
             if (coreCirc.id.startsWith(shooterTeam)) {

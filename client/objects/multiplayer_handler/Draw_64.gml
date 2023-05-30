@@ -96,7 +96,7 @@ if (global.gamemenu) {
 	draw_set_font(Inventory_fnt)
 	draw_text(
 	window_get_width()/2,window_get_height()/2+60,
-		$"Control Style: {global.control_style} (press C to change)\nServer Code: {global.splash_data.ip}\nConnected Code: {global.ip_construct}\nGame Version: {global.splash_data.gameVersion}\nServer Avg Tick Time: {global.splash_data.nsPerTick}\nServer Last Tick Time: {global.splash_data.nsLastTick}\nMaximum Tick Time: {global.splash_data.maxTick}"
+		$"Control Style: {global.control_style} (press C to change)\nServer Code: {global.splash_data.ip}\nConnected Code: {global.ip_construct}\nGame Version: {global.splash_data.gameVersion}\nServer Avg Tick Time: {global.splash_data.nsPerTick}ns\nServer Last Tick Time: {global.splash_data.nsLastTick}ns\nMaximum Tick Time: {global.splash_data.maxTick}ns"
 	)
 	draw_set_font(font)
 	draw_set_halign(fa_center)

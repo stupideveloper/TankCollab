@@ -5,8 +5,8 @@ const do_lag_back = false
 
 const debug = false
 
-const core_max_health = 1000/2
-const shield_generator_max_health = 500/2
+const core_max_health = 1000 / 2
+const shield_generator_max_health = 500 / 2
 
 /**
  * Whether to allow friendly fire
@@ -239,7 +239,9 @@ setInterval(async function SERVER_GAME_TICK() {
 
     // Server shutdown sequence, occurs if the game ends, it is far better to reset the server than reset every variable, also prevents memory leaks
     reset = Math.max(reset - 1, -1)
+    //console.log(reset)
     if (reset == 0) {
+        REPLAY.saveToFile()
         process.exit()
     }
     // console.log(`spawnedGem: ${spawnedGems}`)
@@ -351,7 +353,7 @@ setInterval(async function SERVER_GAME_TICK() {
                 x: projectile.x,
                 y: projectile.y,
                 angle: projectile.dir || 0
-            },"bullet")) {
+            }, "bullet")) {
                 deletables.push(id)
             }
         })
@@ -367,7 +369,7 @@ setInterval(async function SERVER_GAME_TICK() {
     let tickTime = tickTimeEnd - tickTimeStart
     splashData.nsPerTick = (splashData.nsPerTick * gameTicks + tickTime) / (gameTicks + 1)
     splashData.nsLastTick = tickTime
-    splashData.maxTick = Math.max(splashData.maxTick,tickTime)
+    splashData.maxTick = Math.max(splashData.maxTick, tickTime)
     gameTicks += 1
 }, 1e3 / 60);
 /**
@@ -433,7 +435,7 @@ function damagePlayer(id, room, damage) {
         type: "health_update",
         health: clientsPos[id].health,
         max_health: -1
-    },{
+    }, {
         type: "damage"
     })
     if (clientsPos[id].health <= 0) {
@@ -455,6 +457,8 @@ function damagePlayer(id, room, damage) {
             teamAlive[teamMap[id]] -= 1
             let killedTeam = teamMap[id]
             if (teamAlive[teamMap[id]] == 0) {
+                console.log(`[DEBUG] TEAM ${killedTeam=="A"?"B":"A"} HAS WON, RESTARTING SERVER`)
+                reset = 5 * 60
                 for (let key in clientPackets) {
                     let team = teamMap[key]
                     if (team == killedTeam) {
@@ -463,14 +467,13 @@ function damagePlayer(id, room, damage) {
                             title: "loss",
                             time: -1
                         })
-                        reset = 5 * 60
+                        
                     } else {
                         clientPackets[key].push({
                             type: "gamestate",
                             title: "win",
                             time: -1
                         })
-                        reset = 5 * 60
                     }
                 }
             } else {
@@ -530,7 +533,7 @@ function teleport(id, x, y, dir) {
 
 let nameSet = new Set();
 function nameDiscriminator() {
-    return Math.floor(Math.random()*10000).toString().padStart(4,"0")
+    return Math.floor(Math.random() * 10000).toString().padStart(4, "0")
 }
 /**
  * Main connection handler
@@ -578,15 +581,15 @@ server.on('connection', function (conn) {
             shield_generator_max_health,
             core_max_health
         })
-        for (let gem of gem_uuids.values()) {
-            clientPackets[id].push({
-                type: "gem_spawn",
-                x: gem.x,
-                y: gem.y,
-                gem_type: gem.type,
-                uuid: gem.uuid
-            })
-        }
+    for (let gem of gem_uuids.values()) {
+        clientPackets[id].push({
+            type: "gem_spawn",
+            x: gem.x,
+            y: gem.y,
+            gem_type: gem.type,
+            uuid: gem.uuid
+        })
+    }
     clientsPos[id] = {
         id: id,
         x: 120,
@@ -766,7 +769,7 @@ server.on('connection', function (conn) {
                     x: packet.x,
                     y: packet.y,
                     angle: packet.dir || 0
-                },"player") && do_lag_back) {
+                }, "player") && do_lag_back) {
                     clientPackets[id].push({
                         type: "teleport",
                         x: clientsPos[id].x,
@@ -884,7 +887,7 @@ server.on('connection', function (conn) {
             }
             else if (packet.type == "setname") {
                 if (nameSet.has(packet.name)) {
-                    let tempName = packet.name.substring(0,12) + "_" + nameDiscriminator()
+                    let tempName = packet.name.substring(0, 12) + "_" + nameDiscriminator()
                     clientsPos[id].name = tempName
                     nameSet.add(tempName)
                 } else {
@@ -957,7 +960,6 @@ server.on('connection', function (conn) {
      * Disconnect the current client
      */
     function disconnect() {
-        REPLAY.saveToFile()
         disconnected = true;
         conn.end()
         if (clientsPos[id].respawnTime >= -1) teamAlive[team] -= 1
@@ -965,6 +967,8 @@ server.on('connection', function (conn) {
         delete clientsPos[id]
         delete clientPackets[id]
         if (teamAlive[team] == 0 && started) {
+            console.log(`[DEBUG]\n[DEBUG] TEAM ${team=="A"?"B":"A"} HAS WON, RESTARTING SERVER\n[DEBUG]`)
+            reset = 5 * 60
             for (let key in clientPackets) {
                 let team2 = teamMap[key]
                 if (team2 == team) {
@@ -973,14 +977,12 @@ server.on('connection', function (conn) {
                         title: "loss",
                         time: -1
                     })
-                    reset = 5 * 60
                 } else {
                     clientPackets[key].push({
                         type: "gamestate",
                         title: "win",
                         time: -1
                     })
-                    reset = 5 * 60
                 }
             }
         }

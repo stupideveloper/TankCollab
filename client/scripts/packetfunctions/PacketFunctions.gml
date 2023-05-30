@@ -91,6 +91,35 @@ function handlePackets(packets) {
 				variable_struct_remove(global.other_players,variable_struct_get_names(global.other_players)[i])
 			}
 		}
+		try {
+			global.right_shield_own_health = packets.team_data.rightShieldHealth
+			global.left_shield_own_health = packets.team_data.leftShieldHealth
+			global.right_shield_other_health = packets.other_team_info.rightShield
+			global.left_shield_other_health = packets.other_team_info.leftShield
+			global.core_own_health = packets.team_data.coreHealth
+			global.core_other_health = packets.other_team_info.core
+			if (!global.has_spawned_shields) {
+				var sls = packets.team_data.leftShield
+				var sle = packets.other_team_info.leftShieldLoc
+				var srs = packets.team_data.rightShield
+				var sre = packets.other_team_info.rightShieldLoc
+				var ce = packets.other_team_info.coreLoc
+				var cs = packets.team_data.core
+				
+				var a = instance_create_layer(sle.x,sle.y,"Instances",shield_left_enemy_obj,{sdead: !sle.alive, image_xscale: 0.5, image_yscale: 0.5})
+				var b = instance_create_layer(sls.x,sls.y,"Instances",shield_left_self_obj,{sdead: !sls.alive, image_xscale: 0.5, image_yscale: 0.5})
+				var c = instance_create_layer(srs.x,srs.y,"Instances",shield_right_self_obj, {sdead: !srs.alive, image_xscale: 0.5, image_yscale: 0.5})
+				var d = instance_create_layer(sre.x,sre.y,"Instances",shield_right_enemy_obj, {sdead: !sre.alive, image_xscale: 0.5, image_yscale: 0.5})
+				var e = instance_create_layer(ce.x,ce.y,"Instances",core_ememy_obj, {sdead: !ce.alive, image_xscale: 0.75, image_yscale: 0.75})
+				var f = instance_create_layer(cs.x,cs.y,"Instances",core_self_obj, {sdead: !cs.alive, image_xscale: 0.75, image_yscale: 0.75})
+				
+				global.has_spawned_shields = true;
+				array_push(global.remove_on_disconnect,a,b,c,d,e,f)
+			}
+		} catch (e) {
+		show_debug_message(e)
+		show_debug_message(packets)
+		}
 		for (var i = 0; i < array_length(packets.misc_packets); i++) {
 			var extra_packet = packets.misc_packets[i];
 			//show_debug_message(extra_packet)
@@ -289,35 +318,7 @@ function handlePackets(packets) {
 		if (global.respawntime == -1) {
 			global.dead = false	
 		}
-		try {
-			global.right_shield_own_health = packets.team_data.rightShieldHealth
-			global.left_shield_own_health = packets.team_data.leftShieldHealth
-			global.right_shield_other_health = packets.other_team_info.rightShield
-			global.left_shield_other_health = packets.other_team_info.leftShield
-			global.core_own_health = packets.team_data.coreHealth
-			global.core_other_health = packets.other_team_info.core
-			if (!global.has_spawned_shields) {
-				var sls = packets.team_data.leftShield
-				var sle = packets.other_team_info.leftShieldLoc
-				var srs = packets.team_data.rightShield
-				var sre = packets.other_team_info.rightShieldLoc
-				var ce = packets.other_team_info.coreLoc
-				var cs = packets.team_data.core
-				
-				var a = instance_create_layer(sle.x,sle.y,"Instances",shield_left_enemy_obj,{sdead: !sle.alive, image_xscale: 0.5, image_yscale: 0.5})
-				var b = instance_create_layer(sls.x,sls.y,"Instances",shield_left_self_obj,{sdead: !sls.alive, image_xscale: 0.5, image_yscale: 0.5})
-				var c = instance_create_layer(srs.x,srs.y,"Instances",shield_right_self_obj, {sdead: !srs.alive, image_xscale: 0.5, image_yscale: 0.5})
-				var d = instance_create_layer(sre.x,sre.y,"Instances",shield_right_enemy_obj, {sdead: !sre.alive, image_xscale: 0.5, image_yscale: 0.5})
-				var e = instance_create_layer(ce.x,ce.y,"Instances",core_ememy_obj, {sdead: !ce.alive, image_xscale: 0.75, image_yscale: 0.75})
-				var f = instance_create_layer(cs.x,cs.y,"Instances",core_self_obj, {sdead: !cs.alive, image_xscale: 0.75, image_yscale: 0.75})
-				
-				global.has_spawned_shields = true;
-				array_push(global.remove_on_disconnect,a,b,c,d,e,f)
-			}
-		} catch (e) {
-		show_debug_message(e)
-		show_debug_message(packets)
-		}
+		
 		global.core_health = packets.team_data.coreHealth
 		global.teams = packets.teamPlayers
 		global.projectiles = packets.projectiles

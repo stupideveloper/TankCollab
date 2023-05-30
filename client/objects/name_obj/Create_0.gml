@@ -8,3 +8,4 @@ pressed = 0
 stage = 0
 has_success = false
 global.name = ""
+global.squareroot_two_over_two = sqrt(2)/2

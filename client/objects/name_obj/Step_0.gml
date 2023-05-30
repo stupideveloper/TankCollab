@@ -109,7 +109,7 @@ if (string_length(global.name) < 16 && keyboard_check_pressed(ord("9"))) {
 if (string_length(global.name) < 16 && keyboard_check_pressed(ord("0"))) {
     global.name += "0"
 }
-if (keyboard_check_pressed(189) && string_length(global.name) >= 1 && not string_ends_with(global.name,"_")) {
+if ((keyboard_check_pressed(189)||keyboard_check_pressed(vk_space)) && string_length(global.name) >= 1 && not string_ends_with(global.name,"_")) {
     global.name += "_"
 }
 if (keyboard_check(vk_backspace)) {

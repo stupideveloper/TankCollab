@@ -4,7 +4,7 @@ const Collisions = require("./rect_collisions")
  */
 const arenaGeometry = [
     {
-        rough_radius: Math.sqrt(980**2+500**2), // Rough radius for the circle filtering
+        rough_radius: Math.sqrt(980 ** 2 + 500 ** 2), // Rough radius for the circle filtering
         x: 325, // Location X
         y: 890, // Location Y
         h: 980, // Height
@@ -15,7 +15,7 @@ const arenaGeometry = [
         gem: true
     },
     {
-        rough_radius: Math.sqrt(980**2+500**2), // Rough radius for the circle filtering
+        rough_radius: Math.sqrt(980 ** 2 + 500 ** 2), // Rough radius for the circle filtering
         x: 3400, // Location X
         y: 890, // Location Y
         h: 980, // Height
@@ -98,9 +98,9 @@ const checkWallCollisions = function (rect, checkType = "player") {
     let returnval = false
     arenaGeometry.forEach(function (arenaPart) {
         if (returnval) return;
-        if (checkType=="bullet" && !arenaPart.bullet) return;
-        if (checkType=="player" && !arenaPart.player) return;
-        if (checkType=="gem" && !arenaPart.gem) return;
+        if (checkType == "bullet" && !arenaPart.bullet) return;
+        if (checkType == "player" && !arenaPart.player) return;
+        if (checkType == "gem" && !arenaPart.gem) return;
         const circleOfPart = {
             radius: arenaPart.rough_radius,
             x: arenaPart.x,

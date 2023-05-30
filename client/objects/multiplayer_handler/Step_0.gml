@@ -63,7 +63,8 @@ var imageanglekey = 0b0000
 var _speed = global.speeed
 phy_speed_x*=0.9
 phy_speed_y*=0.9
-if (keyboard_check(ord("W"))||keyboard_check(vk_up)) {
+if ((keyboard_check(ord("W")) xor keyboard_check(ord("S"))) and (keyboard_check(ord("D")) xor keyboard_check(ord("A")))) _speed *= global.squareroot_two_over_two
+if (keyboard_check(ord("W"))||keyboard_check(vk_up)) and not (keyboard_check(ord("S"))||keyboard_check(vk_down)) {
 	sendPosPack = true
 	if (global.control_style=="classic") {
 		phy_speed_x=_speed*cos_(fake_direction)
@@ -71,7 +72,7 @@ if (keyboard_check(ord("W"))||keyboard_check(vk_up)) {
 	}
 	else phy_speed_y=-_speed//*sin_(fake_direction)
 }
-if (keyboard_check(ord("S"))||keyboard_check(vk_down)) {
+if (keyboard_check(ord("S"))||keyboard_check(vk_down)) and not (keyboard_check(ord("W"))||keyboard_check(vk_up)) {
 	// physics_apply_force(x-global.speeed*100*cos_(fake_direction),y-global.speeed*100*sin_(fake_direction),500,500)
 	sendPosPack = true
 	if (global.control_style=="classic") {
@@ -80,11 +81,11 @@ if (keyboard_check(ord("S"))||keyboard_check(vk_down)) {
 	}
 	else phy_speed_y=_speed
 }
-if (keyboard_check(ord("A"))||keyboard_check(vk_left)) {
+if (keyboard_check(ord("A"))||keyboard_check(vk_left)) and not (keyboard_check(ord("D"))||keyboard_check(vk_right)) {
 	if (global.control_style=="classic") fake_direction -= 3.65
 	else {phy_speed_x=-_speed;sendPosPack = true}
 }
-if (keyboard_check(ord("D"))||keyboard_check(vk_right)) {
+if (keyboard_check(ord("D"))||keyboard_check(vk_right)) and not (keyboard_check(ord("A"))||keyboard_check(vk_left)) {
 	if (global.control_style=="classic") fake_direction += 3.65
 	else {phy_speed_x=_speed;sendPosPack = true}
 }
