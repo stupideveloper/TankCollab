@@ -15,7 +15,7 @@ draw_text(
 	camera_get_view_height(view_camera[0])/2 - 50,
 	"Enter Server Code:"
 )
-var icon = (flasher mod 40 > 20 && string_length(global.ip_construct) != 7)?"▌":" "
+var icon = string_length(global.ip_construct)>=7?"":((flasher mod 40 > 20 && string_length(global.ip_construct) != 7)?"▌":"  ")
 draw_text(
 	camera_get_view_width(view_camera[0])/2,
 	camera_get_view_height(view_camera[0])/2,

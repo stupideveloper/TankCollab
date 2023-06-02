@@ -5,7 +5,7 @@ draw_set_halign(fa_center)
 draw_set_valign(fa_middle)
 
 draw_self()
-var icon = (flasher mod 40 > 20 && string_length(global.name) != 16)?"▌":" "
+var icon = string_length(global.name)>=16?"":((flasher mod 40 > 20 && string_length(global.name) != 16)?"▌":"  ")
 draw_text(
 	x,y+45,
 	""+string(global.name)+icon

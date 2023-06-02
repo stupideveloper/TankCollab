@@ -48,7 +48,7 @@ let teamUpgrades = {
 }
 
 let upgradeTiers = {
-    bulletDamage: [100.5, 2, 3, 4.5, 6, 7, 8],
+    bulletDamage: [1.5, 2, 3, 4.5, 6, 7, 8],
     bulletSpeed: [10, 11, 12, 14, 16, 19, 22],
     bulletReload: [10, 9, 7, 6, 5, 3, 2],
     moveSpeed: [6.25, 7.5, 8, 8.5, 8.875, 9.125, 9.375],

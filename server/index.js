@@ -5,6 +5,8 @@ const do_lag_back = false
 
 const debug = false
 
+const should_stop_server = process.argv.includes("noreset")
+
 const core_max_health = 1000 / 2
 const shield_generator_max_health = 500 / 2
 
@@ -17,8 +19,12 @@ const do_friendly_fire = true;
  * Import the networking library API
  */
 const net = require("net")
+
+const logCode = require("./gamecodelogger")
+
+// Replay funcionality, not yet implemented, unlikely to be ever implemented
 let REPLAY = {
-    recordFrame: () => { },
+    recordFrame: (uuid) => { },
     saveToFile: () => { }
 };
 let gameTicks = 0
@@ -29,11 +35,6 @@ let splashData = {
     nsPerTick: 0,
     nsLastTick: 0,
     maxTick: 0,
-}
-try {
-    REPLAY = require("./replay.hidden")
-} catch {
-
 }
 /** 
  * The separator between two gamemaker packets
@@ -240,7 +241,7 @@ setInterval(async function SERVER_GAME_TICK() {
     // Server shutdown sequence, occurs if the game ends, it is far better to reset the server than reset every variable, also prevents memory leaks
     reset = Math.max(reset - 1, -1)
     //console.log(reset)
-    if (reset == 0) {
+    if (reset == 0 && should_stop_server) {
         REPLAY.saveToFile()
         process.exit()
     }
@@ -1027,5 +1028,5 @@ try {
  */
 server.listen(9000, function () {
     console.log('[INFO]  Server listening to %s:%j', IP, server.address().port);
-    console.log(`[INFO]  Use the code [${CODE}]`)
+    logCode(CODE)
 });
