@@ -4,7 +4,6 @@ function run(i) {
     let proc = child.exec(`node "${process.cwd()}/index.js" noreset`)
     proc.stdout.pipe(process.stdout)
     proc.on("exit", (c) => {
-        console.log(c)
         setTimeout(() => { run(i + 1) }, 1)
     })
 }
