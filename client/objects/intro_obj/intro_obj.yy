@@ -30,8 +30,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "progressbar_spr",
-    "path": "sprites/progressbar_spr/progressbar_spr.yy",
+    "name": "start_button_spr",
+    "path": "sprites/start_button_spr/start_button_spr.yy",
   },
   "spriteMaskId": null,
   "visible": true,

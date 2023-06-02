@@ -1,5 +1,7 @@
 {
-  "FolderOrderSettings": [],
+  "FolderOrderSettings": [
+    {"name":"bg","order":12,"path":"folders/Sprites/bg.yy",},
+  ],
   "ResourceOrderSettings": [
     {"name":"instructions_spr","order":5,"path":"sprites/instructions_spr/instructions_spr.yy",},
     {"name":"intro_spr","order":10,"path":"sprites/intro_spr/intro_spr.yy",},
@@ -36,6 +38,7 @@
     {"name":"winlose_spr","order":9,"path":"sprites/winlose_spr/winlose_spr.yy",},
     {"name":"IntroRoom","order":2,"path":"rooms/IntroRoom/IntroRoom.yy",},
     {"name":"wall_piece_obj","order":6,"path":"objects/wall_piece_obj/wall_piece_obj.yy",},
+    {"name":"choose_name_spr","order":13,"path":"sprites/choose_name_spr/choose_name_spr.yy",},
     {"name":"DisplayAlert","order":1,"path":"scripts/DisplayAlert/DisplayAlert.yy",},
   ],
 }
