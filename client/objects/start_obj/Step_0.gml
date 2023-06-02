@@ -3,7 +3,7 @@
 flasher ++
 if (global.has_forced_server) {
 global.IP_ADDR = global.forced_server
-room_goto(Room1)
+//room_goto(Room1)
 
 }
 
@@ -149,6 +149,10 @@ if (string_length(global.ip_construct) < 7 && keyboard_check_pressed(ord("Y"))) 
 
 if (string_length(global.ip_construct) < 7 && keyboard_check_pressed(ord("Z"))) {
     global.ip_construct += "Z"
+}
+
+if (keyboard_check_pressed(vk_escape)) {
+	room_goto(NameSelectRoom)
 }
 
 if (keyboard_check(vk_backspace)) {

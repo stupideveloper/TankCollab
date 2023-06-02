@@ -8,5 +8,5 @@ if (clicked) {
 if (floor(slide) == sprite_get_number(sprite_index)) {
 	room_goto(NameSelectRoom)
 }
-draw_sprite(intro_spr,0,0,0)
+// draw_sprite(intro_spr,0,0,0)
 draw_self()

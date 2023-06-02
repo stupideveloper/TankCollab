@@ -7,8 +7,8 @@ else if (immediatelyhide){
 	visible = false
 }
 
-x = window_get_width()/2
-y = window_get_height()/2 - 200
+x = view_wport[0]/2
+y = view_hport[0]/2 - 200
 if (!global.started) {
 	sprite_index = instructions_spr
 	//x = 50
