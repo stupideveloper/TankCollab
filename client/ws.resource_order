@@ -4,7 +4,6 @@
   ],
   "ResourceOrderSettings": [
     {"name":"instructions_spr","order":5,"path":"sprites/instructions_spr/instructions_spr.yy",},
-    {"name":"intro_spr","order":10,"path":"sprites/intro_spr/intro_spr.yy",},
     {"name":"shield_right_enemy_obj","order":3,"path":"objects/shield_right_enemy_obj/shield_right_enemy_obj.yy",},
     {"name":"Inventory_fnt","order":1,"path":"fonts/Inventory_fnt/Inventory_fnt.yy",},
     {"name":"max_health_spr","order":2,"path":"sprites/max_health_spr/max_health_spr.yy",},

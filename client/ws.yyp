@@ -41,7 +41,6 @@
     {"id":{"name":"start_obj","path":"objects/start_obj/start_obj.yy",},},
     {"id":{"name":"move_speed_spr","path":"sprites/move_speed_spr/move_speed_spr.yy",},},
     {"id":{"name":"bullet_speed_spr","path":"sprites/bullet_speed_spr/bullet_speed_spr.yy",},},
-    {"id":{"name":"intro_spr","path":"sprites/intro_spr/intro_spr.yy",},},
     {"id":{"name":"shield_right_enemy_obj","path":"objects/shield_right_enemy_obj/shield_right_enemy_obj.yy",},},
     {"id":{"name":"start_screen_bg_spr","path":"sprites/start_screen_bg_spr/start_screen_bg_spr.yy",},},
     {"id":{"name":"Inventory_fnt","path":"fonts/Inventory_fnt/Inventory_fnt.yy",},},

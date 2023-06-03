@@ -242,12 +242,10 @@ setInterval(async function SERVER_GAME_TICK() {
 
     // Server shutdown sequence, occurs if the game ends, it is far better to reset the server than reset every variable, also prevents memory leaks
     reset = Math.max(reset - 1, -1)
-    //console.log(reset)
     if (reset == 0 && should_stop_server) {
         REPLAY.saveToFile()
         process.exit()
     }
-    // console.log(`spawnedGem: ${spawnedGems}`)
     /**
      * Runs every packet listener, this acts more as a game tick listener
      */
@@ -255,7 +253,6 @@ setInterval(async function SERVER_GAME_TICK() {
         packetListeners[player]()
     })
     if (started && spawnedGems < 40 && Math.random() > 0.99) {
-        // console.log(`I spawned gem number ${spawnedGems}`)
         spawnedGems++;
         var gem = randomGem(3733, 2330)
         broadcast({
@@ -460,7 +457,7 @@ function damagePlayer(id, room, damage) {
             teamAlive[teamMap[id]] -= 1
             let killedTeam = teamMap[id]
             if (teamAlive[teamMap[id]] == 0) {
-                console.log(`[DEBUG] TEAM ${killedTeam=="A"?"B":"A"} HAS WON, RESTARTING SERVER`)
+                console.log(`[DEBUG]\n[DEBUG] TEAM ${killedTeam=="A"?"B":"A"} HAS WON, RESTARTING SERVER\n[DEBUG]`)
                 reset = 5 * 60
                 for (let key in clientPackets) {
                     let team = teamMap[key]
@@ -818,7 +815,6 @@ server.on('connection', function (conn) {
                  */
                 if (bulletPacketLimiter != 0) continue;
                 if (clientsPos[id].respawnTime != -1) continue;
-                sendBulletPack = true;
                 bulletPacketLimiter = Upgrades.getUpgradeForTeam(team, UpgradeTypes.BulletReload);
                 clientPackets[id].push({
                     type: "screenshake",
@@ -859,7 +855,7 @@ server.on('connection', function (conn) {
                         Upgrades.doUpgrade(team, UpgradeTypes.MoveSpeed, teamData[team].gems)
                         break
                     }
-                    default: console.log(packet)
+                    default:
                 }
                 Upgrades.updateAvailability(team, teamData[team].availableUpgrades, teamData[team].gems)
             } else if (packet.type == "collect_gem") {
@@ -926,7 +922,6 @@ server.on('connection', function (conn) {
 
     function onConnData(d) {
         lastPacketTime = 0;
-        var sendBulletPack = false;
         /**
          * Check how many packets gamemaker has sent
          */
@@ -940,19 +935,22 @@ server.on('connection', function (conn) {
                     var newpos = JSON.parse(/{.+}/g.exec(packet)[0].replaceAll(/[^\u0000-\u007F]+/g, ""))
 
                     handlePacket(newpos)
-                } catch {
-                    console.log(packet)
+                } catch (e) {
+                    /**
+                     * Writes the buffer as a hex file to a file for debugging purposes
+                     */
+                    writeFileSync("./error.hex", Buffer.from(d).toString("hex") + "\n" + e);
                 }
             }
         } else {
             try {
                 var newpos = JSON.parse(/{.+}/g.exec(Buffer.from(d).toString())[0].replaceAll(/[^\u0000-\u007F]+/g, ""))
                 handlePacket(newpos)
-            } catch {
+            } catch (e) {
                 /**
-                 * Writes the buffer as a hex file to a file
+                 * Writes the buffer as a hex file to a file for debugging purposes
                  */
-                writeFileSync("./error.hex", Buffer.from(d).toString("hex"));
+                writeFileSync("./error.hex", Buffer.from(d).toString("hex") + "\n" + e);
             }
         }
         // bulletPacketLimiter = sendBulletPack && bulletPacketLimiter

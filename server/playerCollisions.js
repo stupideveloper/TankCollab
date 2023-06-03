@@ -106,6 +106,7 @@ function checkCoreBullet(cores = [], shieldGenerators = [], x, y, dir, shooterTe
         if (!coreCirc.alive) continue;
 
         if (circle(coreCirc, damageCircle)) {
+            let team;
             if (coreCirc.id.startsWith("A")) {
                 team = "A"
             } else {
