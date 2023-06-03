@@ -13,26 +13,30 @@ function getCode(ip="192.168.0.1") {
     binary = binary.replace(binary[0],dictionary[(randomLetter*2)+parseInt(first,36)])
     return binary
 }
-const getNetworkInterfaces = require("os").networkInterfaces;
+
+import { networkInterfaces as getNetworkInterfaces} from "os";
 const networkInterfaces = getNetworkInterfaces();
 for (let id in networkInterfaces) {
     let networkInterface = networkInterfaces[id]
-    for (let interface of networkInterface) {
-        if ([4, "IPv4"].includes(interface.family)
-            && interface.internal == false) {
-            if (interface.address.startsWith("192")) {
-                probablyIP ??= interface.address
-                oneninetwos.push(interface.address)
+    for (let _interface of networkInterface) {
+        if ([4, "IPv4"].includes(_interface.family)
+            && _interface.internal == false) {
+            if (_interface.address.startsWith("192")) {
+                probablyIP ??= _interface.address
+                oneninetwos.push(_interface.address)
             }
-            ips.push(interface.address)
+            ips.push(_interface.address)
         }
     }
 }
 probablyIP ??= "127.0.0.1"
-module.exports = {
-    ip: probablyIP,
+const codes = ips.map(getCode)
+const ip = probablyIP
+const code = getCode(ip)
+export default {
+    ip,
     ips,
     oneninetwos,
-    code: getCode(probablyIP),
-    codes: ips.map(getCode)
+    code,
+    codes
 }

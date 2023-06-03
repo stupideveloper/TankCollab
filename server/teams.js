@@ -6,7 +6,8 @@
  * @typedef {{"RED":number,"BLUE":number,"GREEN":number,"PURPLE":number}} AbstractBank
  * @typedef {{"RED":number,"BLUE":number,"GREEN":number,"PURPLE":number}} AbstractRequirement
  * @typedef {{"bulletDamage":number,"bulletSpeed":number,"bulletReload":number,"moveSpeed":number,"maxHealth":number,"healthRegen":number}} AbstractUpgrades*/
-const { GemType } = require("./gems")
+
+import { GemType } from "./gems.js"
 
 const teams = {
     TEAM_A: "A",
@@ -270,7 +271,7 @@ function teamUpgradesToTiers(upgrades) {
  */
 const teamUpgradesDefault = JSON.stringify(teamUpgrades)
 
-module.exports = {
+export {
     teamSelector,
     teamSizes,
     upgradeTiers,

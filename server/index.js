@@ -18,9 +18,9 @@ const do_friendly_fire = true;
 /**
  * Import the networking library API
  */
-const net = require("net")
+import { createServer } from "net"
 
-const logCode = require("./gamecodelogger")
+import {logCode} from "./gamecodelogger.js"
 
 // Replay funcionality, not yet implemented, unlikely to be ever implemented
 let REPLAY = {
@@ -44,8 +44,8 @@ const gamemakerMagic = "dec0adde0c"
 /**
  * Import the randomUUID function from `crypto`, which creates a cryptographically secure UUID
  */
-const uuid = require("crypto").randomUUID
-const fs = require("fs")
+import { randomUUID as uuid } from "crypto"
+import { writeFileSync } from "fs"
 /**
  * Converts a degree angle to radians
  * @param {number} degrees 
@@ -53,16 +53,18 @@ const fs = require("fs")
  */
 const toRadians = (degrees) => degrees * Math.PI / 180;
 const toDegrees = (radians) => radians * 180 / Math.PI;
-const Collision = require("./rect_collisions");
-const { teamSelector, teamUpgradesToTiers, teamSizes, upgradeTiers, UpgradeTypes, Upgrades, teamAlive } = require("./teams")
-const { randomGem, GemType, gem_uuids } = require("./gems")
+
+import { teamSelector, teamUpgradesToTiers, teamSizes, upgradeTiers, UpgradeTypes, Upgrades, teamAlive } from "./teams.js"
+import { randomGem, GemType, gem_uuids } from "./gems.js"
+
+import iptest from "./iptest.js"
 /**
  * Imports the collision helper functions
  */
-const { checkWalls, bulletRect, tankRect, gemRect } = require("./arenaCollisions");
-const { checkPlayer, checkCores } = require("./playerCollisions");
+import { checkWallCollisions as checkWalls, bulletRect, tankRect, gemRect } from "./arenaCollisions.js"
+import { checkPlayer, checkCores } from "./playerCollisions.js"
 
-var server = net.createServer();
+var server = createServer();
 /**
  * An object that stores all of the positions for the clients
  */
@@ -950,7 +952,7 @@ server.on('connection', function (conn) {
                 /**
                  * Writes the buffer as a hex file to a file
                  */
-                fs.writeFileSync("./error.hex", Buffer.from(d).toString("hex"));
+                writeFileSync("./error.hex", Buffer.from(d).toString("hex"));
             }
         }
         // bulletPacketLimiter = sendBulletPack && bulletPacketLimiter
@@ -1013,7 +1015,7 @@ server.on('connection', function (conn) {
 let IP = "localhost";
 let CODE = ""
 try {
-    let iptest = require("./iptest")
+    
     IP = iptest.ip
     CODE = iptest.code
     if (iptest.oneninetwos.length > 1) console.log(`[WARN]  Multiple 192.168.x.x local IPs found!: ${iptest.oneninetwos.join(", ")}`)

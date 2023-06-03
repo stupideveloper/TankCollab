@@ -1,6 +1,6 @@
-const Collisions = require("./rect_collisions")
+import { circle, rect, toDegrees, reflect } from "./rect_collisions.js";
 
-let { bulletRect, tankRect, coreRect, shieldGeneratorRect } = require("./arenaCollisions")
+import { bulletRect, tankRect, coreRect, shieldGeneratorRect } from "./arenaCollisions.js";
 /**
  * Returns if a bullet is colliding with a player
  * @param {{
@@ -71,11 +71,11 @@ function checkPlayerBullet(playerMap, playerLocMap, x, y, dir, shooter, damage, 
         /**
          * Sees if the bullet and tank are close enough to justify using the rectangle function
          */
-        if (Collisions.circle(tankCircle, damageCircle)) {
+        if (circle(tankCircle, damageCircle)) {
             /**
              * yet another use of the costly rectangle collision function
              */
-            if (Collisions.rect(bulletColl, tankColl)) {
+            if (rect(bulletColl, tankColl)) {
                 hits.push(player)
             }
         }
@@ -105,15 +105,15 @@ function checkCoreBullet(cores = [], shieldGenerators = [], x, y, dir, shooterTe
         //if (coreCirc.id.startsWith(shooterTeam)) continue;
         if (!coreCirc.alive) continue;
 
-        if (Collisions.circle(coreCirc, damageCircle)) {
+        if (circle(coreCirc, damageCircle)) {
             if (coreCirc.id.startsWith("A")) {
                 team = "A"
             } else {
                 team = "B"
             }
             if (teamData[team].rightShieldHealth > 0 || teamData[team].leftShieldHealth > 0) {
-                let inangle = Collisions.toDegrees(Math.atan2(x - coreCirc.x, y - coreCirc.y));
-                returns.dirUpdate = Collisions.reflect(dir, inangle - 90)
+                let inangle = toDegrees(Math.atan2(x - coreCirc.x, y - coreCirc.y));
+                returns.dirUpdate = reflect(dir, inangle - 90)
                 continue
             }
             if (coreCirc.id.startsWith(shooterTeam)) {
@@ -125,7 +125,7 @@ function checkCoreBullet(cores = [], shieldGenerators = [], x, y, dir, shooterTe
     }
     for (let shieldCirc of shieldCircles) {
         if (!shieldCirc.alive) continue;
-        if (Collisions.circle(shieldCirc, damageCircle)) {
+        if (circle(shieldCirc, damageCircle)) {
             if (shieldCirc.id.startsWith(shooterTeam)) {
                 returns.hits.push(0)
                 continue;
@@ -136,7 +136,5 @@ function checkCoreBullet(cores = [], shieldGenerators = [], x, y, dir, shooterTe
     return returns
 }
 
-module.exports = {
-    checkPlayer: checkPlayerBullet,
-    checkCores: checkCoreBullet
-}
+export const checkPlayer = checkPlayerBullet;
+export const checkCores = checkCoreBullet;

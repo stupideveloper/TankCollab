@@ -200,10 +200,11 @@ const isPointInRect = function (x, y, x_min, x_max, y_min, y_max) {
     if (x >= x_max || x <= x_min || y >= y_max || y <= y_min) return false;
     return true
 }
-module.exports = {
-    rect: isRectCollide,
-    circle: isCircleCollide,
-    point: isPointInRect,
+export const rect = isRectCollide
+export const circle = isCircleCollide
+export const point = isPointInRect
+
+export {
     toDegrees,
     toRadians,
     reflect

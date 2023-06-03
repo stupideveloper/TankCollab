@@ -1,5 +1,5 @@
-const { checkWalls, gemRect } = require("./arenaCollisions")
-const uuid = require("crypto").randomUUID
+import { checkWallCollisions as checkWalls, gemRect } from "./arenaCollisions.js";
+import { randomUUID as uuid } from "crypto";
 
 const gem_uuids = new Map()
 /**
@@ -87,7 +87,7 @@ function randomGem(width, height, type = GemType.random()) {
         }
     }
 }
-module.exports = {
+export {
     GemType,
     randomGem,
     gem_uuids

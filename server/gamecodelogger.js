@@ -218,7 +218,7 @@ function charConcat(char1, char2) {
         return c.padEnd(longest + 1, " ") + (rows2[i] || rows2[0] || "")
     }).join("\n")
 }
-module.exports = function logCode(code) { 
+export function logCode(code) { 
     console.log(`[DEBUG] The Code is [${code}]`)
     console.log(charConcat("[DEBUG]", convertToLarge(`The Code Is [${code}]`))) 
 }

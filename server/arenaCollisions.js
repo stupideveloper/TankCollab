@@ -1,4 +1,4 @@
-const Collisions = require("./rect_collisions")
+import { point, circle, rect as _rect } from "./rect_collisions.js"
 /**
  * Add more arena geometry here
  */
@@ -92,7 +92,7 @@ const checkWallCollisions = function (rect, checkType = "player") {
         x: rect.x,
         y: rect.y
     }
-    if (!Collisions.point(rect.x, rect.y, arenaBounds.x_min, arenaBounds.x_max, arenaBounds.y_min, arenaBounds.y_max)) {
+    if (!point(rect.x, rect.y, arenaBounds.x_min, arenaBounds.x_max, arenaBounds.y_min, arenaBounds.y_max)) {
         return true
     }
     let returnval = false
@@ -109,11 +109,11 @@ const checkWallCollisions = function (rect, checkType = "player") {
         /**
          * Checks whether the two objects are close enough to do the rectangle check
          */
-        if (Collisions.circle(circleOfRect, circleOfPart)) {
+        if (circle(circleOfRect, circleOfPart)) {
             /**
              * Runs an expensive rectangle check
              */
-            if (Collisions.rect(rect, arenaPart)) {
+            if (_rect(rect, arenaPart)) {
                 returnval = true;
             }
         }
@@ -121,8 +121,8 @@ const checkWallCollisions = function (rect, checkType = "player") {
     return returnval
 }
 
-module.exports = {
-    checkWalls: checkWallCollisions,
+export {
+    checkWallCollisions,
     bulletRect,
     tankRect,
     gemRect,
