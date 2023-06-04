@@ -3,7 +3,11 @@ let oneninetwos = []
 let ips = []
 const dictionary = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 let remainder = 0
+function validateIp(ip="192.168.0.1") {
+    return /^[0-2]{0,1}[0-9]{1,2}.[0-2]{0,1}[0-9]{1,2}.[0-2]{0,1}[0-9]{1,2}.[0-2]{0,1}[0-9]{1,2}$/.test(ip)
+}
 function getCode(ip="192.168.0.1") {
+    if (!validateIp(ip)) return;
     let number = ip.split(".").map(a=>a*1)
     let randomLetter = Math.floor((dictionary.length/2)*Math.random())
     let binary = (parseInt(number.map(a=>{
@@ -38,5 +42,6 @@ export default {
     ips,
     oneninetwos,
     code,
-    codes
+    codes,
+    getCode
 }

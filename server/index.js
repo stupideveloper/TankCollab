@@ -1,6 +1,8 @@
 /**
  * Whether to reset player location if the client goes too fast
  */
+process.on("uncaughtException",console.log)
+
 const do_lag_back = false
 
 const debug = false
@@ -14,6 +16,8 @@ const shield_generator_max_health = 500 / 2
  * Whether to allow friendly fire
  */
 const do_friendly_fire = true;
+
+import config from "./config.json" assert { type: "json" };
 
 /**
  * Import the networking library API
@@ -316,7 +320,7 @@ setInterval(async function SERVER_GAME_TICK() {
                      * Damage the player
                      */
                     if (teamMap[p] == teamMap[projectile.shooter] && !do_friendly_fire) return
-                    damagePlayer(p, room, damage)
+                    damagePlayer(p, room, damage, projectile.shooter)
                 })
                 return;
             }
@@ -422,8 +426,9 @@ function doCollisions() {
  * @param {import("crypto").UUID} id 
  * @param {import("crypto").UUID|null} room 
  * @param {number} damage 
+ * @param {import("crypto").UUID|null}
  */
-function damagePlayer(id, room, damage) {
+function damagePlayer(id, room, damage, damager) {
     /**
      * Reduce the health on the server
      */
@@ -437,8 +442,12 @@ function damagePlayer(id, room, damage) {
         max_health: -1
     }, {
         type: "damage"
-    })
+    });
+    (clientsPos[damager]||{stats: {damageTaken: 0}}).stats.damageTaken += 1
+    clientsPos[id].stats.damageTaken += 1
     if (clientsPos[id].health <= 0) {
+        (clientsPos[damager]||{stats: {damageTaken: 0}}).stats.kills += 1
+        clientsPos[id].stats.deaths += 1
         /**
          * If the player loses all health, send a death packet
          */
@@ -510,6 +519,7 @@ function fireBullet(x = 0, y = 0, dir = 0, shooter = uuid(), damage = 1, vel = 1
         damage,
         shooter: shooter,
     }
+    clientsPos[shooter].stats.bulletsFired += 1
 }
 
 /**
@@ -605,8 +615,17 @@ server.on('connection', function (conn) {
             [GemType.PURPLE.getName()]: 0,
             [GemType.GREEN.getName()]: 0,
         },
-        name: ""
+        name: "",
+        stats: {
+            kills: 0,
+            damageDealt: 0,
+            bulletsFired: 0,
+            deaths: 0,
+            damageTaken: 0,
+            gemsCollected: 0
+        }
     }
+    let selfObject = clientsPos[id]
     clientsPos[id].max_health = Upgrades.getUpgradeForTeam(team, UpgradeTypes.MaxHealth)
     clientsPos[id].health = Upgrades.getUpgradeForTeam(team, UpgradeTypes.MaxHealth)
     teleport(id, ...teamData[team].getSpawnpoint())
@@ -862,6 +881,7 @@ server.on('connection', function (conn) {
                 if (clientsPos[id].respawnTime != -1) continue;
                 var legal = !!gem_uuids.has(packet.uuid)
                 if (!legal) continue;
+                clientsPos[id].stats.gemsCollected += 1
                 spawnedGems--;
                 gem_uuids.delete(packet.uuid)
                 var gem_type = GemType.fromId(packet.gem_type)
@@ -1013,13 +1033,17 @@ server.on('connection', function (conn) {
 let IP = "localhost";
 let CODE = ""
 try {
-    
+    if (!config.server_ip) {
     IP = iptest.ip
     CODE = iptest.code
     if (iptest.oneninetwos.length > 1) console.log(`[WARN]  Multiple 192.168.x.x local IPs found!: ${iptest.oneninetwos.join(", ")}`)
     if (iptest.oneninetwos.length == 0 && iptest.ips.length != 0) console.log(`[WARN]  No 192.168.x.x local IPs found!\n[WARN]  Other possible local IPs: ${iptest.ips.join(", ")}, with codes [${iptest.codes.join(", ")}]`)
     if (iptest.oneninetwos.length == 0 && iptest.ips.length == 0) console.log(`[WARN]  No Network Interfaces found! Do you have Airplane mode enabled?`)
     splashData.ip = CODE;
+    } else {
+        CODE = iptest.getCode(config.server_ip)
+        splashData.ip = CODE;
+    }
 } catch {
     console.warn("[WARN]  Unable to get local IP, Multiplayer may not work!")
 }
@@ -1030,3 +1054,4 @@ server.listen(9000, function () {
     console.log('[INFO]  Server listening to %s:%j', IP, server.address().port);
     logCode(CODE)
 });
+
