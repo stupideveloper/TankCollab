@@ -99,7 +99,6 @@
     {"id":{"name":"choose_name_spr","path":"sprites/choose_name_spr/choose_name_spr.yy",},},
     {"id":{"name":"DisplayAlert","path":"scripts/DisplayAlert/DisplayAlert.yy",},},
     {"id":{"name":"upgrade_button_obj","path":"objects/upgrade_button_obj/upgrade_button_obj.yy",},},
-    {"id":{"name":"GamePlayRenderer","path":"scripts/GamePlayRenderer/GamePlayRenderer.yy",},},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
   ],
   "RoomOrderNodes": [

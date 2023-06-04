@@ -282,6 +282,7 @@ setInterval(async function SERVER_GAME_TICK() {
          * Every projectile in that room, run ticking code
          */
         Object.keys(rooms[room].projectiles).forEach(id => {
+            if (!started) return;
             var projectile = rooms[room].projectiles[id]
             var dir = projectile.dir
             var vel = projectile.vel
@@ -403,13 +404,7 @@ function broadcast(packet) {
         clientPackets[key].push(packet)
     }
 }
-function broadcastConditional(packet, condition) {
-    for (let key in clientPackets) {
-        if (condition(key)) {
-            clientPackets[key].push(packet)
-        }
-    }
-}
+
 /**
  * An object containing packets that get sent to specific clients.
  * 
@@ -419,9 +414,7 @@ function broadcastConditional(packet, condition) {
  * @type {Map<import("crypto").UUID,Array<Packet>>}
  */
 let clientPackets = {}
-function doCollisions() {
 
-}
 /**
  * Apply damage to a player
  * @param {import("crypto").UUID} id 
@@ -610,12 +603,6 @@ server.on('connection', function (conn) {
         max_health: 100,
         hidden: false,
         respawnTime: -1,
-        gems: {
-            [GemType.BLUE.getName()]: 0,
-            [GemType.RED.getName()]: 0,
-            [GemType.PURPLE.getName()]: 0,
-            [GemType.GREEN.getName()]: 0,
-        },
         name: "",
         stats: {
             kills: 0,
@@ -626,7 +613,6 @@ server.on('connection', function (conn) {
             gemsCollected: 0
         }
     }
-    let selfObject = clientsPos[id]
     clientsPos[id].max_health = Upgrades.getUpgradeForTeam(team, UpgradeTypes.MaxHealth)
     clientsPos[id].health = Upgrades.getUpgradeForTeam(team, UpgradeTypes.MaxHealth)
     teleport(id, ...teamData[team].getSpawnpoint())
@@ -645,12 +631,6 @@ server.on('connection', function (conn) {
      * Function that can change the room, currently unused
      * @param {import("crypto").UUID} newRoom 
      */
-    function moveRoom(newRoom) {
-        if (!clients[newRoom]) clients[newRoom] = new Set()
-        clients[currentRoom].delete(id)
-        currentRoom = newRoom
-        clients[currentRoom].add(id)
-    }
     let bulletPacketLimiter = 0
     /**
      * Packet listener, more like a game tick listener

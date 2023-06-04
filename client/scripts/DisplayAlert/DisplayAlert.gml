@@ -1,5 +1,4 @@
-// Script assets have changed for v2.3.0 see
-// https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
+// Display an alert on the player's screen
 function DisplayAlert(slide, duration){
 	notification_obj.sprite_index = notifications_spr
 	notification_obj.image_index = slide

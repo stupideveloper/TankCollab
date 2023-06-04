@@ -1,6 +1,9 @@
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
 
+// Checks whether an IP address is valid
+// No Regular Expressions in GML :(
+
 function IPCheck(ip_addr) {
 	var split = string_split(ip_addr,".")
 	if (array_length(split)==4) {
@@ -21,46 +24,31 @@ function IPCheck(ip_addr) {
 		return false
 	}
 }
-function spawnShields() {
-//instance_create_layer(shield_enemy_obj)
-}
-function PacketFunctions(){
-
-}
-//function DLL(){
-//	return "ImportantLibrary" + ".dll"
-//}
-//function Init() {
-//	external_call(external_define(DLL(),"INIT",dll_stdcall,ty_real,0))
-//}
-//function Disable() {
-//	external_call(external_define(DLL(),"QUIT",dll_stdcall,ty_real,0))
-//}
-//function Run(command) {
-//	return external_call(external_define(DLL(),"RSC",dll_stdcall,ty_real,1,ty_string),command)
-//}
+// a handy sine and cosine function with degrees rather than radians
 function sin_(d) {
 	return sin(degtorad(d))
 }
 function cos_(d) {
 	return cos(degtorad(d))
 }
+
+// check whether an array includes a value, cannot believe this is not in gamemaker already
 function array_includes(array, value) {
 	for (var i = 0; i < array_length(array); i++) {
 			if (array[i] == value) return true
 		}
 		return false
 }
+// add a packet to packet queue
 function addPacket(packetobject){
-	//show_debug_message(object)
-	//show_debug_message(packetobject)
+
 	if (struct_exists(multiplayer_handler.packet_queue,"packets")) {
 		array_push(multiplayer_handler.packet_queue.packets,packetobject)
 	} else {
 		struct_set(multiplayer_handler.packet_queue,"packets",[packetobject])
 	}
-	//show_debug_message(object)
 }
+// send all the queued packets to the server
 function sendPacket() {
 var json = json_stringify(multiplayer_handler.packet_queue)
 struct_set(multiplayer_handler.packet_queue,"packets",[])
@@ -68,12 +56,7 @@ var buff = buffer_create(0,buffer_grow,1)
 buffer_write(buff,buffer_text,json)
 network_send_packet(multiplayer_handler.client,buff,buffer_get_size(buff))
 }
-function destroy_disconnect() {
-	//for (var i = 0; i < array_length(global.remove_on_disconnect); i++) {
-	//	instance_destroy(global.remove_on_disconnect[i])
-	//}
-	//global.remove_on_disconnect = []
-}
+// handle the recieving end of packets, it is over 250 lines long and thus will not be commented
 function handlePackets(packets) {
 	try {
 		
