@@ -188,7 +188,7 @@ let teamData = {
 Upgrades.updateAvailability("A", teamData.A.availableUpgrades, teamData.A.gems)
 Upgrades.updateAvailability("B", teamData.B.availableUpgrades, teamData.B.gems)
 
-function damageCore(coreId = "", damage) {
+function damageCore(coreId = "", damage, damager) {
     let team;
     if (coreId.startsWith("A")) {
         team = "A"
@@ -213,6 +213,7 @@ function damageCore(coreId = "", damage) {
             id: coreId
         })
     }
+    (clientsPos[damager]||{stats: {damageTaken: 0}}).stats.damageDealt += 1
 }
 
 function getCores() {
@@ -338,7 +339,7 @@ setInterval(async function SERVER_GAME_TICK() {
                 deletables.push(id)
                 let coreHitsL = coreHits.hits.filter(a => { return a != 0 })
                 coreHitsL.map(p => {
-                    damageCore(p, damage)
+                    damageCore(p, damage, projectile.shooter)
                 })
             }
             projectile.dir = coreHits.dirUpdate
@@ -443,10 +444,10 @@ function damagePlayer(id, room, damage, damager) {
     }, {
         type: "damage"
     });
-    (clientsPos[damager]||{stats: {damageTaken: 0}}).stats.damageTaken += 1
+    (clientsPos[damager]||{stats: {damageDealt: 0}}).stats.damageDealt += 1
     clientsPos[id].stats.damageTaken += 1
     if (clientsPos[id].health <= 0) {
-        (clientsPos[damager]||{stats: {damageTaken: 0}}).stats.kills += 1
+        (clientsPos[damager]||{stats: {kills: 0}}).stats.kills += 1
         clientsPos[id].stats.deaths += 1
         /**
          * If the player loses all health, send a death packet
@@ -466,7 +467,7 @@ function damagePlayer(id, room, damage, damager) {
             teamAlive[teamMap[id]] -= 1
             let killedTeam = teamMap[id]
             if (teamAlive[teamMap[id]] == 0) {
-                console.log(`[DEBUG]\n[DEBUG] TEAM ${killedTeam=="A"?"B":"A"} HAS WON, RESTARTING SERVER\n[DEBUG]`)
+                if (should_stop_server) console.log(`[DEBUG]\n[DEBUG] TEAM ${killedTeam=="A"?"B":"A"} HAS WON, RESTARTING SERVER\n[DEBUG]`)
                 reset = 5 * 60
                 for (let key in clientPackets) {
                     let team = teamMap[key]
@@ -983,12 +984,13 @@ server.on('connection', function (conn) {
     function disconnect() {
         disconnected = true;
         conn.end()
+        console.log('[DEBUG] - %s (Stats: %s)', id, clientsPos[id].stats);
         if (clientsPos[id].respawnTime >= -1) teamAlive[team] -= 1
         nameSet.delete(clientsPos[id].name)
         delete clientsPos[id]
         delete clientPackets[id]
         if (teamAlive[team] == 0 && started) {
-            console.log(`[DEBUG]\n[DEBUG] TEAM ${team=="A"?"B":"A"} HAS WON, RESTARTING SERVER\n[DEBUG]`)
+            if (should_stop_server) console.log(`[DEBUG]\n[DEBUG] TEAM ${team=="A"?"B":"A"} HAS WON, RESTARTING SERVER\n[DEBUG]`)
             reset = 5 * 60
             for (let key in clientPackets) {
                 let team2 = teamMap[key]
@@ -1007,7 +1009,6 @@ server.on('connection', function (conn) {
                 }
             }
         }
-        console.log('[DEBUG] - %s', id);
         clients[currentRoom].delete(id)
         delete packetListeners[id]
         delete teamMap[id]

@@ -156,8 +156,8 @@ if (keyboard_check_pressed(vk_escape)) {
 }
 
 if (keyboard_check(vk_backspace)) {
-	pressed = (pressed + 1) mod 5
-	if (pressed == 1) global.ip_construct = string_delete(global.ip_construct,string_length(global.ip_construct),1)
+	pressed = pressed + 1
+	if (pressed == 1 or (pressed mod 7 == 1 && pressed > 20))  global.ip_construct = string_delete(global.ip_construct,string_length(global.ip_construct),1)
 } else {
 	pressed = 0
 }

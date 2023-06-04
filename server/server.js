@@ -4,7 +4,9 @@ function run(i) {
     let proc = exec(`node index noreset`,{cwd: process.cwd()})
     proc.stdout.pipe(process.stdout)
     proc.on("exit", (c) => {
-        console.log(c)
+        if (c != 0) {
+            console.log(`[WARN]  NODE.JS EXIT CODE WAS NOT ZERO (Was: ${c}, Expected: 0)`)
+        }
         setTimeout(() => { run(i + 1) }, 1)
     })
 }
