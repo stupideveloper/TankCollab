@@ -280,6 +280,7 @@ function handlePackets(packets) {
 					} else {
 						global.gamestate = "win"
 					}
+					global.stats = extra_packet.stats
 					break;
 				}
 				case "damage": {

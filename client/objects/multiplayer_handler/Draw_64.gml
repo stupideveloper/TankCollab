@@ -153,10 +153,23 @@ if (global.left_shield_other_health > 0 || global.right_shield_other_health > 0)
 }
 
 
-
 // Draw either the win or lose sprite if applicable
 if (global.gamestate == "loss") {
 	draw_sprite(winlose_spr,0,0,0)
+	draw_set_colour(c_black)
+	draw_set_halign(fa_right)
+	draw_set_font(IP_fnt)
+	draw_text(650,570,string(global.stats.bulletsFired))
+	draw_text(650,693,string(global.stats.kills))
+	draw_text(650,816,string(global.stats.deaths))
+	draw_text(650,939,string(global.stats.gemsCollected))
 } else if (global.gamestate == "win") {
 	draw_sprite(winlose_spr,1,0,0)
+	draw_set_colour(c_black)
+	draw_set_halign(fa_right)
+	draw_set_font(IP_fnt)
+	draw_text(650,570,string(global.stats.bulletsFired))
+	draw_text(650,693,string(global.stats.kills))
+	draw_text(650,816,string(global.stats.deaths))
+	draw_text(650,939,string(global.stats.gemsCollected))
 }

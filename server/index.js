@@ -462,20 +462,21 @@ function damagePlayer(id, room, damage, damager) {
             if (teamAlive[teamMap[id]] == 0) {
                 if (should_stop_server) console.log(`[DEBUG]\n[DEBUG] TEAM ${killedTeam=="A"?"B":"A"} HAS WON, RESTARTING SERVER\n[DEBUG]`)
                 reset = 5 * 60
+                started = false
                 for (let key in clientPackets) {
                     let team = teamMap[key]
                     if (team == killedTeam) {
                         clientPackets[key].push({
                             type: "gamestate",
                             title: "loss",
-                            time: -1
+                            stats: clientsPos[key].stats
                         })
                         
                     } else {
                         clientPackets[key].push({
                             type: "gamestate",
                             title: "win",
-                            time: -1
+                            stats: clientsPos[key].stats
                         })
                     }
                 }
@@ -755,7 +756,8 @@ server.on('connection', function (conn) {
                  * }
                  */
                 let distanceTraveledSquared = (packet.x - clientsPos[id].x) ** 2 + (packet.y - clientsPos[id].y) ** 2
-                if (!started || distanceTraveledSquared >= 25 ** 2 && do_lag_back) {
+                // Prevent teleportation
+                if (!started || distanceTraveledSquared >= 25 ** 2) {
                     clientPackets[id].push({
                         type: "teleport",
                         x: clientsPos[id].x,
@@ -874,15 +876,15 @@ server.on('connection', function (conn) {
                 })
             }
             else if (packet.type == "begin") {
-                //tmp
-                // if (Object.values(teamSizes).reduce((p, v) => p + v, 0) < 2) {
-                //     clientPackets[id].push({
-                //         type: "title",
-                //         time: 1,
-                //         title: "Insufficient Players"
-                //     })
-                //     continue
-                // }
+                if (Object.values(teamSizes).reduce((p, v) => p + v, 0) < 2) {
+                    clientPackets[id].push({
+                        type: "title",
+                        time: 1,
+                        title: "Insufficient Players"
+                    })
+                    continue
+                }
+                if (reset != -1) continue;
                 started = !started;
             }
             else if (packet.type == "setname") {
@@ -964,7 +966,7 @@ server.on('connection', function (conn) {
     function disconnect() {
         disconnected = true;
         conn.end()
-        console.log('[DEBUG] - %s (Stats: %s)', id, clientsPos[id].stats);
+        console.log('[DEBUG] - %s (Stats: %s)', id, JSON.stringify(clientsPos[id].stats));
         if (clientsPos[id].respawnTime >= -1) teamAlive[team] -= 1
         nameSet.delete(clientsPos[id].name)
         delete clientsPos[id]
@@ -972,19 +974,20 @@ server.on('connection', function (conn) {
         if (teamAlive[team] == 0 && started) {
             if (should_stop_server) console.log(`[DEBUG]\n[DEBUG] TEAM ${team=="A"?"B":"A"} HAS WON, RESTARTING SERVER\n[DEBUG]`)
             reset = 5 * 60
+            started = false
             for (let key in clientPackets) {
                 let team2 = teamMap[key]
                 if (team2 == team) {
                     clientPackets[key].push({
                         type: "gamestate",
                         title: "loss",
-                        time: -1
+                        stats: clientsPos[key].stats
                     })
                 } else {
                     clientPackets[key].push({
                         type: "gamestate",
                         title: "win",
-                        time: -1
+                        stats: clientsPos[key].stats
                     })
                 }
             }
@@ -1014,7 +1017,7 @@ server.on('connection', function (conn) {
 let IP = "localhost";
 let CODE = ""
 try {
-    if (!config.server_ip) {
+    if (!config.server_ip || !config.forced_host) {
     IP = iptest.ip
     CODE = iptest.code
     if (iptest.oneninetwos.length > 1) console.log(`[WARN]  Multiple 192.168.x.x local IPs found!: ${iptest.oneninetwos.join(", ")}`)

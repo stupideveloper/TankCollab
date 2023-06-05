@@ -1,6 +1,14 @@
 /// @description Insert description here
 // You can write your code in this editor
 global.gamestate = "play"
+global.stats = {
+            kills: 0,
+            damageDealt: 0,
+            bulletsFired: 0,
+            deaths: 0,
+            damageTaken: 0,
+            gemsCollected: 0
+        }
 flash = shader_get_uniform(red_flash, "params");
 
 music_readied = true
