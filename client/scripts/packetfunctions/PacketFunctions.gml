@@ -123,6 +123,9 @@ function decompressMiscPacket(packet) {
 }
 
 function decompressPacket(packet) {
+		var max_supported_protocol = 1
+		var protocol_version = packet[array_length(packet)-1]
+		if (max_supported_protocol < protocol_version) throw "Unsupported Protocol Version Detected!"
     try {
         var positionCompressed = packet[8]
         var positionDecompressed = []
@@ -142,12 +145,12 @@ function decompressPacket(packet) {
             var pos = array_get(positionCompressed, i)
             var poss = {
                 id: pos[0],
-                x: pos[1],
-                y: pos[2],
-                dir: pos[3],
+                x: parseInt(pos[1], 36) / 100,
+                y: parseInt(pos[2], 36) / 100,
+                dir: parseInt(pos[3], 36) / 100,
                 name: pos[4],
-                health: pos[5],
-                max_health: pos[6]
+                health: parseInt(pos[5], 36) / 100,
+                max_health: parseInt(pos[6], 36) / 100
             }
             array_push(positionDecompressed, poss)
         }
@@ -155,8 +158,8 @@ function decompressPacket(packet) {
             var pos = array_get(projectileCompressed, i)
             var poss = {
                 id: pos[0],
-                x: pos[1],
-                y: pos[2]
+                x: parseInt(pos[1], 36) / 100,
+                y: parseInt(pos[2], 36) / 100,
             }
             struct_set(projectileDecompressed, pos[0], poss)
         }
@@ -169,7 +172,7 @@ function decompressPacket(packet) {
                 GREEN: packet[1][2],
                 PURPLE: packet[1][3]
             },
-            health: packet[2],
+            health: parseInt(packet[2],36)/100,
             teamPlayers: packet[3],
             playerlist: packet[4],
             upgrades: {
@@ -193,48 +196,48 @@ function decompressPacket(packet) {
             projectiles: projectileDecompressed,
             misc_packets: miscPacketsDecompressed,
             team_data: {
-                rightShieldHealth: packet[11][0],
-                leftShieldHealth: packet[11][1],
-                coreHealth: packet[11][2],
+                rightShieldHealth: parseInt(packet[11][0],36)/100,
+                leftShieldHealth: parseInt(packet[11][1],36)/100,
+                coreHealth: parseInt(packet[11][2],36)/100,
                 rightShield: {
                     id: packet[11][3][0],
-                    x: packet[11][3][1],
-                    y: packet[11][3][2],
+                    x: parseInt(packet[11][3][1],36)/100,
+                    y: parseInt(packet[11][3][2],36)/100,
                     alive: packet[11][3][3]
                 },
                 leftShield: {
                     id: packet[11][4][0],
-                    x: packet[11][4][1],
-                    y: packet[11][4][2],
+                    x: parseInt(packet[11][4][1],36)/100,
+                    y: parseInt(packet[11][4][2],36)/100,
                     alive: packet[11][4][3]
                 },
                 core: {
                     id: packet[11][5][0],
-                    x: packet[11][5][1],
-                    y: packet[11][5][2],
+                    x: parseInt(packet[11][5][1],36)/100,
+                    y: parseInt(packet[11][5][2],36)/100,
                     alive: packet[11][5][3]
                 }
             },
             other_team_info: {
-                rightShield: packet[12][0],
-                leftShield: packet[12][1],
-                core: packet[12][2],
+                rightShield: parseInt(packet[12][0],36)/100,
+                leftShield: parseInt(packet[12][1],36)/100,
+                core: parseInt(packet[12][2],36)/100,
                 rightShieldLoc: {
                     id: packet[12][3][0],
-                    x: packet[12][3][1],
-                    y: packet[12][3][2],
+                    x: parseInt(packet[12][3][1],36)/100,
+                    y: parseInt(packet[12][3][2],36)/100,
                     alive: packet[12][3][3]
                 },
                 leftShieldLoc: {
                     id: packet[12][4][0],
-                    x: packet[12][4][1],
-                    y: packet[12][4][2],
+                    x: parseInt(packet[12][4][1],36)/100,
+                    y: parseInt(packet[12][4][2],36)/100,
                     alive: packet[12][4][3]
                 },
                 coreLoc: {
                     id: packet[12][5][0],
-                    x: packet[12][5][1],
-                    y: packet[12][5][2],
+                    x: parseInt(packet[12][5][1],36)/100,
+                    y: parseInt(packet[12][5][2],36)/100,
                     alive: packet[12][5][3]
                 }
             },
@@ -242,9 +245,9 @@ function decompressPacket(packet) {
                 ip: packet[13][0],
                 gameVersion: packet[13][1],
                 connectionIp: packet[13][2],
-                nsPerTick: packet[13][3],
-                nsLastTick: packet[13][4],
-                maxTick: packet[13][5]
+                nsPerTick: parseInt(packet[13][3],36),
+                nsLastTick: parseInt(packet[13][4],36),
+                maxTick: parseInt(packet[13][5],36)
             },
             beginned: packet[14],
             availableUpgrades: {
@@ -256,8 +259,8 @@ function decompressPacket(packet) {
                 healthRegen: packet[15][5]
             },
             teamSizes: {
-                own: packet[16][0],
-                oth: packet[16][1],
+                own: parseInt(packet[16][0],36),
+                oth: parseInt(packet[16][1],36)
             }
         }
         return decompressed

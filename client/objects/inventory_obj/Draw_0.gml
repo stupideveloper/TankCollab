@@ -12,5 +12,5 @@ try {
 	draw_text(x+270,y+text_y_offset,global.gems.GREEN)
 	draw_text(x+370,y+text_y_offset,global.gems.BLUE)
 } catch (e) {
-
+	show_debug_message(e)
 }

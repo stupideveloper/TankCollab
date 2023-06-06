@@ -1,7 +1,13 @@
 
 import {GemType} from "./gems.js"
 import {UpgradeTypes} from "./teams.js"
+import Constants from "./constants.js"
 
+/**
+ * Compresses a packet into a smaller string to save network space
+ * @param {any} packet 
+ * @returns {String} compressed packet
+ */
 function compressMiscPacket(packet) {
     try {
     switch (packet.type) {
@@ -56,6 +62,15 @@ function compressMiscPacket(packet) {
     console.log(e)
 }
 }
+/**
+ * Compresses a packet to be sent to the client
+ * The following methods are used:
+ * Turning the object into an array to remove keys
+ * Removing information not needed by the client
+ * 
+ * @param {T} packet 
+ * @returns {T}
+ */
 function compressPacket(packet) {
     let compressedMiscPackets = packet.misc_packets.map(compressMiscPacket).join("||")
 let exported = packet
@@ -63,20 +78,20 @@ let projectiles = exported.projectiles;
 let fixedProjectiles = Object.keys(projectiles).map(v=>{
     return [
         v,
-        projectiles[v].x,
-        projectiles[v].y
+        (projectiles[v].x*100).toString(36).split(".")[0].toUpperCase(),
+        (projectiles[v].y*100).toString(36).split(".")[0].toUpperCase()
     ]
 })
 let locations = exported.locations
 let fixedLocations = locations.map(v=>{
     return [
         v.id,
-        v.x,
-        v.y,
-        v.dir,
+        (v.x*100).toString(36).split(".")[0].toUpperCase(),
+        (v.y*100).toString(36).split(".")[0].toUpperCase(),
+        (v.dir*100).toString(36).split(".")[0].toUpperCase(),
         v.name,
-        v.health,
-        v.max_health]
+        (v.health*100),
+        (v.max_health*100).toString(36).split(".")[0].toUpperCase()]
 })
 let processed = [
     exported.this_id,
@@ -86,7 +101,7 @@ let processed = [
         exported.gems[GemType.GREEN],
         exported.gems[GemType.PURPLE],
     ],
-    exported.health,
+    (exported.health*100).toString(36).split(".")[0].toUpperCase(),
     exported.teamPlayers,
     exported.playerlist,
     [
@@ -110,48 +125,48 @@ let processed = [
     fixedProjectiles,
     compressedMiscPackets,
     [
-        exported.team_data.rightShieldHealth,
-        exported.team_data.leftShieldHealth,
-        exported.team_data.coreHealth,
+        (exported.team_data.rightShieldHealth*100).toString(36).split(".")[0].toUpperCase(),
+        (exported.team_data.leftShieldHealth*100).toString(36).split(".")[0].toUpperCase(),
+        (exported.team_data.coreHealth*100).toString(36).split(".")[0].toUpperCase(),
         [
             exported.team_data.rightShield.id,
-            exported.team_data.rightShield.x,
-            exported.team_data.rightShield.y,
+            (exported.team_data.rightShield.x*100).toString(36).split(".")[0].toUpperCase(),
+            (exported.team_data.rightShield.y*100).toString(36).split(".")[0].toUpperCase(),
             exported.team_data.rightShield.alive
         ],
         [
             exported.team_data.leftShield.id,
-            exported.team_data.leftShield.x,
-            exported.team_data.leftShield.y,
+            (exported.team_data.leftShield.x*100).toString(36).split(".")[0].toUpperCase(),
+            (exported.team_data.leftShield.y*100).toString(36).split(".")[0].toUpperCase(),
             exported.team_data.leftShield.alive
         ],
         [
             exported.team_data.core.id,
-            exported.team_data.core.x,
-            exported.team_data.core.y,
+            (exported.team_data.core.x*100).toString(36).split(".")[0].toUpperCase(),
+            (exported.team_data.core.y*100).toString(36).split(".")[0].toUpperCase(),
             exported.team_data.core.alive
         ]
     ],
     [
-        exported.other_team_info.rightShield,
-        exported.other_team_info.leftShield,
-        exported.other_team_info.core,
+        (exported.other_team_info.rightShield*100).toString(36).split(".")[0].toUpperCase(),
+        (exported.other_team_info.leftShield*100).toString(36).split(".")[0].toUpperCase(),
+        (exported.other_team_info.core*100).toString(36).split(".")[0].toUpperCase(),
         [
             exported.other_team_info.rightShieldLoc.id,
-            exported.other_team_info.rightShieldLoc.x,
-            exported.other_team_info.rightShieldLoc.y,
+            (exported.other_team_info.rightShieldLoc.x*100).toString(36).split(".")[0].toUpperCase(),
+            (exported.other_team_info.rightShieldLoc.y*100).toString(36).split(".")[0].toUpperCase(),
             exported.other_team_info.rightShieldLoc.alive
         ],
         [
             exported.other_team_info.leftShieldLoc.id,
-            exported.other_team_info.leftShieldLoc.x,
-            exported.other_team_info.leftShieldLoc.y,
+            (exported.other_team_info.leftShieldLoc.x*100).toString(36).split(".")[0].toUpperCase(),
+            (exported.other_team_info.leftShieldLoc.y*100).toString(36).split(".")[0].toUpperCase(),
             exported.other_team_info.leftShieldLoc.alive
         ],
         [
             exported.other_team_info.coreLoc.id,
-            exported.other_team_info.coreLoc.x,
-            exported.other_team_info.coreLoc.y,
+            (exported.other_team_info.coreLoc.x*100).toString(36).split(".")[0].toUpperCase(),
+            (exported.other_team_info.coreLoc.y*100).toString(36).split(".")[0].toUpperCase(),
             exported.other_team_info.coreLoc.alive
         ]
     ],
@@ -159,9 +174,9 @@ let processed = [
         exported.splashData.ip,
         exported.splashData.gameVersion,
         exported.splashData.connectionIp,
-        Math.ceil(exported.splashData.nsPerTick),
-        Math.ceil(exported.splashData.nsLastTick),
-        Math.ceil(exported.splashData.maxTick)
+        Math.ceil(exported.splashData.nsPerTick).toString(36).split(".")[0].toUpperCase(),
+        Math.ceil(exported.splashData.nsLastTick).toString(36).split(".")[0].toUpperCase(),
+        Math.ceil(exported.splashData.maxTick).toString(36).split(".")[0].toUpperCase()
     ],
     exported.beginned,
     [
@@ -172,7 +187,8 @@ let processed = [
         exported.availableUpgrades[UpgradeTypes.MaxHealth],
         exported.availableUpgrades[UpgradeTypes.HealthRegen]
     ],
-    [exported.teamSizes.own,exported.teamSizes.oth],
+    [exported.teamSizes.own.toString(36).split(".")[0].toUpperCase(),exported.teamSizes.oth.toString(36).split(".")[0].toUpperCase()],
+    Constants.PROTOCOL_VERSION
 ]
 //console.log(JSON.stringify(processed))
 return processed

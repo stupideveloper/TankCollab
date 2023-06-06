@@ -1,10 +1,9 @@
 /// @description Insert description here
 // You can write your code in this editor
 
-x=camera_get_view_x(view_camera[0]) + x_offset
-y= camera_get_view_y(view_camera[0]) + y_offset
+x = camera_get_view_x(view_camera[0]) + x_offset
+y = camera_get_view_y(view_camera[0]) + y_offset
 try {
-
 switch (spr) {
 	case bullet_damage_spr: {
 		image_index = upgrade_buttom_manager_obj.bullet_damage

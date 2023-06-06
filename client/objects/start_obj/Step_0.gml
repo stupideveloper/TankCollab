@@ -2,9 +2,7 @@
 // You can write your code in this editor
 flasher ++
 if (global.has_forced_server) {
-global.IP_ADDR = global.forced_server
-//room_goto(Room1)
-
+	global.IP_ADDR = global.forced_server
 }
 
 if (string_length(global.ip_construct) < 7 && keyboard_check_pressed(ord("0"))) {
