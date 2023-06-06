@@ -2,13 +2,13 @@
 // You can write your code in this editor
 global.gamestate = "play"
 global.stats = {
-            kills: 0,
-            damageDealt: 0,
-            bulletsFired: 0,
-            deaths: 0,
-            damageTaken: 0,
-            gemsCollected: 0
-        }
+    kills: 0,
+    damageDealt: 0,
+    bulletsFired: 0,
+    deaths: 0,
+    damageTaken: 0,
+    gemsCollected: 0
+}
 flash = shader_get_uniform(red_flash, "params");
 
 music_readied = true
@@ -16,16 +16,16 @@ music_readied = true
 var gameId = "hi"
 // displays the command required to spawn another instance
 show_debug_message(parameter_string(0) + " " +
-        parameter_string(1) + " " +
-        parameter_string(2) + " " +
-        parameter_string(3))
+    parameter_string(1) + " " +
+    parameter_string(2) + " " +
+    parameter_string(3))
 
 // Whether a bullet was fired last game tick
 last_was_clicked = false
 
 // Packet send queue, packets added here will be sent to the server
 packet_queue = {
-	packets: []
+    packets: []
 }
 // Whether the game menu is open
 global.gamemenu = false
@@ -65,7 +65,7 @@ Which control style to use.
 Classic: Rotation and forward/backwards
 Simple: Standard WASD controls
  */
-global.control_style = "simple"//"easy"
+global.control_style = "simple" //"easy"
 
 // Maximum health
 global.max_health = 100
@@ -107,10 +107,10 @@ green_n = 0
 red_n = 0
 purple_n = 0
 global.gems = {
-	BLUE: 0,
-	RED: 0,
-	GREEN: 0,
-	PURPLE: 0
+    BLUE: 0,
+    RED: 0,
+    GREEN: 0,
+    PURPLE: 0
 }
 
 
@@ -126,7 +126,5 @@ is_x = true;
 
 // connect to the server
 client = network_create_socket(network_socket_tcp);
-var server = network_connect_raw_async( client,global.IP_ADDR, 9000 );
+var server = network_connect_raw_async(client, global.IP_ADDR, 9000);
 show_debug_message(string(server))
-
-

@@ -25,7 +25,7 @@ global.constants = {
 	shield_generator_max_health: 250,
 	core_max_health: 500
 }
-global.splash_data = {ip: "unknown",gameVersion: "latest", connectionIp: "unknown",nsPerTick: 0,nsLastTick: 0,maxTick: 0}
+global.splash_data = {ip: "unknown",gameVersion: "latest", connectionIp: "unknown",nsPerTick: 0,nsLastTick: 0,maxTick: 0,packetsize:0}
 has_success = false
 global.ip_construct = ""
 audio_stop_all()

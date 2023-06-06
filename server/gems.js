@@ -1,6 +1,8 @@
 import { checkWallCollisions as checkWalls, gemRect } from "./arenaCollisions.js";
-import { randomUUID as uuid } from "crypto";
-
+import { randomUUID as _uuid } from "crypto"
+function uuid() {
+    return _uuid().slice(0,6)
+}
 const gem_uuids = new Map()
 /**
  * Different team names

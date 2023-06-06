@@ -19,6 +19,8 @@ const do_friendly_fire = true;
 
 import config from "./config.json" assert { type: "json" };
 
+import compressPacket from "./networkcompressor.js"
+
 /**
  * Import the networking library API
  */
@@ -48,7 +50,11 @@ const gamemakerMagic = "dec0adde0c"
 /**
  * Import the randomUUID function from `crypto`, which creates a cryptographically secure UUID
  */
-import { randomUUID as uuid } from "crypto"
+import { randomUUID as _uuid } from "crypto"
+function uuid() {
+    return _uuid().slice(0,6)
+}
+
 import { writeFileSync } from "fs"
 /**
  * Converts a degree angle to radians
@@ -722,6 +728,7 @@ server.on('connection', function (conn) {
                 return p
             }, {}),
         }
+        packets = compressPacket(packets)
         REPLAY.recordFrame(id, packets)
         conn.write(JSON.stringify(packets))
         /**
@@ -882,7 +889,7 @@ server.on('connection', function (conn) {
                         time: 1,
                         title: "Insufficient Players"
                     })
-                    continue
+                    //continue
                 }
                 if (reset != -1) continue;
                 started = !started;
@@ -966,7 +973,7 @@ server.on('connection', function (conn) {
     function disconnect() {
         disconnected = true;
         conn.end()
-        console.log('[DEBUG] - %s (Stats: %s)', id, JSON.stringify(clientsPos[id].stats));
+        console.log('[DEBUG] - %s (Stats: %s)', id, JSON.stringify(clientsPos[id].stats).replaceAll("\"",""));
         if (clientsPos[id].respawnTime >= -1) teamAlive[team] -= 1
         nameSet.delete(clientsPos[id].name)
         delete clientsPos[id]
