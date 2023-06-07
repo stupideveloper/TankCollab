@@ -12,13 +12,6 @@ global.stats = {
 flash = shader_get_uniform(red_flash, "params");
 
 music_readied = true
-// network_set_config(network_config_connect_timeout,10000)
-var gameId = "hi"
-// displays the command required to spawn another instance
-show_debug_message(parameter_string(0) + " " +
-    parameter_string(1) + " " +
-    parameter_string(2) + " " +
-    parameter_string(3))
 
 // Whether a bullet was fired last game tick
 last_was_clicked = false
@@ -65,7 +58,7 @@ Which control style to use.
 Classic: Rotation and forward/backwards
 Simple: Standard WASD controls
  */
-global.control_style = "simple" //"easy"
+global.control_style = "simple"
 
 // Maximum health
 global.max_health = 100
@@ -91,15 +84,9 @@ global.projectiles = {}
 // How much health the client has
 global.health = 100
 
-// [UNUSED] camera target for spectating
-global.camera_target = ""
 
 // What the client thinks it's UUID is
 this_id = ""
-
-// Whether to send pos update, if these two dont change, neither does the packet
-old_x = 0
-old_y = 0
 
 // Gem Inventory
 blue_n = 0
@@ -119,10 +106,6 @@ old_x2 = 0
 ticks_since_update = 0
 old_y2 = 0
 last_pack_ticks = 0
-avg_tick_time = 0
-ticks = 0
-halfit = false
-is_x = true;
 
 // connect to the server
 client = network_create_socket(network_socket_tcp);

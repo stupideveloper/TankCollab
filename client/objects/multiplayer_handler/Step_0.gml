@@ -55,7 +55,6 @@ if (keyboard_check_pressed(ord("C")) && (global.gamemenu || !global.started)) {
 last_pack_ticks += 1
 ticks_since_update += 1
 
-var imageanglekey = 0b0000
 var _speed = global.speeed
 phy_speed_x *= 0.9
 phy_speed_y *= 0.9
@@ -147,20 +146,12 @@ if (sendPosPack) {
     })
 }
 
-if ((mouse_check_button(mb_left) || keyboard_check(vk_space)) && (!global.gamemenu || keyboard_check(ord("O")))) {
+if ((mouse_check_button(mb_left) || keyboard_check(vk_space)) && (!global.gamemenu)) {
     last_was_clicked = true
     addPacket({
         type: "fire_bullet",
     })
 }
-
-if (keyboard_check_pressed(vk_numpad9)) {
-    addPacket({
-        type: "cheat",
-        cheat: "gem"
-    })
-}
-
 
 if (keyboard_check_pressed(ord("P")) && (global.gamemenu || !global.started)) {
     addPacket({

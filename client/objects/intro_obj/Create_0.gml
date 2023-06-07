@@ -3,5 +3,4 @@
 slide = 0
 clicked = false
 
-
 animate_speed = 18

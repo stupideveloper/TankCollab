@@ -634,10 +634,6 @@ server.on('connection', function (conn) {
             ally: teamMap[client] == team
         })
     })
-    /**
-     * Function that can change the room, currently unused
-     * @param {import("crypto").UUID} newRoom 
-     */
     let bulletPacketLimiter = 0
     /**
      * Packet listener, more like a game tick listener

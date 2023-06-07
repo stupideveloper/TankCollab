@@ -5,7 +5,7 @@ const dictionary = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 let remainder = 0
 function validateIp(ip = "192.168.0.1")
 {
-    return /^[0-2]{0,1}[0-9]{1,2}.[0-2]{0,1}[0-9]{1,2}.[0-2]{0,1}[0-9]{1,2}.[0-2]{0,1}[0-9]{1,2}$/.test(ip)
+    return /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/.test(ip)
 }
 function getCode(ip = "192.168.0.1")
 {

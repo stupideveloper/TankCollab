@@ -403,15 +403,6 @@ function handlePackets(packets) {
                 //show_debug_message(extra_packet)
                 try {
                     switch extra_packet.type {
-                        case "animation": {
-                            if (extra_packet.player == global.this_id) break;
-                            if (extra_packet.data == "press") {
-                                variable_struct_get(global.other_players, extra_packet.player).colour = "notnormal";
-                            } else {
-                                variable_struct_get(global.other_players, extra_packet.player).colour = "normal";
-                            }
-                            break;
-                        }
                         case "teleport": {
 
                             //show_debug_message(extra_packet)
@@ -468,12 +459,9 @@ function handlePackets(packets) {
 
                             try {
                                 var gemtodelete = struct_get(global.spawned_gems, extra_packet.uuid)
-                                // show_debug_message(global.spawned_gems)
-                                // show_debug_message(extra_packet.uuid)
                                 instance_destroy(gemtodelete)
                                 struct_remove(global.spawned_gems, extra_packet.uuid)
                             } catch (e) {
-                                // show_debug_message(e)
                             }
                             break;
                         }
@@ -583,9 +571,6 @@ function handlePackets(packets) {
                             global.damage_flash = 10
                             break;
                         }
-                        default: {
-                            show_debug_message(extra_packet)
-                        }
                     }
                 } catch (e) {
                     show_debug_message(packets)
@@ -613,9 +598,6 @@ function handlePackets(packets) {
             global.available_upgrades = packets.availableUpgrades
             global.started = packets.beginned
             global.max_health = global.upgrades.maxHealth
-            //global.maxhealth = global.upgrades.maxHealth
-            // show_debug_message(packets.availableUpgrades)
-            //show_debug_message(array_length(variable_struct_get_names(packets.projectiles)))
         } else if (packets.type == "id") {
             global.this_id = packets.this_id
         }
