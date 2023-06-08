@@ -962,7 +962,8 @@ server.on('connection', function (conn) {
                     /**
                      * Writes the buffer as a hex file to a file for debugging purposes
                      */
-                    writeFileSync("./error.hex", Buffer.from(d).toString("hex") + "\n" + e);
+                    writeFileSync("./error.hex", Buffer.from(d).toString("hex") + "\n" + e + "\n" + e.stack);
+                    console.log(`An error has occured. Check 'error.hex' for more information`)
                 }
             }
         } else {
@@ -973,7 +974,7 @@ server.on('connection', function (conn) {
                 /**
                  * Writes the buffer as a hex file to a file for debugging purposes
                  */
-                writeFileSync("./error.hex", Buffer.from(d).toString("hex") + "\n" + e);
+                writeFileSync("./error.hex", Buffer.from(d).toString("hex") + "\n" + e + "\n" + e.stack);
             }
         }
         // bulletPacketLimiter = sendBulletPack && bulletPacketLimiter
