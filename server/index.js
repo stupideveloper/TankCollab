@@ -568,6 +568,7 @@ server.on('connection', function (conn) {
     if (BANS.has(remoteAddress)) {
         conn.end()
         console.log(`[WARN]  Player with IP ${remoteAddress} attempted to join, yet they are banned!`)
+        return;
     }
     /**
      * Assigns the player a unique id, UUIDv4 has a collision chance of like, close to zero
