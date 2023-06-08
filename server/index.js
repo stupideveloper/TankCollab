@@ -1,8 +1,18 @@
 /**
+ * Import the networking library API
+ */
+import { createServer } from "net"
+import { writeFileSync, readFileSync } from "fs"
+
+process.on("uncaughtException", console.log)
+const BANS = new Set(JSON.parse(readFileSync("./bans.json","utf8")))
+process.on("beforeExit",(c)=>{
+    writeFileSync('bans.json', JSON.stringify([...BANS.values()]), 'utf8')
+})
+
+/**
  * Whether to reset player location if the client goes too fast
  */
-process.on("uncaughtException",console.log)
-
 const do_lag_back = false
 
 const debug = false
@@ -21,12 +31,8 @@ import config from "./config.json" assert { type: "json" };
 
 import compressPacket from "./networkcompressor.js"
 
-/**
- * Import the networking library API
- */
-import { createServer } from "net"
 
-import {logCode} from "./gamecodelogger.js"
+import { logCode } from "./gamecodelogger.js"
 
 // Replay funcionality, not yet implemented, unlikely to be ever implemented
 let REPLAY = {
@@ -52,10 +58,8 @@ const gamemakerMagic = "dec0adde0c"
  */
 import { randomUUID as _uuid } from "crypto"
 function uuid() {
-    return _uuid().slice(0,6)
+    return _uuid().slice(0, 6)
 }
-
-import { writeFileSync } from "fs"
 /**
  * Converts a degree angle to radians
  * @param {number} degrees 
@@ -219,7 +223,7 @@ function damageCore(coreId = "", damage, damager) {
             id: coreId
         })
     }
-    (clientsPos[damager]||{stats: {damageTaken: 0}}).stats.damageDealt += 1
+    (clientsPos[damager] || { stats: { damageTaken: 0 } }).stats.damageDealt += 1
 }
 
 function getCores() {
@@ -443,10 +447,10 @@ function damagePlayer(id, room, damage, damager) {
     }, {
         type: "damage"
     });
-    (clientsPos[damager]||{stats: {damageDealt: 0}}).stats.damageDealt += 1
+    (clientsPos[damager] || { stats: { damageDealt: 0 } }).stats.damageDealt += 1
     clientsPos[id].stats.damageTaken += 1
     if (clientsPos[id].health <= 0) {
-        (clientsPos[damager]||{stats: {kills: 0}}).stats.kills += 1
+        (clientsPos[damager] || { stats: { kills: 0 } }).stats.kills += 1
         clientsPos[id].stats.deaths += 1
         /**
          * If the player loses all health, send a death packet
@@ -466,7 +470,7 @@ function damagePlayer(id, room, damage, damager) {
             teamAlive[teamMap[id]] -= 1
             let killedTeam = teamMap[id]
             if (teamAlive[teamMap[id]] == 0) {
-                if (should_stop_server) console.log(`[DEBUG]\n[DEBUG] TEAM ${killedTeam=="A"?"B":"A"} HAS WON, RESTARTING SERVER\n[DEBUG]`)
+                if (should_stop_server) console.log(`[DEBUG]\n[DEBUG] TEAM ${killedTeam == "A" ? "B" : "A"} HAS WON, RESTARTING SERVER\n[DEBUG]`)
                 reset = 5 * 60
                 started = false
                 for (let key in clientPackets) {
@@ -477,7 +481,7 @@ function damagePlayer(id, room, damage, damager) {
                             title: "loss",
                             stats: clientsPos[key].stats
                         })
-                        
+
                     } else {
                         clientPackets[key].push({
                             type: "gamestate",
@@ -542,6 +546,13 @@ function teleport(id, x, y, dir) {
     })
 }
 
+function collectGem(team, gemType, quantity) {
+    /// console.log(quantity)
+    teamData[team].gems[gemType] += quantity;
+    // console.log(teamData[team].gems)
+    Upgrades.updateAvailability(team, teamData[team].availableUpgrades, teamData[team].gems)
+}
+let disconnectMap = new Map()
 let nameSet = new Set();
 function nameDiscriminator() {
     return Math.floor(Math.random() * 10000).toString().padStart(4, "0")
@@ -554,6 +565,10 @@ server.on('connection', function (conn) {
      * Client's IP Address
      */
     var remoteAddress = conn.remoteAddress;
+    if (BANS.has(remoteAddress)) {
+        conn.end()
+        console.log(`[WARN]  Player with IP ${remoteAddress} attempted to join, yet they are banned!`)
+    }
     /**
      * Assigns the player a unique id, UUIDv4 has a collision chance of like, close to zero
      */
@@ -602,6 +617,7 @@ server.on('connection', function (conn) {
         })
     }
     clientsPos[id] = {
+        ip: remoteAddress,
         id: id,
         x: 120,
         y: 120,
@@ -962,20 +978,19 @@ server.on('connection', function (conn) {
         // bulletPacketLimiter = sendBulletPack && bulletPacketLimiter
     }
     let disconnected = false
-
     /**
      * Disconnect the current client
      */
     function disconnect() {
         disconnected = true;
         conn.end()
-        console.log('[DEBUG] - %s (Stats: %s)', id, JSON.stringify(clientsPos[id].stats).replaceAll("\"",""));
+        console.log('[DEBUG] - %s (Stats: %s)', id, JSON.stringify(clientsPos[id].stats).replaceAll("\"", ""));
         if (clientsPos[id].respawnTime >= -1) teamAlive[team] -= 1
         nameSet.delete(clientsPos[id].name)
         delete clientsPos[id]
         delete clientPackets[id]
         if (teamAlive[team] == 0 && started) {
-            if (should_stop_server) console.log(`[DEBUG]\n[DEBUG] TEAM ${team=="A"?"B":"A"} HAS WON, RESTARTING SERVER\n[DEBUG]`)
+            if (should_stop_server) console.log(`[DEBUG]\n[DEBUG] TEAM ${team == "A" ? "B" : "A"} HAS WON, RESTARTING SERVER\n[DEBUG]`)
             reset = 5 * 60
             started = false
             for (let key in clientPackets) {
@@ -1006,7 +1021,9 @@ server.on('connection', function (conn) {
                 player: id,
             })
         })
+        disconnectMap.delete(id)
     }
+    disconnectMap.set(id,disconnect)
     function onConnClose() {
         if (!disconnected) disconnect()
     }
@@ -1021,12 +1038,12 @@ let IP = "localhost";
 let CODE = ""
 try {
     if (!config.server_ip || !config.forced_host) {
-    IP = iptest.ip
-    CODE = iptest.code
-    if (iptest.oneninetwos.length > 1) console.log(`[WARN]  Multiple 192.168.x.x local IPs found!: ${iptest.oneninetwos.join(", ")}`)
-    if (iptest.oneninetwos.length == 0 && iptest.ips.length != 0) console.log(`[WARN]  No 192.168.x.x local IPs found!\n[WARN]  Other possible local IPs: ${iptest.ips.join(", ")}, with codes [${iptest.codes.join(", ")}]`)
-    if (iptest.oneninetwos.length == 0 && iptest.ips.length == 0) console.log(`[WARN]  No Network Interfaces found! Do you have Airplane mode enabled?`)
-    splashData.ip = CODE;
+        IP = iptest.ip
+        CODE = iptest.code
+        if (iptest.oneninetwos.length > 1) console.log(`[WARN]  Multiple 192.168.x.x local IPs found!: ${iptest.oneninetwos.join(", ")}`)
+        if (iptest.oneninetwos.length == 0 && iptest.ips.length != 0) console.log(`[WARN]  No 192.168.x.x local IPs found!\n[WARN]  Other possible local IPs: ${iptest.ips.join(", ")}, with codes [${iptest.codes.join(", ")}]`)
+        if (iptest.oneninetwos.length == 0 && iptest.ips.length == 0) console.log(`[WARN]  No Network Interfaces found! Do you have Airplane mode enabled?`)
+        splashData.ip = CODE;
     } else {
         CODE = iptest.getCode(config.server_ip)
         splashData.ip = CODE;
@@ -1041,4 +1058,277 @@ server.listen(9000, function () {
     console.log('[INFO]  Server listening to %s:%j', IP, server.address().port);
     logCode(CODE)
 });
+if (process.stdin.isTTY) {
+    process.stdin.setRawMode(true)
+    process.stdin.resume();
+    process.stdin.setEncoding('utf8');
+    function commandHandler(command) {
+        let commandType = command.split(" ")[0].toUpperCase()
+        let args = command.split(" ")
+        if (["LIST", "LS"].includes(commandType)) {
+            return `${Object.keys(clientsPos).length} Player${Object.keys(clientsPos).length == 1 ? "" : "s"} online: [ ${Object.keys(clientsPos).map(v => {
+                return `${clientsPos[v].name} (${v})`
+            }).join(", ")} ]`
+        }
+        if (["DAMAGE", "DMG"].includes(commandType)) {
+            if (args.length != 3) {
+                return `Usage: DAMAGE (PlayerID) (Damage)`
+            }
+            if (Object.keys(clientsPos).includes(args[1])) {
+                if (/^(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$/.test(args[2])) {
+                    damagePlayer(args[1], null, parseFloat(args[2]))
+                    return `Dealt (${args[2]}) damage to (${args[1]})`
+                } else {
+                    return `Invalid Number (${args[2]})!`
+                }
+            } else {
+                return `No such player (${args[1]})!`
+            }
+        }
+        if (["GIVE"].includes(commandType)) {
+            if (args.length != 3 && args.length != 4) {
+                return `Usage: GIVE (TeamId) (GemType) [Quantity]`
+            }
+            if (!["A", "a", "B", "b"].includes(args[1])) {
+                return `Invalid Team (${args[1]})! Must be "A" or "B"`
+            }
+            if (!["RED", "BLUE", "GREEN", "PURPLE"].includes(args[2].toUpperCase())) {
+                return `Invalid Gem Type (${args[2]})!`
+            }
+            if (args.length == 3) {
+                collectGem(args[1].toUpperCase(), args[2].toUpperCase(), 1)
+                return `Gave Team ${args[1].toUpperCase()} 1 ${args[2].toUpperCase()} Gem`
+            }
+            if (/^(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$/.test(args[3])) {
+                collectGem(args[1].toUpperCase(), args[2].toUpperCase(), parseInt(args[3]))
+                // console.log()
+                return `Gave Team ${args[1].toUpperCase()} ${args[3]} ${args[2].toUpperCase()} Gems`
+            } else {
+                return `Invalid Quantity (${args[3]})!`
+            }
+        }
+        if (["EXIT"].includes(commandType)) {
+            process.exit()
+            return `Stopping server!`
+        }
+        if (["KILL"].includes(commandType)) {
+            if (args.length != 2) {
+                return `Usage: KILL (PlayerId)`
+            }
+            if (Object.keys(clientsPos).includes(args[1])) {
+                damagePlayer(args[1], null, clientsPos[args[1]].health)
+                return `Killed ${args[1]}`
+            } else {
+                return `No such player (${args[1]})!`
+            }
+        }
+        if (["HIDE"].includes(commandType)) {
+            if (args.length != 2) {
+                return `Usage: HIDE (PlayerId)`
+            }
+            if (Object.keys(clientsPos).includes(args[1].toLowerCase())) {
+                clientsPos[args[1].toLowerCase()].hidden = !clientsPos[args[1].toLowerCase()].hidden
+                return `Player ${args[1]}'s visibility has been toggled`
+            } else {
+                return `No such player (${args[1]})!`
+            }
+        }
+        if (["TP", "TELEPORT"].includes(commandType)) {
+            if (args.length != 4) {
+                return `Usage: TELEPORT (PlayerId) (x) (y)`
+            }
+            if (Object.keys(clientsPos).includes(args[1].toLowerCase())) {
+                if (/^(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$/.test(args[2]) && /^(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$/.test(args[3])) {
+                    teleport(args[1].toLowerCase(), parseInt(args[2]), parseInt(args[3]), clientsPos[args[1].toLowerCase()].dir)
+                    return `Teleported ${args[1].toUpperCase()}  to (${args[2]}, ${args[3]})`
+                } else {
+                    return `Invalid X or Y coordinate (${args[2]}, ${args[3]})!`
+                }
+            } else {
+                return `No such player (${args[1]})!`
+            }
+        }
+        if (["START", "BEGIN", "PAUSE", "STOP"].includes(commandType)) {
+            if (["PAUSE", "STOP"].includes(commandType)) {
+                if (started == false) {
+                    return `Nothing changed! The game was already stopped!`
+                }
+                started = false
+                return `Stopped the game!`
+            } else {
+                if (started == true) {
+                    return `Nothing changed! The game was already started!`
+                }
+                started = true
+                return `Started the game!`
+            }
+        }
+        if (["BANS"].includes(commandType)) {
+            return `Current Bans: [${[...BANS.values()].join(", ")}]`
+        }
+        if (["PARDON"].includes(commandType)) {
+            if (args.length != 2) return `Usage: PARDON (ip)`
+            if (BANS.delete(args[1])) {
+                writeFileSync('bans.json', JSON.stringify([...BANS.values()]), 'utf8')
+                return `Ip ${args[1]} has been pardoned!`
+            }
+            return `Ip ${args[1]} was never banned!`
+        }
+        if (["IPBAN"].includes(commandType)) {
+            if (args.length != 2) return `Usage: IPBAN (IP)`
+            BANS.add(args[1])
+            writeFileSync('bans.json', [...BANS.values()], 'utf8')
+            return `Ip ${args[1]} has been banned!`
+        }
+        if (["BAN"].includes(commandType)) {
+            if (args.length != 2) return `Usage: BAN (PlayerId)`
+            if (Object.keys(clientsPos).includes(args[1].toLowerCase())) {
+                BANS.add(clientsPos[args[1]].ip)
+                writeFileSync('bans.json', JSON.stringify([...BANS.values()]), 'utf8')
+                disconnectMap.get(args[1].toLowerCase())()
+                return `Player ${args[1]} has been banned!`
+            } else {
+                return `No such player (${args[1]})!`
+            }   
+        }
+        if (["KICK"].includes(commandType)) {
+            if (args.length != 2) return `Usage: KICK (PlayerId)`
+            if (Object.keys(clientsPos).includes(args[1].toLowerCase())) {
+                disconnectMap.get(args[1].toLowerCase())()
+                return `Player ${args[1]} has been kicked!`
+            } else {
+                return `No such player (${args[1]})!`
+            }   
+        }
+        if (["HELLO"].includes(commandType)) {
+            return `WORLD`
+        }
+        if (["?", "HELP"].includes(commandType)) {
+            return `Available Commands: 
+KILL (PlayerId): Kills a player
+GIVE (TeamId) (GemType) [quantity]: Gives a team gems
+DAMAGE (PlayerId) (Amount): Damages a player
+LIST: Lists all online players
+HIDE (PlayerId): Toggles the visibility of a player
+TELEPORT (PlayerId) (x) (y): Teleports a player
+START: Start the game
+PAUSE: Stop the game
+BAN (PlayerId): Ban a player
+IPBAN (IP): Ban an IP address
+PARDON (IP): Pardon an IP address
+KICK (PlayerId): Kick a player
+EXIT: Stop the server`
+        }
+        return `Unrecognised Command: ${commandType}`
+    }
+    function doTabComplete(command) {
+        let splitted = command.split(" ")
+        switch (splitted[0].toUpperCase()) {
+            case "KILL": 
+            case "KICK":
+            case "BAN":
+            {
+                switch (splitted.length) {
+                    case 1: return command
+                    case 2: return tabComplete(command, "player")
+                    default: return command
+                }
+            }
+            case "GIVE": {
+                switch (splitted.length) {
+                    case 2: return tabComplete(command, "team")
+                    case 3: return tabComplete(command, "gem")
+                    default: return command
+                }
+            }
+            case "DAMAGE": {
+                switch (splitted.length) {
+                    case 1: return command
+                    case 2: return tabComplete(command, "player")
+                    default: return command
+                }
+            }
+            case "HIDE": {
+                switch (splitted.length) {
+                    case 1: return command
+                    case 2: return tabComplete(command, "player")
+                    default: return command
+                }
+            }
+            case "TP": {
+                switch (splitted.length) {
+                    case 2: return tabComplete(command, "player")
+                    default: return command
+                }
+            }
+        }
+        return command
+    }
+    function tabComplete(command = "", tabCompleteType = "player") {
+        let splitted = command.split(" ")
+        let completed = splitted.at(-1).toUpperCase()
+        let results
+        if (tabCompleteType == "player") {
+            results = Object.keys(clientsPos).filter(a => {
+                return a.includes(completed.toLowerCase())
+            })
+        } else if (tabCompleteType == "gem") {
+            results = ["BLUE", "RED", "GREEN", "PURPLE"].filter(a => {
+                return a.includes(completed)
+            })
+        } else if (tabCompleteType == "team") {
+            results = ["A", "B"].filter(a => {
+                return a.includes(completed)
+            })
+        }
+        if (results.length == 1) splitted[splitted.length - 1] = results[0]
+        return splitted.join(" ")
+    }
+    console._log = console.log;
+    let pre = "> "
+    console.log = (message, ...optionalParams) => {
+        process.stdout.clearLine(0)
+        process.stdout.moveCursor(-100, 0)
+        console._log(message, ...optionalParams)
+        process.stdout.write(pre + command)
+    }
+    let command = ""
 
+    let lastCommand = ""
+    process.stdin.on("data", (key) => {
+        if (key === '\u0003') {
+            process.exit();
+        }
+        if (key == '\u0008') {
+            process.stdout.clearLine(0)
+            process.stdout.moveCursor(-100, 0)
+            command = command.slice(0, -1)
+            process.stdout.write(pre + command)
+            return;
+        }
+        if (key == '\u000D') {
+            console._log("\n[COMMAND] " + commandHandler(command.replace(pre, "")))
+            lastCommand = command
+            process.stdout.write(pre)
+            command = ""
+            return;
+        }
+        if (key.charCodeAt(0) == 27) {
+            command = lastCommand
+            process.stdout.clearLine(0)
+            process.stdout.moveCursor(-100, 0)
+            process.stdout.write(pre + command)
+            return
+        }
+        if (key == "\u0009") {
+            command = doTabComplete(command)
+            process.stdout.clearLine(0)
+            process.stdout.moveCursor(-100, 0)
+            process.stdout.write(pre + command)
+            return;
+        }
+        command += key
+        process.stdout.write(key)
+    })
+
+}

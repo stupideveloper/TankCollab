@@ -1,0 +1,1 @@
+// This file needs to be empty to prevent dafault rendering for the notification

@@ -10,5 +10,4 @@ try {
 	bullet_reload = global.upgrade_tiers.bulletReload
 	move_speed = global.upgrade_tiers.moveSpeed
 } catch (e){
-	show_debug_message(e)
 }

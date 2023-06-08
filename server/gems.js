@@ -34,7 +34,11 @@ class GemType {
      */
     static random() {
         return (
-            (Math.random() > 0.5) ? (Math.random() > 0.5) ? this.BLUE : this.GREEN : (Math.random() > 0.5) ? this.PURPLE : this.RED
+            (Math.random() > 0.66) ? 
+                (Math.random() > 0.5) ? this.BLUE : 
+                    this.PURPLE : 
+                (Math.random() > 0.5) ? this.GREEN : 
+                    this.RED
         )
     }
     /**
