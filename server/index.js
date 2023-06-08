@@ -564,7 +564,7 @@ server.on('connection', function (conn) {
     /**
      * Client's IP Address
      */
-    var remoteAddress = conn.remoteAddress;
+    var remoteAddress = conn.remoteAddress.replace("::ffff:","");
     if (BANS.has(remoteAddress)) {
         conn.end()
         console.log(`[WARN]  Player with IP ${remoteAddress} attempted to join, yet they are banned!`)
@@ -1262,6 +1262,12 @@ EXIT: Stop the server`
                     default: return command
                 }
             }
+            case "PARDON": {
+                switch (splitted.length) {
+                    case 2: return tabComplete(command, "bans")
+                    default: return command
+                }
+            }
         }
         return command
     }
@@ -1279,6 +1285,10 @@ EXIT: Stop the server`
             })
         } else if (tabCompleteType == "team") {
             results = ["A", "B"].filter(a => {
+                return a.includes(completed)
+            })
+        } else if (tabCompleteType == "bans") {
+            results = [...BANS.values()].filter(a => {
                 return a.includes(completed)
             })
         }
