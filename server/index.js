@@ -560,7 +560,7 @@ function nameDiscriminator() {
 /**
  * Main connection handler
  */
-server.on('connection', function (conn) {
+function connectionHandler (conn) {
     /**
      * Client's IP Address
      */
@@ -1031,7 +1031,8 @@ server.on('connection', function (conn) {
     }
     function onConnError(err) {
     }
-});
+}
+server.on('connection', connectionHandler);
 
 /**
  * Get the IP address
@@ -1223,7 +1224,7 @@ EXIT: Stop the server`
         }
         return `Unrecognised Command: ${commandType}`
     }
-    function doTabComplete(command) {
+    function doTabComplete(command, choice) {
         let splitted = command.split(" ")
         switch (splitted[0].toUpperCase()) {
             case "KILL": 
@@ -1232,68 +1233,79 @@ EXIT: Stop the server`
             {
                 switch (splitted.length) {
                     case 1: return command
-                    case 2: return tabComplete(command, "player")
+                    case 2: return tabComplete(command, "player", choice)
                     default: return command
                 }
             }
             case "GIVE": {
                 switch (splitted.length) {
-                    case 2: return tabComplete(command, "team")
-                    case 3: return tabComplete(command, "gem")
+                    case 2: return tabComplete(command, "team", choice)
+                    case 3: return tabComplete(command, "gem", choice)
                     default: return command
                 }
             }
             case "DAMAGE": {
                 switch (splitted.length) {
                     case 1: return command
-                    case 2: return tabComplete(command, "player")
+                    case 2: return tabComplete(command, "player", choice)
                     default: return command
                 }
             }
             case "HIDE": {
                 switch (splitted.length) {
                     case 1: return command
-                    case 2: return tabComplete(command, "player")
+                    case 2: return tabComplete(command, "player", choice)
                     default: return command
                 }
             }
             case "TP": {
                 switch (splitted.length) {
-                    case 2: return tabComplete(command, "player")
+                    case 2: return tabComplete(command, "player", choice)
                     default: return command
                 }
             }
             case "PARDON": {
                 switch (splitted.length) {
-                    case 2: return tabComplete(command, "bans")
+                    case 2: return tabComplete(command, "bans", choice)
                     default: return command
                 }
             }
         }
-        return command
+        return tabComplete(command,"commands", choice)
     }
-    function tabComplete(command = "", tabCompleteType = "player") {
+    function tabComplete(command = "", tabCompleteType = "player",choice) {
         let splitted = command.split(" ")
         let completed = splitted.at(-1).toUpperCase()
         let results
         if (tabCompleteType == "player") {
             results = Object.keys(clientsPos).filter(a => {
-                return a.includes(completed.toLowerCase())
-            })
+                return a.startsWith(completed.toLowerCase())
+            }).sort()
         } else if (tabCompleteType == "gem") {
             results = ["BLUE", "RED", "GREEN", "PURPLE"].filter(a => {
-                return a.includes(completed)
-            })
+                return a.startsWith(completed)
+            }).sort()
         } else if (tabCompleteType == "team") {
             results = ["A", "B"].filter(a => {
-                return a.includes(completed)
-            })
+                return a.startsWith(completed)
+            }).sort()
         } else if (tabCompleteType == "bans") {
             results = [...BANS.values()].filter(a => {
-                return a.includes(completed)
-            })
+                return a.startsWith(completed)
+            }).sort()
+        } else if (tabCompleteType == "commands") {
+            results = [
+                "LIST","LS","DAMAGE","DMG",
+                "GIVE","EXIT","KILL","HIDE",
+                "TP","TELEPORT","START","BEGIN",
+                "PAUSE","PAUSE","STOP",
+                "BANS","BAN","PARDON","IPBAN",
+                "KICK","HELP"
+            ].filter(a => {
+                return a.startsWith(completed)
+            }).sort()
         }
-        if (results.length == 1) splitted[splitted.length - 1] = results[0]
+        if (results.length >= 1) splitted[splitted.length - 1] = results[choice % (results.length)]
         return splitted.join(" ")
     }
     console._log = console.log;
@@ -1305,7 +1317,7 @@ EXIT: Stop the server`
         process.stdout.write(pre + command)
     }
     let command = ""
-
+    let lastTabComplete = ["",0,false]
     let lastCommand = ""
     process.stdin.on("data", (key) => {
         if (key === '\u0003') {
@@ -1316,29 +1328,39 @@ EXIT: Stop the server`
             process.stdout.moveCursor(-100, 0)
             command = command.slice(0, -1)
             process.stdout.write(pre + command)
+            lastTabComplete = ["",0,false]
             return;
         }
         if (key == '\u000D') {
             console._log("\n[COMMAND] " + commandHandler(command.replace(pre, "")))
             lastCommand = command
+            lastTabComplete = ["",0,false]
             process.stdout.write(pre)
             command = ""
             return;
         }
         if (key.charCodeAt(0) == 27) {
             command = lastCommand
+            lastTabComplete = ["",0,false]
             process.stdout.clearLine(0)
             process.stdout.moveCursor(-100, 0)
             process.stdout.write(pre + command)
             return
         }
         if (key == "\u0009") {
-            command = doTabComplete(command)
+            if (!lastTabComplete[2]) {
+            lastTabComplete = [command,0,true]
+            command = doTabComplete(command,0)
+            } else {
+                lastTabComplete[1] ++;
+                command = doTabComplete(lastTabComplete[0],lastTabComplete[1])
+            }
             process.stdout.clearLine(0)
             process.stdout.moveCursor(-100, 0)
             process.stdout.write(pre + command)
             return;
         }
+        lastTabComplete = ["",0,false]
         command += key
         process.stdout.write(key)
     })
