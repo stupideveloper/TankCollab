@@ -1,7 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
 
-// show_debug_message(move_speed)
 try {
 	max_health = global.upgrade_tiers.maxHealth
 	health_regen  = global.upgrade_tiers.healthRegen

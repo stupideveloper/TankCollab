@@ -1203,8 +1203,16 @@ if (process.stdin.isTTY) {
                 return `No such player (${args[1]})!`
             }   
         }
-        if (["HELLO"].includes(commandType)) {
-            return `WORLD`
+        if (["GETID"].includes(commandType)) {
+            if (args.length != 2) return `Usage: GETID (PlayerName)`
+            var options = Object.keys(clientsPos).filter(a=>{
+                return clientsPos[a].name.toUpperCase() == args[1].toUpperCase()
+            })
+            if (options.length == 1) {
+                return `Id for Player ${args[1]} is ${options[0]}`
+            } else {
+                return `No Player has Name ${args[1]}`
+            }
         }
         if (["?", "HELP"].includes(commandType)) {
             return `Available Commands: 
@@ -1220,6 +1228,7 @@ BAN (PlayerId): Ban a player
 IPBAN (IP): Ban an IP address
 PARDON (IP): Pardon an IP address
 KICK (PlayerId): Kick a player
+GETID (PlayerName): get the id of a player
 EXIT: Stop the server`
         }
         return `Unrecognised Command: ${commandType}`
@@ -1270,6 +1279,12 @@ EXIT: Stop the server`
                     default: return command
                 }
             }
+            case "GETID": {
+                switch (splitted.length) {
+                    case 2: return tabComplete(command, "playername",choice)
+                    default: return command
+                }
+            }
         }
         return tabComplete(command,"commands", choice)
     }
@@ -1280,6 +1295,10 @@ EXIT: Stop the server`
         if (tabCompleteType == "player") {
             results = Object.keys(clientsPos).filter(a => {
                 return a.startsWith(completed.toLowerCase())
+            }).sort()
+        } else if (tabCompleteType == "playername") {
+            results = Object.values(clientsPos).map(a=>a.name.toUpperCase()).filter(a => {
+                return a.startsWith(completed.toUpperCase())
             }).sort()
         } else if (tabCompleteType == "gem") {
             results = ["BLUE", "RED", "GREEN", "PURPLE"].filter(a => {
@@ -1300,7 +1319,7 @@ EXIT: Stop the server`
                 "TP","TELEPORT","START","BEGIN",
                 "PAUSE","PAUSE","STOP",
                 "BANS","BAN","PARDON","IPBAN",
-                "KICK","HELP"
+                "KICK","HELP","GETID"
             ].filter(a => {
                 return a.startsWith(completed)
             }).sort()
