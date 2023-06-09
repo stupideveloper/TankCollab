@@ -150,6 +150,7 @@ function decompressPacket(packet) {
                 dir: parseInt(pos[3], 36) / 100,
                 name: pos[4],
                 health: parseInt(pos[5], 36) / 100,
+				hidden: false,
                 max_health: parseInt(pos[6], 36) / 100
             }
             array_push(positionDecompressed, poss)
