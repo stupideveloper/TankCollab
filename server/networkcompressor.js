@@ -90,7 +90,7 @@ let fixedLocations = locations.map(v=>{
         (v.y*100).toString(36).split(".")[0].toUpperCase(),
         (v.dir*100).toString(36).split(".")[0].toUpperCase(),
         v.name,
-        (v.health*100),
+        (v.health*100).toString(36).split(".")[0].toUpperCase(),
         (v.max_health*100).toString(36).split(".")[0].toUpperCase()]
 })
 let processed = [

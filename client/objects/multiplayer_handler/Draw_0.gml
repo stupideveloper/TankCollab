@@ -20,7 +20,9 @@ for (var i = 0; i < array_length(global.other_player_xy); i++) {
     try {
         var _x = global.other_player_xy[i].x
         var _y = global.other_player_xy[i].y
-        draw_healthbar(_x - 50, _y - 65, _x + 50, _y - 50, (global.other_player_xy[i].health / global.other_player_xy[i].max_health) * 100, c_black, c_red, c_green, 0, true, true)
+        draw_healthbar(
+		_x - 50, _y - 65, _x + 50, _y - 50, 
+		(global.other_player_xy[i].health / global.other_player_xy[i].max_health) * 100, c_black, c_red, c_green, 0, true, true)
         var oldFont = draw_get_font()
         draw_set_font(nametag_fnt)
         draw_set_colour(c_black)

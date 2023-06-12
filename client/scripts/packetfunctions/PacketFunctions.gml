@@ -30,7 +30,7 @@ function decompressMiscPacket(packet) {
                 }
             }
             case "3": {
-                var state = splitted[1] == "1" ? "win" : "lose"
+                var state = splitted[1] == "1" ? "win" : "loss"
                 return {
                     type: "gamestate",
                     title: state,
@@ -89,7 +89,7 @@ function decompressMiscPacket(packet) {
                 return {
                     type: "gameplay_data_update",
                     shield_generator_max_health: parseInt(splitted[1], 36),
-                    core_max_health: parseInt(splitted[1], 36)
+                    core_max_health: parseInt(splitted[2], 36)
                 }
             }
             case "9": {
